@@ -12,6 +12,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -23,10 +24,10 @@ public class Room extends BaseEntity {
     private String description;
     private LocalDate availableStartDay;
     private LocalDate availableEndDay;
-    private LocalDateTime availableStartTime;
-    private LocalDateTime availableEndTime;
+    private LocalTime availableStartTime;
+    private LocalTime availableEndTime;
     private LocalDateTime deadLine;
-    private LocalDateTime meetingDuration;
+    private LocalTime meetingDuration;
     private String accessCode;
 
     @OneToOne
