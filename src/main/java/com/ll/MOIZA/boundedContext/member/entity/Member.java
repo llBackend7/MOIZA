@@ -2,6 +2,7 @@ package com.ll.MOIZA.boundedContext.member.entity;
 
 import com.ll.MOIZA.base.entity.BaseEntity;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
@@ -10,8 +11,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -20,7 +24,9 @@ import java.util.List;
 @SuperBuilder
 @ToString(callSuper = true)
 public class Member extends BaseEntity {
+    @Column(unique = true)
     private String name;
+    private String password;
     private String email;
     private String profile;
 
@@ -28,4 +34,8 @@ public class Member extends BaseEntity {
     @ToString.Exclude
     @Builder.Default
     private List<EnterRoom> enterRooms = new ArrayList<>();
+
+    public Collection<? extends GrantedAuthority> getGrantedAuthorities() {
+        return List.of(new SimpleGrantedAuthority("USER"));
+    }
 }
