@@ -27,6 +27,7 @@ public class SelectedTimeService {
             EnterRoom enterRoom
     ) {
         validDate(enterRoom.getRoom(), day);
+        validTime(enterRoom.getRoom(), startTime, endTime);
         SelectedTime selectedTime = SelectedTime.builder()
                 .date(day)
                 .startTime(startTime)
@@ -45,6 +46,21 @@ public class SelectedTimeService {
         if (room.getAvailableEndDay().isBefore(day)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "선택할 수 있는 날짜이 아닙니다. 선택한 날짜이 가능한 날짜보다 늦습니다.");
+        }
+    }
+
+    private void validTime(Room room, LocalTime startTime, LocalTime endTime) {
+        if (startTime.isAfter(endTime)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "시작하는 시간은 끝나는 시간보다 빠를 수 없습니다.");
+        }
+        if (room.getAvailableStartTime().isAfter(startTime)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "선택할 수 있는 시간이 아닙니다. 선택한 시간이 가능한 시간보다 이릅니다.");
+        }
+        if (room.getAvailableEndTime().isBefore(endTime)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "선택할 수 있는 시간이 아닙니다. 선택한 시간이 가능한 시간보다 늦습니다.");
         }
     }
 }
