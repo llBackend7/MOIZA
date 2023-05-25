@@ -46,12 +46,12 @@ public class EnterRoomServiceTest {
                 member,
                 "테스트룸",
                 "테스트룸임",
-                LocalDate.now(),
-                LocalDate.now().plusDays(3),
+                LocalDate.now().plusDays(5),
+                LocalDate.now().plusDays(7),
                 LocalTime.of(1, 0),
                 LocalTime.of(5, 0),
                 LocalTime.of(3, 0),
-                LocalDateTime.now().plusDays(4));
+                LocalDateTime.now().plusDays(2));
 
         EnterRoom enterRoom = enterRoomService.createEnterRoom(
                 room,
