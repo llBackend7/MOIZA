@@ -1,8 +1,8 @@
-package com.ll.MOIZA.boundedContext.selectedPlace.repository;
+package com.ll.MOIZA.boundedContext.selectedTime.repository;
 
-import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
+import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface SelectedPlaceRepository extends JpaRepository<SelectedPlace, Long> {
+public interface SelectedTimeRepository extends JpaRepository<SelectedTime, Long> {
 
 }

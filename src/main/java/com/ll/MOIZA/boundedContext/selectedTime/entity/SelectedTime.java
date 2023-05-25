@@ -11,14 +11,15 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
-public class SelectedTimes extends BaseEntity {
-    private LocalDate day;
+public class SelectedTime extends BaseEntity {
+    private LocalDate date;
     private LocalTime startTime;
     private LocalTime endTime;
     @ManyToOne
