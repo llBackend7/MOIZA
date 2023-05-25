@@ -63,4 +63,8 @@ public class RoomService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "마감시간은 가능한 날짜보다 이전이어야 합니다.");
         }
     }
+
+    public void invite(Room room, Member member) {
+
+    }
 }
