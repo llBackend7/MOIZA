@@ -1,12 +1,8 @@
-package com.ll.MOIZA.boundedContext.room.service;
+package com.ll.MOIZA.boundedContext.selectedPlace.service;
 
-import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
-import com.ll.MOIZA.boundedContext.room.entity.Room;
-import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
-import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
-import java.util.List;
+import com.ll.MOIZA.boundedContext.selectedPlace.repository.SelectedPlaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,37 +10,19 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
-public class EnterRoomService {
+public class SelectedPlaceService {
 
-    private final EnterRoomRepository enterRoomRepository;
-
-    @Transactional
-    public EnterRoom enterRoom(Room room,
-            Member member,
-            List<SelectedTime> timeList,
-            List<SelectedPlace> placesList
-    ) {
-        EnterRoom enterRoom = EnterRoom.builder()
-                .room(room)
-                .member(member)
-                .selectedTimes(timeList)
-                .selectedPlaces(placesList)
-                .build();
-
-        return enterRoomRepository.save(enterRoom);
-    }
+    private final SelectedPlaceRepository selectedPlaceRepository;
 
     @Transactional
-    public EnterRoom enterRoom(Room room,
-            Member member,
-            List<SelectedTime> timeList
+    public SelectedPlace CreateSelectedPlace(
+            String name,
+            EnterRoom enterRoom
     ) {
-        EnterRoom enterRoom = EnterRoom.builder()
-                .room(room)
-                .member(member)
-                .selectedTimes(timeList)
+        SelectedPlace selectedPlace = SelectedPlace.builder()
+                .name(name)
+                .enterRoom(enterRoom)
                 .build();
-
-        return enterRoomRepository.save(enterRoom);
+        return selectedPlaceRepository.save(selectedPlace);
     }
 }
