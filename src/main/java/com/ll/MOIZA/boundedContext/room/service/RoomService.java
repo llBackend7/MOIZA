@@ -50,16 +50,16 @@ public class RoomService {
     }
 
     private void validateTimes(LocalDate startDay, LocalDate endDay, LocalTime availableStartTime, LocalTime availableEndTime, LocalDateTime deadLine) {
-        if (!startDay.isBefore(endDay)) {
+        if (endDay.isBefore(startDay)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가능날짜가 잘못되었습니다.");
         }
-        if (!availableStartTime.isBefore(availableEndTime)) {
+        if (availableEndTime.isBefore(availableStartTime)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가능시간이 잘못되었습니다.");
         }
-        if (!deadLine.isAfter(LocalDateTime.now())) {
+        if (LocalDateTime.now().isAfter(deadLine)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "마감시간이 잘못되었습니다.");
         }
-        if (!deadLine.isBefore(startDay.atStartOfDay())) {
+        if (startDay.atStartOfDay().isBefore(deadLine)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "마감시간은 가능한 날짜보다 이전이어야 합니다.");
         }
     }
