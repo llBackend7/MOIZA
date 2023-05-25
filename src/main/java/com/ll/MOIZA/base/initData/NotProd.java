@@ -15,8 +15,8 @@ public class NotProd {
             MemberRepository memberRepository
     ) {
         return args -> {
-            Member member1 = Member.builder().name("user1").email("email").build();
-            Member member2 = Member.builder().name("user2").email("email").build();
+            Member member1 = Member.builder().name("user1").password("1234").email("email").build();
+            Member member2 = Member.builder().name("user2").password("1234").email("email").build();
             memberRepository.save(member1);
             memberRepository.save(member2);
         };

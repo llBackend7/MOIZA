@@ -52,7 +52,7 @@ public class RoomController {
         LocalDateTime deadLine;
     }
 
-//    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
     public String createRoom(RoomForm roomForm) {
         return "room/create";
