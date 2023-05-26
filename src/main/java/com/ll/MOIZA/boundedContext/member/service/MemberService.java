@@ -24,4 +24,16 @@ public class MemberService {
         }
         return optionalMember.get();
     }
+
+    public Member getMember(Long memberId) {
+        return memberRepository
+                .findById(memberId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+    }
+
+    public Member findByName(String name) {
+        return memberRepository
+                .findByName(name)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+    }
 }

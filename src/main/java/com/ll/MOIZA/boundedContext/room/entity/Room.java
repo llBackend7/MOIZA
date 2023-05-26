@@ -2,9 +2,8 @@ package com.ll.MOIZA.boundedContext.room.entity;
 
 import com.ll.MOIZA.base.entity.BaseEntity;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
@@ -13,6 +12,8 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -29,6 +30,11 @@ public class Room extends BaseEntity {
     private LocalDateTime deadLine;
     private LocalTime meetingDuration;
     private String accessCode;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "room", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @Builder.Default
+    private List<EnterRoom> enterRoom = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "leaderId")
