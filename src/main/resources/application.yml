@@ -14,6 +14,8 @@ spring:
     properties:
       hibernate:
         default_batch_fetch_size: 50
+  sendgrid:
+    api-key: ${SENDGRID_MOIZA}
 custom:
   jwt:
     secretKey: thissecretkeyisfordevandtestdontusethissecretkeyinrealproduction
