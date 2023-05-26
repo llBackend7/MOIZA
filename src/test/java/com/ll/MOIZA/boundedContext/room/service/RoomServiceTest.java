@@ -3,6 +3,7 @@ package com.ll.MOIZA.boundedContext.room.service;
 import com.ll.MOIZA.base.jwt.JwtProvider;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
+import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,6 +48,23 @@ class RoomServiceTest {
 
         assertThat(room.getLeader().getId()).isEqualTo(member.getId());
         assertThat(room.getName()).isEqualTo("테스트룸");
+    }
+
+    @Test
+    void 방주인은_방참여자로_존재해야함() {
+        Member member = memberRepository.findByName("user1").get();
+        Room room = roomService.createRoom(
+                member,
+                "테스트룸",
+                "테스트룸임",
+                LocalDate.now().plusDays(5),
+                LocalDate.now().plusDays(7),
+                LocalTime.of(1, 0),
+                LocalTime.of(5, 0),
+                LocalTime.of(3, 0),
+                LocalDateTime.now().plusDays(2));
+
+        assertThat(room.getEnterRoom().stream().map(EnterRoom::getMember)).contains(member);
     }
 
     @Test
@@ -128,7 +146,6 @@ class RoomServiceTest {
     @Test
     void 액세스토큰_발급() {
         Member inviter = memberRepository.findByName("user1").get();
-        Member invitee = memberRepository.findByName("user2").get();
 
         Room room = roomService.createRoom(
                 inviter,
@@ -141,7 +158,7 @@ class RoomServiceTest {
                 LocalTime.of(3, 0),
                 LocalDateTime.now().plusDays(2));
 
-        String accessToken = roomService.invite(room, invitee);
+        String accessToken = roomService.getAccessToken(room);
         assertThat(jwtProvider.getClaims(accessToken).get("accessCode")).isEqualTo(room.getAccessCode());
     }
 }
