@@ -1,18 +1,15 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
-import com.ll.MOIZA.base.mail.MailConfig;
 import com.ll.MOIZA.base.mail.MailService;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
+import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -20,10 +17,8 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@AutoConfigureMockMvc
-@Import({MailService.class, MailConfig.class})
-@Disabled
+@WebMvcTest(controllers = RoomController.class)
+@MockBean(JpaMetamodelMappingContext.class)
 public class MockedRoomControllerTest {
     @Autowired
     MockMvc mockMvc;
@@ -34,7 +29,7 @@ public class MockedRoomControllerTest {
     @MockBean
     RoomService roomService;
 
-    @Autowired
+    @MockBean
     MailService mailService;
 
     /*
@@ -52,7 +47,7 @@ public class MockedRoomControllerTest {
 
         Member friend = Member.builder()
                 .name("friend")
-                .email("mouse6051@gmail.com")
+                .email("freind@test.com")
                 .build();
         when(memberService.getMember(anyLong())).thenReturn(friend);
 
@@ -63,5 +58,7 @@ public class MockedRoomControllerTest {
 
         mockMvc.perform(get("/room/{roomId}/invite", 1L).param("memberId", "1"))
                 .andExpect(status().isOk());
+
+        verify(mailService, times(1)).sendMailTo(any(Member.class), any(String.class));
     }
 }
