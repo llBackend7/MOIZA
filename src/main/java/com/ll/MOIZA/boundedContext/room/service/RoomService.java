@@ -1,5 +1,6 @@
 package com.ll.MOIZA.boundedContext.room.service;
 
+import com.ll.MOIZA.base.jwt.JwtProvider;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
@@ -12,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -19,6 +21,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RoomService {
     private final RoomRepository roomRepository;
+
+    private final JwtProvider jwtProvider;
 
     @Transactional
     public Room createRoom(Member member,
@@ -64,7 +68,9 @@ public class RoomService {
         }
     }
 
-    public void invite(Room room, Member member) {
-
+    public String invite(Room room, Member member) {
+        String accessCode = room.getAccessCode();
+        String token = jwtProvider.genToken(Map.of("accessCode", accessCode), 60 * 60 * 24 * 7);// 토큰 유효기간은 기본 일주일로
+        return token;
     }
 }

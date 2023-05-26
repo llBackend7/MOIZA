@@ -1,5 +1,6 @@
 package com.ll.MOIZA.boundedContext.room.service;
 
+import com.ll.MOIZA.base.jwt.JwtProvider;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
@@ -26,6 +27,9 @@ class RoomServiceTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    JwtProvider jwtProvider;
 
     @Test
     void 방_만들기() {
@@ -119,5 +123,25 @@ class RoomServiceTest {
         })
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("마감시간은 가능한 날짜보다 이전이어야 합니다.");
+    }
+
+    @Test
+    void 액세스토큰_발급() {
+        Member inviter = memberRepository.findByName("user1").get();
+        Member invitee = memberRepository.findByName("user2").get();
+
+        Room room = roomService.createRoom(
+                inviter,
+                "테스트룸",
+                "테스트룸임",
+                LocalDate.now().plusDays(5),
+                LocalDate.now().plusDays(7),
+                LocalTime.of(1, 0),
+                LocalTime.of(5, 0),
+                LocalTime.of(3, 0),
+                LocalDateTime.now().plusDays(2));
+
+        String accessToken = roomService.invite(room, invitee);
+        assertThat(jwtProvider.getClaims(accessToken).get("accessCode")).isEqualTo(room.getAccessCode());
     }
 }
