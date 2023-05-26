@@ -84,4 +84,10 @@ public class RoomService {
         String token = jwtProvider.genToken(Map.of("accessCode", accessCode), 60 * 60 * 24 * 7);// 토큰 유효기간은 기본 일주일로
         return token;
     }
+
+    public Room getRoom(Long roomId) {
+        return roomRepository
+                .findById(roomId)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "모임을 찾을 수 없습니다."));
+    }
 }
