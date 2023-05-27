@@ -1,10 +1,15 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.css">
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.css">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet"
+      integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+<link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap-responsive.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/jquery.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4" crossorigin="anonymous"></script>
-<link href="https://kendo.cdn.telerik.com/themes/6.3.0/default/default-main.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
+        crossorigin="anonymous"></script>
+<link href="https://kendo.cdn.telerik.com/themes/6.3.0/default/default-main.css" rel="stylesheet"/>
 
 <link rel="stylesheet" href="../../static/room/calander.css">
 <script src="../../static/room/calander.js"></script>
@@ -17,8 +22,10 @@
             <div class="flex-row d-flex justify-content-center">
                 <div class="col-lg-6 col-11">
                     <div class="input-group input-daterange">
-                        <input id="startDate" name="startDate" type="text" class="form-control input1" placeholder="Start Date" readonly>
-                        <input id="endDate" name="endDate" type="text" class="form-control input2" placeholder="End Date" readonly>
+                        <input id="startDate" name="startDate" type="text" class="form-control input1"
+                               placeholder="Start Date" readonly>
+                        <input id="endDate" name="endDate" type="text" class="form-control input2"
+                               placeholder="End Date" readonly>
                     </div>
                     <label for="name" class="form-label">모임이름</label>
                     <input type="text" id="name" name="name" class="form-control">
@@ -38,6 +45,7 @@
                     <select class="time-30m-intervals form-select" name="endTime" id="endTime"></select>
                     <label for="deadLine" class="form-label">마감 시간</label>
                     <input type="datetime-local" class="form-control" name="deadLine" id="deadLine">
+                    <button type="submit" class="btn btn-light mt-3 w-100">방 생성하기</button>
                 </div>
             </div>
         </form>
