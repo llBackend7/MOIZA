@@ -54,7 +54,7 @@ public class RoomController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
     public String createRoom(RoomForm roomForm) {
-        return "room/create";
+        return "create-form";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -63,7 +63,7 @@ public class RoomController {
                              @Valid RoomForm roomForm,
                              BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "/room/create";
+            return "create-form";
         }
 
         Member member = memberService.loginMember(user);
