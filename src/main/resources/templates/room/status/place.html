@@ -1,0 +1,76 @@
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<header layout:fragment="header" class="sticky top-0">
+    <div class="navbar max-w-2xl mx-auto bg-base-100">
+        <div class="navbar-start">
+            <button>
+                <i class="fas fa-thin fa-arrow-left fa-2xl ml-1"></i>
+            </button>
+        </div>
+        <div class="navbar-center">
+        <span class="text-2xl">
+          투표 및 현황
+        </span>
+        </div>
+        <div class="navbar-end">
+            <button>마감하기</button>
+        </div>
+    </div>
+</header>
+
+<main layout:fragment="main" class="flex-grow flex items-center justify-center">
+    <div class="max-w-2xl w-full bg-blue-50">
+        <div class="text">
+            <div class="title">모임이름</div>
+            <div class="font-gsans w-56 flex justify-center text-2xl">서울 벙개</div>
+        </div>
+
+        <div class="place-rank">
+            <div class="text-center m-2 text-xl">
+                장소 투표
+            </div>
+
+            <div class="rank-1th">
+                <span class="rank-one text-bold">1위</span>
+                <span class="place ml-7 text-xl">서울역</span>
+                <span class="people-number ml-16"> 3명 / 7명</span>
+                <span>
+            <button class="vote-btn ml-2">투표</button>
+          </span>
+            </div>
+
+            <div class="rank-nth">
+
+                <div class="rank-content-other">
+                    <div class="rank-n text-bold">2위</div>
+                    <div class="date-n text-lg">동서울역</div>
+                    <div class="people-number-n">2명 / 7명</div>
+                    <div>
+                        <button class="vote-btn">투표</button>
+                    </div>
+                </div>
+
+                <div class="rank-content-other">
+                </div>
+
+            </div>
+        </div>
+
+        <div class="place-input">
+            <input type="text" placeholder=" 원하는 장소 입력 후 장소 추가 버튼을 눌러주세요." />
+            <button class="add-place">+ 장소 추가</button>
+        </div>
+    </div>
+</main>
+
+</body>
+
+<footer layout:fragment="footer">
+    <a href="/room/status/date"><i class="far fa-thin fa-clock text-slate-300 hover:text-sky-600"></i></a>
+    <a href=""><i class="far fa-solid fa-location-dot text-sky-600 "></i></a>
+    <a href="/room/status/chat"><i class="far fa-thin fa-comments text-slate-300 hover:text-sky-600"></i></a>
+</footer>
+
+</html>
