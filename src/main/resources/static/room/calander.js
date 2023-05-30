@@ -1,17 +1,36 @@
-$(document).ready(function () {
-    $(".hourSelect, .minuteSelect").change(function () {
-        var hour = $(".hourSelect").val();
-        var minute = $(".minuteSelect").val();
+function setDurationValue() {
+    var hour = $(".hourSelect").val();
+    var minute = $(".minuteSelect").val();
 
-        if (hour && minute) {
-            $("#duration").val(hour + ":" + minute);
-        }
+    if (hour !== "00" && hour !== "01" && hour !== "02" && hour !== "03" && hour !== "04" && hour !== "05" && hour !== "06" && hour !== "07" && hour !== "08" && hour !== "09" && hour !== "10" && hour !== "11" && hour !== "12") {
+        alert("시간을 올바르게 선택해주세요.");
+        return false;
+    }
+
+    if (minute !== "00" && minute !== "30") {
+        alert("분을 올바르게 선택해주세요.");
+        return false;
+    }
+
+    if (hour && minute) {
+        $("#duration").val(hour + ":" + minute);
+    }
+}
+
+$(document).ready(function () {
+    setDurationValue();
+
+    $(".hourSelect, .minuteSelect").change(function () {
+        setDurationValue();
     });
 });
 
 $(document).ready(function () {
     $('form').on('submit', function (e) {
         e.preventDefault(); // 폼 제출의 기본 동작을 방지합니다.
+        if (setDurationValue()) {
+            return false;
+        }
 
         let startDate = $('#startDate').val();
         let endDate = $('#endDate').val();
@@ -28,6 +47,9 @@ $(document).ready(function () {
                 url: $(this).attr('action'),
                 data: $(this).serialize(),
                 success: function (resp) {
+                    $('form input, select, textarea').prop('disabled', true);
+                    $('form button[type="submit"]').prop('disabled', true);
+
                     $('#response').attr('href',resp.link);
                     $('#dialog').dialog();
                 },
@@ -40,6 +62,10 @@ $(document).ready(function () {
 });
 
 function validateTimes(startDate, endDate, name, description, duration, startTime, endTime, deadLine) {
+    if (!validateTime(startTime) || !validateTime(endTime)) {
+        alert("30분단위로 시각을 입력해주세요.");
+        return false;
+    }
     startDate = new Date(startDate);
     endDate = new Date(endDate);
     startTime = new Date(`1970-01-01T${startTime}:00`);
@@ -78,5 +104,19 @@ $(document).ready(function () {
         }
     }
 });
+
+function validateTime(time) {
+    // 시간과 분을 추출
+    var parts = time.split(":");
+    var hour = parseInt(parts[0]);
+    var minute = parseInt(parts[1]);
+
+    // 유효성 검사
+    if (hour < 0 || hour > 23 || minute % 30 !== 0) {
+        return false;
+    }
+
+    return true;
+}
 
 
