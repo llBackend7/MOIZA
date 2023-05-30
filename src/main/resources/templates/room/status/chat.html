@@ -1,0 +1,59 @@
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<header layout:fragment="header" class="sticky top-0">
+    <div class="navbar max-w-2xl mx-auto bg-base-100">
+        <div class="navbar-start">
+            <button>
+                <i class="fas fa-thin fa-arrow-left fa-2xl ml-1"></i>
+            </button>
+        </div>
+        <div class="navbar-center">
+        <span class="text-2xl">
+          투표 및 현황
+        </span>
+        </div>
+        <div class="navbar-end">
+            <button>마감하기</button>
+        </div>
+    </div>
+</header>
+
+<main layout:fragment="main" class="flex-grow flex items-center justify-center">
+    <div class="max-w-2xl w-full bg-blue-50">
+        <div class="text">
+            <div class="title">모임이름</div>
+            <div class="font-gsans w-56 flex justify-center text-2xl">서울 벙개</div>
+        </div>
+
+        <div class="chat-box flex flex-col mx-12 pt-2.5">
+            <div class="text-center m-2 text-xl">
+                채팅창
+            </div>
+
+            <div class="message font-gsans px-2.5 text-sm">
+                <span>User 1:</span>
+                <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
+            </div>
+            <div class="message font-gsans px-2.5 text-sm">
+                <span>User 2:</span>
+                <span>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
+            </div>
+            <div class="flex-grow"></div>
+            <div class="chat-input p-2.5">
+                <input type="text" class="p-1 font-gsans" placeholder=" 내용 입력 후 Enter" />
+            </div>
+        </div>
+    </div>
+</main>
+
+<footer layout:fragment="footer">
+    <a href="/room/status/date"><i class="far fa-thin fa-clock text-slate-300 hover:text-sky-600"></i></a>
+    <a href="/room/status/place"><i class="far fa-solid fa-location-dot text-slate-300 hover:text-sky-600"></i></a>
+    <a href=""><i class="far fa-thin fa-comments text-sky-600"></i></a>
+</footer>
+
+</body>
+
+</html>
