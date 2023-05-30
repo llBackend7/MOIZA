@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
 @Configuration
-@Profile({"test"})
+@Profile({"test", "dev"})
 public class NotProd {
     @Bean
     CommandLineRunner commandLineRunner(
@@ -17,8 +17,13 @@ public class NotProd {
         return args -> {
             Member member1 = Member.builder().name("user1").password("1234").email("email").build();
             Member member2 = Member.builder().name("user2").password("1234").email("email").build();
-            memberRepository.save(member1);
-            memberRepository.save(member2);
+            try {
+                memberRepository.save(member1);
+            } catch (Exception e) {
+            }
+            try {
+                memberRepository.save(member2);
+            } catch (Exception e) {}
         };
     }
 }

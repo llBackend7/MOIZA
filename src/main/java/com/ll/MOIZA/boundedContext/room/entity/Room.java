@@ -36,7 +36,7 @@ public class Room extends BaseEntity {
     @Builder.Default
     private List<EnterRoom> enterRoom = new ArrayList<>();
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "leaderId")
     private Member leader;
 }
