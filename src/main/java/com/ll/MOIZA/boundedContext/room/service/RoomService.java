@@ -2,9 +2,7 @@ package com.ll.MOIZA.boundedContext.room.service;
 
 import com.ll.MOIZA.base.jwt.JwtProvider;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
-import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
-import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
 import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,7 +21,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RoomService {
     private final RoomRepository roomRepository;
-    private final EnterRoomRepository enterRoomRepository;
 
     private final JwtProvider jwtProvider;
 
@@ -37,7 +34,7 @@ public class RoomService {
                            LocalTime availableEndTime,
                            LocalTime duration,
                            LocalDateTime deadLine) {
-        validateTimes(startDay, endDay, availableStartTime, availableEndTime, deadLine);
+        validateTimes(startDay, endDay, availableStartTime, availableEndTime,duration, deadLine);
 
         Room room = Room.builder()
                 .leader(member)
@@ -53,18 +50,14 @@ public class RoomService {
                 .build();
         Room createdRoom = roomRepository.save(room);
 
-        EnterRoom enterRoom = EnterRoom.builder()
-                .member(member)
-                .room(room)
-                .build();
-        enterRoomRepository.save(enterRoom);
-
-        member.participate(enterRoom);
-
         return createdRoom;
     }
 
-    private void validateTimes(LocalDate startDay, LocalDate endDay, LocalTime availableStartTime, LocalTime availableEndTime, LocalDateTime deadLine) {
+    private void validateTimes(LocalDate startDay, LocalDate endDay, LocalTime availableStartTime, LocalTime availableEndTime, LocalTime duration, LocalDateTime deadLine) {
+        if (!(validateTime(availableStartTime) && validateTime(availableEndTime) && validateTime(duration))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "시간은 30분 단위로 입력 가능합니다.");
+        }
+
         if (endDay.isBefore(startDay)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가능날짜가 잘못되었습니다.");
         }
@@ -77,6 +70,10 @@ public class RoomService {
         if (startDay.atStartOfDay().isBefore(deadLine)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "마감시간은 가능한 날짜보다 이전이어야 합니다.");
         }
+    }
+
+    private boolean validateTime(LocalTime time) {
+        return time.getMinute() % 30 == 0;
     }
 
     public String getAccessToken(Room room) {

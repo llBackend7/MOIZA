@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Map;
 
 @Controller
 @RequiredArgsConstructor
@@ -51,22 +52,27 @@ public class RoomController {
         LocalDateTime deadLine;
     }
 
-    @PreAuthorize("isAuthenticated()")
+    //TODO 로그인 기능 완성되면 주석해제
+//    @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
     public String createRoom(RoomForm roomForm) {
-        return "room/create";
+        return "/room/room/create";
     }
 
-    @PreAuthorize("isAuthenticated()")
+    //TODO 로그인 기능 완성되면 주석해제
+//    @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
-    public String createRoom(@AuthenticationPrincipal User user,
-                             @Valid RoomForm roomForm,
-                             BindingResult bindingResult) {
+    @ResponseBody
+    public Map<String, Object> createRoom(@AuthenticationPrincipal User user,
+                          @Valid RoomForm roomForm,
+                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "/room/create";
+            return Map.of("error", bindingResult.getAllErrors());
         }
 
-        Member member = memberService.loginMember(user);
+        //TODO 로그인 기능 완성되면 원래대로
+        Member member = memberService.findByName("user1");
+//        Member member = memberService.loginMember(user);
         Room room = roomService.createRoom(member,
                 roomForm.name,
                 roomForm.description,
@@ -76,7 +82,9 @@ public class RoomController {
                 roomForm.availableEndTime,
                 roomForm.duration,
                 roomForm.deadLine);
-        return "redirect:/room/enter/" + room.getId();
+        String accessToken = roomService.getAccessToken(room);
+        Long roomId = room.getId();
+        return Map.of("link", "http://localhost:8080/room/enter?roomId=%d&accessToken=%s".formatted(roomId,accessToken));
     }
 
     @PreAuthorize("isAuthenticated()")

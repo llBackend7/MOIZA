@@ -2,6 +2,7 @@ package com.ll.MOIZA.boundedContext.member.entity;
 
 import com.ll.MOIZA.base.entity.BaseEntity;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
+import com.ll.MOIZA.boundedContext.room.entity.Room;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -35,12 +36,12 @@ public class Member extends BaseEntity {
     @Builder.Default
     private List<EnterRoom> enterRooms = new ArrayList<>();
 
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "leader")
+    @ToString.Exclude
+    @Builder.Default
+    private List<Room> rooms = new ArrayList<>();
+
     public Collection<? extends GrantedAuthority> getGrantedAuthorities() {
         return List.of(new SimpleGrantedAuthority("USER"));
-    }
-
-    public void participate(EnterRoom enterRoom) {
-        enterRooms.add(enterRoom);
-        enterRoom.getRoom().getEnterRoom().add(enterRoom);
     }
 }

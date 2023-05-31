@@ -51,23 +51,6 @@ class RoomServiceTest {
     }
 
     @Test
-    void 방주인은_방참여자로_존재해야함() {
-        Member member = memberRepository.findByName("user1").get();
-        Room room = roomService.createRoom(
-                member,
-                "테스트룸",
-                "테스트룸임",
-                LocalDate.now().plusDays(5),
-                LocalDate.now().plusDays(7),
-                LocalTime.of(1, 0),
-                LocalTime.of(5, 0),
-                LocalTime.of(3, 0),
-                LocalDateTime.now().plusDays(2));
-
-        assertThat(room.getEnterRoom().stream().map(EnterRoom::getMember)).contains(member);
-    }
-
-    @Test
     void 끝날짜_시작날짜보다_앞설경우_BAD_REQUEST() {
         assertThatThrownBy(() -> {
             Member member = memberRepository.findByName("user1").get();
@@ -141,6 +124,63 @@ class RoomServiceTest {
         })
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("마감시간은 가능한 날짜보다 이전이어야 합니다.");
+    }
+
+    @Test
+    void 가능시작시간이_30분단위가_아니면_BAD_REQUEST() {
+        assertThatThrownBy(() -> {
+            Member member = memberRepository.findByName("user1").get();
+            Room room = roomService.createRoom(
+                    member,
+                    "테스트룸",
+                    "테스트룸임",
+                    LocalDate.now().plusDays(5),
+                    LocalDate.now().plusDays(8),
+                    LocalTime.of(10, 12),
+                    LocalTime.of(14, 0),
+                    LocalTime.of(3, 0),
+                    LocalDateTime.now().plusDays(4));
+        })
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("시간은 30분 단위로 입력 가능합니다.");
+    }
+
+    @Test
+    void 가능끝시간이_30분단위가_아니면_BAD_REQUEST() {
+        assertThatThrownBy(() -> {
+            Member member = memberRepository.findByName("user1").get();
+            Room room = roomService.createRoom(
+                    member,
+                    "테스트룸",
+                    "테스트룸임",
+                    LocalDate.now().plusDays(5),
+                    LocalDate.now().plusDays(8),
+                    LocalTime.of(10, 30),
+                    LocalTime.of(14, 24),
+                    LocalTime.of(3, 0),
+                    LocalDateTime.now().plusDays(4));
+        })
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("시간은 30분 단위로 입력 가능합니다.");
+    }
+
+    @Test
+    void 기간이_30분단위가_아니면_BAD_REQUEST() {
+        assertThatThrownBy(() -> {
+            Member member = memberRepository.findByName("user1").get();
+            Room room = roomService.createRoom(
+                    member,
+                    "테스트룸",
+                    "테스트룸임",
+                    LocalDate.now().plusDays(5),
+                    LocalDate.now().plusDays(8),
+                    LocalTime.of(10, 30),
+                    LocalTime.of(14, 0),
+                    LocalTime.of(3, 23),
+                    LocalDateTime.now().plusDays(4));
+        })
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("시간은 30분 단위로 입력 가능합니다.");
     }
 
     @Test

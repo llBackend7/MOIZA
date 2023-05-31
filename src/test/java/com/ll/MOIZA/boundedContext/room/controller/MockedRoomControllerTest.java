@@ -1,5 +1,6 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
+import com.ll.MOIZA.base.exception.GlobalExceptionHandler;
 import com.ll.MOIZA.base.mail.MailService;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
@@ -12,12 +13,21 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
+import java.time.DateTimeException;
+import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = RoomController.class)
+@WebMvcTest(controllers = {RoomController.class, GlobalExceptionHandler.class})
 @MockBean(JpaMetamodelMappingContext.class)
 public class MockedRoomControllerTest {
     @Autowired
@@ -60,5 +70,28 @@ public class MockedRoomControllerTest {
                 .andExpect(status().isOk());
 
         verify(mailService, times(1)).sendMailTo(any(Member.class), any(String.class));
+    }
+
+    @Test
+    @WithMockUser
+    public void testDateTimeExceptionHandler() throws Exception {
+        when(roomService.createRoom(any(), any(), any(), any(), any(), any(), any(), any(), any())).thenThrow(new DateTimeException("Test Exception"));
+
+        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
+
+        form.put("name", List.of("테스트룸"));
+        form.put("description", List.of("설명"));
+        form.put("startDate", List.of("2023-07-10"));
+        form.put("endDate", List.of("2023-07-19"));
+        form.put("availableStartTime", List.of("13:30"));
+        form.put("availableEndTime", List.of("15:30"));
+        form.put("duration", List.of("03:30"));
+        form.put("deadLine", List.of(LocalDateTime.now().toString()));
+
+        mockMvc
+                .perform(post("/room/create")
+                        .params(form)
+                        .with(csrf()))
+                .andExpect(status().isBadRequest());
     }
 }
