@@ -1,11 +1,17 @@
 package com.ll.MOIZA.boundedContext.selectedTime.service;
 
+import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -62,5 +68,11 @@ public class SelectedTimeService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "선택할 수 있는 시간이 아닙니다. 선택한 시간이 가능한 시간보다 늦습니다.");
         }
+    }
+
+    public List<SelectedTime> findSelectedTimeByEnterRoomAndDate(Room room, LocalDate date) {
+        List<SelectedTime> selectedTimes = selectedTimeRepository.searchSelectedTimeByRoom(
+                room, date);
+        return selectedTimes;
     }
 }
