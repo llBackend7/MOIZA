@@ -1,3 +1,18 @@
+$(function() {
+    $('#dialog').dialog({
+        autoOpen: false, // 초기에 자동으로 열리지 않도록 설정
+        modal: true, // 모달 다이얼로그로 설정
+        resizable: true, // 크기 조정 허용
+        open: function(event, ui) {
+            // 다이얼로그 열릴 때 중앙 정렬
+            $(this).dialog('widget').position({
+                my: 'center',
+                at: 'center',
+                of: window
+            });
+        }
+    });
+});
 function setDurationValue() {
     var hour = $(".hourSelect").val();
     var minute = $(".minuteSelect").val();
@@ -51,7 +66,7 @@ $(document).ready(function () {
                     $('form button[type="submit"]').prop('disabled', true);
 
                     $('#response').attr('href',resp.link);
-                    $('#dialog').dialog();
+                    $('#dialog').dialog('open');
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.error(textStatus, errorThrown);
@@ -80,7 +95,7 @@ function validateTimes(startDate, endDate, name, description, duration, startTim
         alert("시작날짜는 끝날짜보다 앞서야합니다.");
         return false;
     }
-    if (endTime < startTime) {
+    if (endTime <= startTime) {
         alert("시작시간은 끝시간보다 앞서야 합니다.");
         return false;
     }

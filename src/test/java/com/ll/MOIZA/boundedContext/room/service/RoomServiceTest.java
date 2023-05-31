@@ -89,6 +89,25 @@ class RoomServiceTest {
     }
 
     @Test
+    void 끝시간이_시작시간과_같아도_BAD_REQUEST() {
+        assertThatThrownBy(() -> {
+            Member member = memberRepository.findByName("user1").get();
+            Room room = roomService.createRoom(
+                    member,
+                    "테스트룸",
+                    "테스트룸임",
+                    LocalDate.now().plusDays(5),
+                    LocalDate.now().plusDays(8),
+                    LocalTime.of(10, 0),
+                    LocalTime.of(10, 0),
+                    LocalTime.of(3, 0),
+                    LocalDateTime.now().plusDays(4));
+        })
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("가능시간이 잘못되었습니다.");
+    }
+
+    @Test
     void 마감시간이_지금보다_앞설경우_BAD_REQUEST() {
         assertThatThrownBy(() -> {
             Member member = memberRepository.findByName("user1").get();

@@ -3,31 +3,31 @@
     <form th:action="@{/room/create}" method="post" th:object="${roomForm}">
         <div class="p-2 gap-2 flex flex-col m-0">
             <div class="shrink-0 flex gap-10">
-                <span class="label">모임이름</span>
+                <span class="label self-center">모임이름</span>
                 <input th:field="*{name}" required type="text" placeholder="모임이름을 정해주세요."
-                       class="border-b-2 font-gsans focus:outline-none text-center text-l w-full">
+                       class="border-b-2 bg-transparent font-gsans focus:outline-none text-center text-l w-full">
             </div>
 
             <div  class="shrink-0">
                 <span class="label">모임설명</span>
                 <textarea th:field="*{description}" required placeholder="모임의 내용을 적어주세요."
-                          class="font-gsans text-l w-full  h-[5rem]"></textarea>
+                          class="input input-bordered font-gsans text-l w-full  h-[5rem]"></textarea>
             </div>
 
             <div class="shrink-0">
                 <span class="label">선택 가능 모임 날짜</span>
                 <div class="text-center flex flex-nowrap justify-between gap-2">
-                    <input required th:field="*{startDate}" type="date" class="font-gsans w-[150px]" value="2023/05/29">
-                    <span>부터</span>
-                    <input required th:field="*{endDate}" type="date" class="font-gsans w-[150px]">
-                    <span>까지</span>
+                    <input required th:field="*{startDate}" type="date" class="flex-grow input input-bordered font-gsans w-[150px]" value="2023/05/29">
+                    <span class="self-center" style="font-family: GmarketSansMedium !important;">부터</span>
+                    <input required th:field="*{endDate}" type="date" class="flex-grow input input-bordered font-gsans w-[150px]">
+                    <span class="self-center" style="font-family: GmarketSansMedium !important;">까지</span>
                 </div>
             </div>
 
             <div class="shrink-0">
                 <span class="label">모임 진행 시간</span>
                 <div class="text-center flex flex-nowrap justify-center gap-2">
-                    <select class="w-auto text-end hourSelect" value="00">
+                    <select class="select select-bordered select-sm w-auto text-end hourSelect" value="00">
                         <option selected>00</option>
                         <option>01</option>
                         <option>02</option>
@@ -42,34 +42,52 @@
                         <option>11</option>
                         <option>12</option>
                     </select>
-                    <span>시간</span>
-                    <select class="w-auto text-end minuteSelect" value="00">
+                    <span class="self-center" style="font-family: GmarketSansMedium !important;">시간</span>
+                    <select class="select select-bordered select-sm w-auto text-end minuteSelect" value="00">
                         <option selected>00</option>
                         <option>30</option>
                     </select>
-                    <span>분 동안 진행</span>
+                    <span class="self-center" style="font-family: GmarketSansMedium !important;">분 동안 진행</span>
                 </div>
                 <input type="hidden" th:field="*{duration}">
             </div>
 
             <div class="shrink-0">
                 <span class="label">선택 가능 시간 제한</span>
-                <div class="text-center flex flex-nowrap justify-between gap-2">
-                    <span>시작 시간</span>
-                    <select required class="time-30m-intervals" th:field="*{availableStartTime}"></select>
-                    <span>끝나는 시간</span>
-                    <select required class="time-30m-intervals" th:field="*{availableEndTime}"></select>
+                <div class="text-center flex flex-col flex-nowrap justify-between gap-2">
+                    <div class="flex justify-center">
+                        <span class="w-1/5 text-left self-center" style="font-family: GmarketSansMedium !important;">시작 시간</span>
+                        <select required class="select select-bordered select-sm time-30m-intervals w-3/5  text-center" th:field="*{availableStartTime}"></select>
+                    </div>
+                    <div class="flex justify-center">
+                        <span class="w-1/5 text-left self-center" style="font-family: GmarketSansMedium !important;">끝나는 시간</span>
+                        <select required class="select select-bordered select-sm time-30m-intervals w-3/5 text-center" th:field="*{availableEndTime}"></select>
+                    </div>
                 </div>
             </div>
 
-            <div class="shrink-0">
+            <div class="shrink-0 flex flex-col">
                 <span class="label">마감 기한</span>
-                <input required th:field="*{deadLine}" type="datetime-local" placeholder="yy:MM:dd hh:mm까지" class="font-gsans">
+                <input required th:field="*{deadLine}" type="datetime-local" class="mx-auto bg-transparent border-b-2 w-4/5 text-center font-gsans">
             </div>
 
             <div class="text-center mt-2 shrink-0">
-                <button class="btn btn-accent" type="submit">생성하기</button>
+                <button class="custom-button" type="submit">생성하기</button>
             </div>
+            <style>
+                .custom-button {
+                    font-family: GmarketSansMedium;
+                    background-color: #3b82f6;
+                    color: #ffffff;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    transition: background-color 0.3s;
+                }
+
+                .custom-button:hover {
+                    background-color: #2563eb;
+                }
+            </style>
         </div>
     </form>
 </div>
