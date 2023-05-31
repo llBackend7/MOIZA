@@ -2,7 +2,7 @@
 
 <body>
 <header layout:fragment="header" class="sticky top-0">
-  <div class="navbar max-w-2xl mx-auto bg-base-100">
+  <div class="navbar max-w-2xl mx-auto bg-base-100 shrink-0">
     <div class="navbar-start">
       <button>
         <i class="fas fa-thin fa-arrow-left fa-2xl ml-1"></i>
@@ -24,8 +24,14 @@
 </header>
 
 <main layout:fragment="main" class="flex-grow flex items-center justify-center">
-  <div class="max-w-2xl mx-auto flex-grow p-10 bg-[#F7FAFE]" th:insert="~{create-form :: create-form}"></div>
+  <div class="w-full max-w-2xl mx-auto flex-grow p-4 bg-[#F7FAFE]" th:insert="~{create-form :: create-form}"></div>
 </main>
-
+<style>
+  @media (max-width: 640px) {
+    .w-screen {
+      width: 100vw;
+    }
+  }
+</style>
 </body>
 </html>
