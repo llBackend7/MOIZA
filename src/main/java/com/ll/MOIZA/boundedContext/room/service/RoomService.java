@@ -53,14 +53,6 @@ public class RoomService {
                 .build();
         Room createdRoom = roomRepository.save(room);
 
-        EnterRoom enterRoom = EnterRoom.builder()
-                .member(member)
-                .room(room)
-                .build();
-        enterRoomRepository.save(enterRoom);
-
-        member.participate(enterRoom);
-
         return createdRoom;
     }
 

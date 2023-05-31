@@ -51,23 +51,6 @@ class RoomServiceTest {
     }
 
     @Test
-    void 방주인은_방참여자로_존재해야함() {
-        Member member = memberRepository.findByName("user1").get();
-        Room room = roomService.createRoom(
-                member,
-                "테스트룸",
-                "테스트룸임",
-                LocalDate.now().plusDays(5),
-                LocalDate.now().plusDays(7),
-                LocalTime.of(1, 0),
-                LocalTime.of(5, 0),
-                LocalTime.of(3, 0),
-                LocalDateTime.now().plusDays(2));
-
-        assertThat(room.getEnterRoom().stream().map(EnterRoom::getMember)).contains(member);
-    }
-
-    @Test
     void 끝날짜_시작날짜보다_앞설경우_BAD_REQUEST() {
         assertThatThrownBy(() -> {
             Member member = memberRepository.findByName("user1").get();

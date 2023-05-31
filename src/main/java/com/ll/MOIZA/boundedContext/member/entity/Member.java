@@ -44,9 +44,4 @@ public class Member extends BaseEntity {
     public Collection<? extends GrantedAuthority> getGrantedAuthorities() {
         return List.of(new SimpleGrantedAuthority("USER"));
     }
-
-    public void participate(EnterRoom enterRoom) {
-        enterRooms.add(enterRoom);
-        enterRoom.getRoom().getEnterRoom().add(enterRoom);
-    }
 }
