@@ -1,8 +1,8 @@
-<div th:fragment="create-form" class="max-w-2xl bg-slate-200 h-screen">
-    <div th:insert="~{room/link-popup :: popup}"></div>
+<div th:fragment="create-form" class="h-screen">
+    <div th:insert="~{link-popup :: popup}"></div>
     <form th:action="@{/room/create}" method="post" th:object="${roomForm}">
         <div class="p-2 gap-2 flex flex-col m-0">
-            <div class="shrink-0">
+            <div class="shrink-0 flex gap-10">
                 <span class="label">모임이름</span>
                 <input th:field="*{name}" required type="text" placeholder="모임이름을 정해주세요."
                        class="border-b-2 font-gsans focus:outline-none text-center text-l w-full">
@@ -26,7 +26,7 @@
 
             <div class="shrink-0">
                 <span class="label">모임 진행 시간</span>
-                <div class="text-center flex flex-nowrap gap-2">
+                <div class="text-center flex flex-nowrap justify-center gap-2">
                     <select class="w-auto text-end hourSelect" value="00">
                         <option selected>00</option>
                         <option>01</option>

@@ -1,4 +1,4 @@
-<html layout:decorate="~{room/layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
 
 <body>
 <header layout:fragment="header" class="sticky top-0">
@@ -24,7 +24,7 @@
 </header>
 
 <main layout:fragment="main" class="flex-grow flex items-center justify-center">
-  <div th:insert="~{room/create-form :: create-form}"></div>
+  <div class="max-w-2xl mx-auto flex-grow p-10 bg-[#F7FAFE]" th:insert="~{create-form :: create-form}"></div>
 </main>
 
 </body>
