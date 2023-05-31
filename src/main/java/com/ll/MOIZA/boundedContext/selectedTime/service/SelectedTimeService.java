@@ -8,6 +8,7 @@ import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepositor
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -74,5 +75,83 @@ public class SelectedTimeService {
         List<SelectedTime> selectedTimes = selectedTimeRepository.searchSelectedTimeByRoom(
                 room, date);
         return selectedTimes;
+    }
+
+    public List<TimeRangeWithMember> findOverlappingTimeRanges(List<SelectedTime> selectedTimeList, LocalTime meetingDuration) {
+
+        if (selectedTimeList.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "선택된 시간이 없습니다. 선택한 시간을 확인해 주세요.");
+        }
+
+        selectedTimeList.sort(Comparator.comparing(SelectedTime::getStartTime));
+
+        LocalDate currentDate = selectedTimeList.get(0).getDate();
+        LocalTime currentStart = selectedTimeList.get(0).getStartTime();
+        LocalTime currentEnd = selectedTimeList.get(0).getEndTime();
+        Member currentMember = selectedTimeList.get(0).getEnterRoom().getMember();
+
+        List<TimeRangeWithMember> overlappingRanges = new ArrayList<>();
+
+        List<Member> members = new ArrayList<>();
+        members.add(currentMember);
+
+        for (int i = 1; i < selectedTimeList.size(); i++) {
+            TimeRangeWithMember currentRange = new TimeRangeWithMember(selectedTimeList.get(i).getDate(),
+                    selectedTimeList.get(i).getStartTime(), selectedTimeList.get(i).getEndTime(),
+                    members);
+
+            Member hereMember = selectedTimeList.get(i).getEnterRoom().getMember();
+
+            if (currentMember.equals(hereMember)) {
+                continue;
+            }
+            if (!currentRange.start.plusHours(meetingDuration.getHour()).isAfter(currentEnd)) {
+                if (currentRange.start.isAfter(currentStart)) {
+                    currentStart = currentRange.start;
+                }
+                if (currentRange.end.isBefore(currentEnd)) {
+                    currentEnd = currentRange.end;
+                }
+                currentRange.members.add(hereMember);
+                currentRange.members.sort(Comparator.comparing(Member::getName));
+            } else {
+                //겹치지 않는 경우
+                overlappingRanges.add(
+                        new TimeRangeWithMember(currentDate, currentStart, currentEnd,
+                                members));
+                currentStart = currentRange.start;
+                currentEnd = currentRange.end;
+                currentMember = hereMember;
+                // 기존 맴버 리스트 초기화 및 새로운 탐색 시작
+                members = new ArrayList<>();
+                members.add(currentMember);
+            }
+        }
+        overlappingRanges.add(
+                new TimeRangeWithMember(currentDate, currentStart, currentEnd,
+                        members));
+
+        Collections.sort(overlappingRanges);
+
+        return overlappingRanges;
+    }
+}
+
+@Getter
+@AllArgsConstructor
+class TimeRangeWithMember implements Comparable<TimeRangeWithMember>{
+
+    LocalDate date;
+    LocalTime start;
+    LocalTime end;
+    List<Member> members;
+
+    @Override
+    public int compareTo(TimeRangeWithMember o1) {
+        if (o1.members.size() == members.size()) {
+            return start.compareTo(o1.start);
+        }
+        return o1.members.size() - members.size();
     }
 }
