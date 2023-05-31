@@ -201,3 +201,21 @@ html > body {
     border-radius: 10px;
     font-family: "GmarketSansMedium";
 }
+
+.main-img {
+    background-image: url("img/main.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.mainsub-img {
+    background-image: url("img/main_sub.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+.text-shadow {
+    text-shadow: 1px 2px 1px black;
+}
