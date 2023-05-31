@@ -50,6 +50,7 @@ class RoomControllerTest {
                 .andExpect(status().is2xxSuccessful());
     }
 
+    //TODO 로그인 기능 구현되면 Disable 해제
     @Test
     @Disabled
     void 인증되지_않은_사용자_방_못만듦() throws Exception {
