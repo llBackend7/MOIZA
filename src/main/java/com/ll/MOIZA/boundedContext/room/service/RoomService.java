@@ -1,5 +1,6 @@
 package com.ll.MOIZA.boundedContext.room.service;
 
+import com.ll.MOIZA.base.jwt.JwtProvider;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
@@ -12,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -19,6 +21,8 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class RoomService {
     private final RoomRepository roomRepository;
+
+    private final JwtProvider jwtProvider;
 
     @Transactional
     public Room createRoom(Member member,
@@ -30,7 +34,7 @@ public class RoomService {
                            LocalTime availableEndTime,
                            LocalTime duration,
                            LocalDateTime deadLine) {
-        validateTimes(startDay, endDay, availableStartTime, availableEndTime, deadLine);
+        validateTimes(startDay, endDay, availableStartTime, availableEndTime,duration, deadLine);
 
         Room room = Room.builder()
                 .leader(member)
@@ -49,18 +53,38 @@ public class RoomService {
         return createdRoom;
     }
 
-    private void validateTimes(LocalDate startDay, LocalDate endDay, LocalTime availableStartTime, LocalTime availableEndTime, LocalDateTime deadLine) {
-        if (!startDay.isBefore(endDay)) {
+    private void validateTimes(LocalDate startDay, LocalDate endDay, LocalTime availableStartTime, LocalTime availableEndTime, LocalTime duration, LocalDateTime deadLine) {
+        if (!(validateTime(availableStartTime) && validateTime(availableEndTime) && validateTime(duration))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "시간은 30분 단위로 입력 가능합니다.");
+        }
+
+        if (endDay.isBefore(startDay)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가능날짜가 잘못되었습니다.");
         }
-        if (!availableStartTime.isBefore(availableEndTime)) {
+        if (availableEndTime.isBefore(availableStartTime)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가능시간이 잘못되었습니다.");
         }
-        if (!deadLine.isAfter(LocalDateTime.now())) {
+        if (LocalDateTime.now().isAfter(deadLine)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "마감시간이 잘못되었습니다.");
         }
-        if (!deadLine.isBefore(startDay.atStartOfDay())) {
+        if (startDay.atStartOfDay().isBefore(deadLine)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "마감시간은 가능한 날짜보다 이전이어야 합니다.");
         }
+    }
+
+    private boolean validateTime(LocalTime time) {
+        return time.getMinute() % 30 == 0;
+    }
+
+    public String getAccessToken(Room room) {
+        String accessCode = room.getAccessCode();
+        String token = jwtProvider.genToken(Map.of("accessCode", accessCode), 60 * 60 * 24 * 7);// 토큰 유효기간은 기본 일주일로
+        return token;
+    }
+
+    public Room getRoom(Long roomId) {
+        return roomRepository
+                .findById(roomId)
+                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "모임을 찾을 수 없습니다."));
     }
 }

@@ -1,10 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>방 생성</title>
-</head>
+<html layout:decorate="~{room/layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
 <body>
-    ㅎㅇ
+<header layout:fragment="header" class="sticky top-0">
+  <div class="navbar max-w-2xl mx-auto bg-base-100">
+    <div class="navbar-start">
+      <button>
+        <i class="fas fa-thin fa-arrow-left fa-2xl ml-1"></i>
+      </button>
+    </div>
+    <div class="navbar-center">
+      <i class="fa-solid fa-location-dot fa-2xl" style="color: #1960ef;"></i>
+      <span class="ml-2 text-xl">
+          모임 생성
+        </span>
+    </div>
+    <div class="navbar-end">
+    </div>
+  </div>
+  <link rel="stylesheet" th:href="@{/room/calander.css}">
+  <script th:src="@{/room/calander.js}"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+  <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+</header>
+
+<main layout:fragment="main" class="flex-grow flex items-center justify-center">
+  <div th:insert="~{room/create-form :: create-form}"></div>
+</main>
+
 </body>
 </html>

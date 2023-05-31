@@ -1,7 +1,9 @@
 package com.ll.MOIZA.boundedContext.room.service;
 
+import com.ll.MOIZA.base.jwt.JwtProvider;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
+import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +28,9 @@ class RoomServiceTest {
 
     @Autowired
     MemberRepository memberRepository;
+
+    @Autowired
+    JwtProvider jwtProvider;
 
     @Test
     void 방_만들기() {
@@ -119,5 +124,81 @@ class RoomServiceTest {
         })
                 .isInstanceOf(ResponseStatusException.class)
                 .hasMessageContaining("마감시간은 가능한 날짜보다 이전이어야 합니다.");
+    }
+
+    @Test
+    void 가능시작시간이_30분단위가_아니면_BAD_REQUEST() {
+        assertThatThrownBy(() -> {
+            Member member = memberRepository.findByName("user1").get();
+            Room room = roomService.createRoom(
+                    member,
+                    "테스트룸",
+                    "테스트룸임",
+                    LocalDate.now().plusDays(5),
+                    LocalDate.now().plusDays(8),
+                    LocalTime.of(10, 12),
+                    LocalTime.of(14, 0),
+                    LocalTime.of(3, 0),
+                    LocalDateTime.now().plusDays(4));
+        })
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("시간은 30분 단위로 입력 가능합니다.");
+    }
+
+    @Test
+    void 가능끝시간이_30분단위가_아니면_BAD_REQUEST() {
+        assertThatThrownBy(() -> {
+            Member member = memberRepository.findByName("user1").get();
+            Room room = roomService.createRoom(
+                    member,
+                    "테스트룸",
+                    "테스트룸임",
+                    LocalDate.now().plusDays(5),
+                    LocalDate.now().plusDays(8),
+                    LocalTime.of(10, 30),
+                    LocalTime.of(14, 24),
+                    LocalTime.of(3, 0),
+                    LocalDateTime.now().plusDays(4));
+        })
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("시간은 30분 단위로 입력 가능합니다.");
+    }
+
+    @Test
+    void 기간이_30분단위가_아니면_BAD_REQUEST() {
+        assertThatThrownBy(() -> {
+            Member member = memberRepository.findByName("user1").get();
+            Room room = roomService.createRoom(
+                    member,
+                    "테스트룸",
+                    "테스트룸임",
+                    LocalDate.now().plusDays(5),
+                    LocalDate.now().plusDays(8),
+                    LocalTime.of(10, 30),
+                    LocalTime.of(14, 0),
+                    LocalTime.of(3, 23),
+                    LocalDateTime.now().plusDays(4));
+        })
+                .isInstanceOf(ResponseStatusException.class)
+                .hasMessageContaining("시간은 30분 단위로 입력 가능합니다.");
+    }
+
+    @Test
+    void 액세스토큰_발급() {
+        Member inviter = memberRepository.findByName("user1").get();
+
+        Room room = roomService.createRoom(
+                inviter,
+                "테스트룸",
+                "테스트룸임",
+                LocalDate.now().plusDays(5),
+                LocalDate.now().plusDays(7),
+                LocalTime.of(1, 0),
+                LocalTime.of(5, 0),
+                LocalTime.of(3, 0),
+                LocalDateTime.now().plusDays(2));
+
+        String accessToken = roomService.getAccessToken(room);
+        assertThat(jwtProvider.getClaims(accessToken).get("accessCode")).isEqualTo(room.getAccessCode());
     }
 }
