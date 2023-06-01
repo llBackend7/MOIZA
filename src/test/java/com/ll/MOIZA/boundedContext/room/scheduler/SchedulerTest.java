@@ -5,6 +5,7 @@ import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -12,6 +13,8 @@ import org.mockito.Mockito;
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static org.assertj.core.api.Assertions.*;
 
 class SchedulerTest {
     List<Room> roomToMailSend;
@@ -85,5 +88,7 @@ class SchedulerTest {
 
         // 마감된 방 수만큼 repository가 save호출
         Mockito.verify(roomRepository, Mockito.times(roomToMailSend.size())).save(Mockito.any(Room.class));
+
+        assertThat(roomToMailSend.stream().map(Room::isMailSent)).allMatch(mailSent -> mailSent);
     }
 }
