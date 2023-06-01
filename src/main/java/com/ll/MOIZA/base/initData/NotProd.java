@@ -57,13 +57,13 @@ public class NotProd {
             selectedTimeService.CreateSelectedTime(
                     LocalDate.now().plusDays(6),
                     LocalTime.of(7, 0),
-                    LocalTime.of(11, 0),
+                    LocalTime.of(13, 0),
                     enterRoom
             );
 
             selectedTimeService.CreateSelectedTime(
                     LocalDate.now().plusDays(6),
-                    LocalTime.of(13, 0),
+                    LocalTime.of(14, 0),
                     LocalTime.of(19, 0),
                     enterRoom
             );
@@ -73,7 +73,7 @@ public class NotProd {
             selectedTimeService.CreateSelectedTime(
                     LocalDate.now().plusDays(6),
                     LocalTime.of(6, 0),
-                    LocalTime.of(10, 0),
+                    LocalTime.of(13, 0),
                     enterRoom2
             );
 
@@ -89,7 +89,14 @@ public class NotProd {
             selectedTimeService.CreateSelectedTime(
                     LocalDate.now().plusDays(6),
                     LocalTime.of(8, 0),
-                    LocalTime.of(12, 0),
+                    LocalTime.of(10, 0),
+                    enterRoom3
+            );
+
+            selectedTimeService.CreateSelectedTime(
+                    LocalDate.now().plusDays(6),
+                    LocalTime.of(11, 0),
+                    LocalTime.of(13, 0),
                     enterRoom3
             );
         };
