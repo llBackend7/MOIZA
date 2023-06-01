@@ -56,7 +56,7 @@ public class RoomController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
     public String createRoom(RoomForm roomForm) {
-        return "room/create";
+        return "/room/create";
     }
 
     //TODO 로그인 기능 완성되면 주석해제

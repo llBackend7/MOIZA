@@ -61,7 +61,7 @@ public class RoomService {
         if (endDay.isBefore(startDay)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가능날짜가 잘못되었습니다.");
         }
-        if (availableEndTime.isBefore(availableStartTime)) {
+        if (availableEndTime.isBefore(availableStartTime) || availableEndTime.equals(availableStartTime)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "가능시간이 잘못되었습니다.");
         }
         if (LocalDateTime.now().isAfter(deadLine)) {
