@@ -7,18 +7,20 @@ import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
+@Transactional
 public class Scheduler {
     private final RoomRepository roomRepository;
     private final MailService mailService;
 
-    // 5분 간격으로 마감된 모임 탐색
-    @Scheduled(fixedRate = 300000)
+    // 2분 간격으로 마감된 모임 탐색
+    @Scheduled(fixedRate = 120_000)
     public void checkConfirmedRoom() {
         List<Room> roomToConfirm = roomRepository.findByDeadLineBeforeAndMailSentFalse(LocalDateTime.now());
         roomToConfirm.forEach(room -> {
