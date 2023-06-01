@@ -53,14 +53,14 @@ public class RoomController {
     }
 
     //TODO 로그인 기능 완성되면 주석해제
-//    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
     public String createRoom(RoomForm roomForm) {
-        return "/room/room/create";
+        return "room/create";
     }
 
     //TODO 로그인 기능 완성되면 주석해제
-//    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
     @ResponseBody
     public Map<String, Object> createRoom(@AuthenticationPrincipal User user,
@@ -71,8 +71,7 @@ public class RoomController {
         }
 
         //TODO 로그인 기능 완성되면 원래대로
-        Member member = memberService.findByName("user1");
-//        Member member = memberService.loginMember(user);
+        Member member = memberService.loginMember(user);
         Room room = roomService.createRoom(member,
                 roomForm.name,
                 roomForm.description,

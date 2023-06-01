@@ -6,7 +6,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity(debug = true)
@@ -15,11 +18,39 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        /*
-        작업 편의를 위해 모든 url 뚫어놓음
-         */
-        http.authorizeHttpRequests(request -> request.anyRequest().permitAll());
+        http
+                .authorizeHttpRequests(request ->
+                        request.requestMatchers("/").permitAll()
+                                .requestMatchers("/login").permitAll()
+                                .requestMatchers("/**").authenticated()
+                )
+                .oauth2Login(
+                        oauth2Login -> oauth2Login.loginPage("/")
+                                .successHandler((request, response, authentication) ->
+                                        response.sendRedirect("/groups")
+                                )
+                )
+                .logout(
+                        logout -> logout
+                                .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
+                                .logoutSuccessHandler((request, response, authentication) -> {
+                                        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
+                                        response.setHeader("Pragma", "no-cache");
+                                        response.setHeader("Expires", "0");
+                                        response.sendRedirect("/");
+                                   }
+                                )
+                                .invalidateHttpSession(true)
+                )
+                .exceptionHandling(
+                        exception -> exception.accessDeniedPage("/")
+                );
 
         return http.build();
+    }
+
+    @Bean
+    PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }

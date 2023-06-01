@@ -1,0 +1,63 @@
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<header layout:fragment="header" class="sticky top-0">
+    <div class="navbar max-w-2xl mx-auto bg-base-100">
+        <div class="navbar-start text-2xl font-gsans m-5">
+            <img width="35" src="https://img.icons8.com/external-flat-lima-studio/64/external-block-toys-flat-lima-studio-2.png" alt="external-block-toys-flat-lima-studio-2"/>
+            <div class="ml-2 mt-1">MOIZA</div>
+        </div>
+        <div class="navbar-center">
+        </div>
+        <div class="navbar-end">
+            <a href="/logout" class="text-gray-300 text-md mr-5">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                로그아웃
+            </a>
+        </div>
+    </div>
+</header>
+
+<main layout:fragment="main" class="flex-grow flex justify-center">
+    <div class="max-w-2xl w-full flex justify-center">
+        <div class="w-full flex flex-col items-center">
+
+            <div class="w-3/4 h-22 flex items-center profile border border-2 border-slate-300 rounded-lg m-5 p-3 pl-14">
+
+                <div>
+                    <img th:src="${@rq.member.profile}" width="65" class="mr-2 mask mask-circle">
+                </div>
+
+                <div>
+                    <div class="text-xl font-gsans font-bold" th:text="${@rq.member.name}"></div>
+                    <div class="text-slate-300 text-sm font-gsans" th:text="${@rq.member.email}"></div>
+                </div>
+
+                <div>
+                    <button class="btn ml-10">+ 모임 생성</button>
+                </div>
+
+            </div>
+
+            <div class="groups w-3/5 h-48 rounded-2xl my-5 flex flex-col justify-center p-6 shadow-md text-white" style="background-color: #006BCE">
+                <div class="flex justify-between px-4 text-sm font-gsans">
+                    <span>내가 만든 모임</span>
+                    <button>X</button>
+                </div>
+
+                <div>
+                    <div class="h-20 flex justify-center items-center text-xl">고딩 동창 모임</div>
+                    <div class="text-sm text-center font-gsans">
+                        <span>마감 기한:</span>
+                        <span>~ 2023/06/02 24:00:00 까지</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

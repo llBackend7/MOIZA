@@ -5,9 +5,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 public class HomeController {
+    @GetMapping("/login")
+    public String subIndex(){
+        return "home/login";
+    }
 
-    @GetMapping("/sub")
-    public String subHome(){
-        return "index_sub";
+    @GetMapping("/groups")
+    public String mainHome(){
+        return "home/main";
     }
 }

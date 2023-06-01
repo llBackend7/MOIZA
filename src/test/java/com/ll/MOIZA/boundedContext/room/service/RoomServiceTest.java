@@ -3,7 +3,6 @@ package com.ll.MOIZA.boundedContext.room.service;
 import com.ll.MOIZA.base.jwt.JwtProvider;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
-import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

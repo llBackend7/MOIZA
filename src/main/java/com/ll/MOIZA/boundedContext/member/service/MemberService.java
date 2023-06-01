@@ -5,6 +5,7 @@ import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,7 +17,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
+    @Transactional
     public Member loginMember(User user) {
         Optional<Member> optionalMember = memberRepository.findByName(user.getUsername());
         if (optionalMember.isEmpty()) {
@@ -35,5 +38,25 @@ public class MemberService {
         return memberRepository
                 .findByName(name)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+    }
+
+    @Transactional
+    public Member whenSocialLogin(String nickname, String profile, String email) {
+        Optional<Member> opMember = memberRepository.findByName(nickname);
+        if(opMember.isPresent())
+            return opMember.get();
+        else
+            return join(nickname, profile, email);
+    }
+
+    private Member join(String nickname, String profile, String email) {
+        Member member = Member.builder()
+                .name(nickname)
+                .email(email)
+                .profile(profile)
+                .build();
+
+        memberRepository.save(member);
+        return member;
     }
 }

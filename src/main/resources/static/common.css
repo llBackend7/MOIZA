@@ -202,20 +202,16 @@ html > body {
     font-family: "GmarketSansMedium";
 }
 
+.text-shadow {
+    text-shadow: 1px 2px 1px black;
+}
+
 .main-img {
-    background-image: url("img/main.png");
+    background: url(img/main.png) no-repeat center;
     background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
 }
 
 .mainsub-img {
-    background-image: url("img/main_sub.png");
+    background: url(img/main_sub.png) no-repeat center;
     background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
-
-.text-shadow {
-    text-shadow: 1px 2px 1px black;
 }
