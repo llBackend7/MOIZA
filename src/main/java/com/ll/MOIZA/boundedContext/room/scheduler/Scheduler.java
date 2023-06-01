@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -18,6 +20,7 @@ import java.util.List;
 public class Scheduler {
     private final RoomRepository roomRepository;
     private final MailService mailService;
+    private final SpringTemplateEngine templateEngine;
 
     // 2분 간격으로 마감된 모임 탐색
     @Scheduled(fixedRate = 120_000)
@@ -26,10 +29,19 @@ public class Scheduler {
         roomToConfirm.forEach(room -> {
             room.getEnterRoom().forEach(enterRoom -> {
                 Member member = enterRoom.getMember();
-                mailService.sendMailTo(member, "<h1>%s 모임의 약속장소와 시간이 정해졌습니다.!</h1>".formatted(room.getName()));
+                mailService.sendMailTo(member, buildMailContent(room.getName(),room.getId()));
             });
             room.setMailSent(true);
             roomRepository.save(room);
         });
+    }
+
+    private String buildMailContent(String roomName, Long id) {
+        Context context = new Context();
+        context.setVariable("roomName", roomName);
+        context.setVariable("id", id);
+
+        String content = templateEngine.process("/mail/mail-template", context);
+        return content;
     }
 }

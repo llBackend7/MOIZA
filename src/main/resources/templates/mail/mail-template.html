@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            background-size: cover;
+            height: 100vh;
+            margin: 0;
+            background: url('/static/img/main.png') no-repeat center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-family: Arial, sans-serif;
+        }
+    </style>
+</head>
+<body>
+<h1 th:text="|${name}의 일정이 확정됐습니다!|"></h1>
+<a th:href="|/room/${id}|"></a>
+</body>
+</html>
