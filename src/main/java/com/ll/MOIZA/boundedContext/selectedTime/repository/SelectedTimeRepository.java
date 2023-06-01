@@ -2,11 +2,10 @@ package com.ll.MOIZA.boundedContext.selectedTime.repository;
 
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Query;
-
 import java.time.LocalDate;
 import java.util.List;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface SelectedTimeRepository extends JpaRepository<SelectedTime, Long> {
 

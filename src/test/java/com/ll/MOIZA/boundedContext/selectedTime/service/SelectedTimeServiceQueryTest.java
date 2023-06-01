@@ -1,5 +1,11 @@
 package com.ll.MOIZA.boundedContext.selectedTime.service;
 
+<<<<<<< HEAD
+=======
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
+
+>>>>>>> bd26852e5d24a78193f80369295d33ed269f72fd
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
@@ -8,12 +14,19 @@ import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
 import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
+<<<<<<< HEAD
+=======
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+>>>>>>> bd26852e5d24a78193f80369295d33ed269f72fd
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
+<<<<<<< HEAD
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -21,6 +34,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+=======
+>>>>>>> bd26852e5d24a78193f80369295d33ed269f72fd
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
