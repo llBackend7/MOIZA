@@ -77,63 +77,59 @@ public class SelectedTimeService {
         return selectedTimes;
     }
 
-    public List<TimeRangeWithMember> findOverlappingTimeRanges(List<SelectedTime> selectedTimeList, LocalTime meetingDuration) {
+    public List<TimeRangeWithMember> findOverlappingTimeRanges(
+            List<SelectedTime> selectedTimeList, LocalTime meetingDuration) {
 
         if (selectedTimeList.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "선택된 시간이 없습니다. 선택한 시간을 확인해 주세요.");
         }
 
+        List<TimeRangeWithMember> overlappingRanges = new ArrayList<>();
+        // 입력된 시간들 정렬
         selectedTimeList.sort(Comparator.comparing(SelectedTime::getStartTime));
 
-        LocalDate currentDate = selectedTimeList.get(0).getDate();
-        LocalTime currentStart = selectedTimeList.get(0).getStartTime();
-        LocalTime currentEnd = selectedTimeList.get(0).getEndTime();
-        Member currentMember = selectedTimeList.get(0).getEnterRoom().getMember();
+        // 탐색 시간 기준 시작점
+        LocalTime time = LocalTime.of(0, 0);
+        LocalDate date = selectedTimeList.get(0).getDate();
 
-        List<TimeRangeWithMember> overlappingRanges = new ArrayList<>();
+        for (int i = 1; i <= 48; i++) {
 
-        List<Member> members = new ArrayList<>();
-        members.add(currentMember);
+            LocalTime startTime = time;
+            LocalTime endTime = time.plusHours(meetingDuration.getHour());
 
-        for (int i = 1; i < selectedTimeList.size(); i++) {
-            TimeRangeWithMember currentRange = new TimeRangeWithMember(selectedTimeList.get(i).getDate(),
-                    selectedTimeList.get(i).getStartTime(), selectedTimeList.get(i).getEndTime(),
-                    members);
+            time = time.plusMinutes(30);
 
-            Member hereMember = selectedTimeList.get(i).getEnterRoom().getMember();
+            List<Member> members = new ArrayList<>();
 
-            if (currentMember.equals(hereMember)) {
+            for (SelectedTime selectedTime : selectedTimeList) {
+                if (selectedTime.getEndTime().minusHours(selectedTime.getStartTime().getHour())
+                        .minusMinutes(selectedTime.getStartTime().getMinute())
+                        .isBefore(meetingDuration)) {
+                    continue;
+                }
+
+                LocalTime ss = selectedTime.getStartTime();
+                LocalTime se = selectedTime.getEndTime();
+
+                if (ss.isAfter(endTime)) {
+                    continue;
+                }
+                if (!ss.isAfter(startTime) && !se.isBefore(endTime)) {
+                    members.add(selectedTime.getEnterRoom().getMember());
+                } else {
+                    members.remove(selectedTime.getEnterRoom().getMember());
+                }
+            }
+            if (members.size() <= 1) {
                 continue;
             }
-            if (!currentRange.start.plusHours(meetingDuration.getHour()).isAfter(currentEnd)) {
-                if (currentRange.start.isAfter(currentStart)) {
-                    currentStart = currentRange.start;
-                }
-                if (currentRange.end.isBefore(currentEnd)) {
-                    currentEnd = currentRange.end;
-                }
-                currentRange.members.add(hereMember);
-                currentRange.members.sort(Comparator.comparing(Member::getName));
-            } else {
-                //겹치지 않는 경우
-                overlappingRanges.add(
-                        new TimeRangeWithMember(currentDate, currentStart, currentEnd,
-                                members));
-                currentStart = currentRange.start;
-                currentEnd = currentRange.end;
-                currentMember = hereMember;
-                // 기존 맴버 리스트 초기화 및 새로운 탐색 시작
-                members = new ArrayList<>();
-                members.add(currentMember);
-            }
+
+            members.sort(Comparator.comparing(Member::getName));
+            overlappingRanges.add(new TimeRangeWithMember(date, startTime, endTime, members));
         }
-        overlappingRanges.add(
-                new TimeRangeWithMember(currentDate, currentStart, currentEnd,
-                        members));
 
         Collections.sort(overlappingRanges);
-
         return overlappingRanges;
     }
 }
