@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.assertAll;
 
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
-import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
 import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
@@ -64,7 +63,7 @@ public class SelectedTimeServiceQueryTest {
                 LocalDate.now().plusDays(6));
 
         List<TimeRangeWithMember> overlappingRanges = selectedTimeService.findOverlappingTimeRanges(
-                selectedTimeList, room.getMeetingDuration()
+                selectedTimeList, room.getMeetingDuration().minusHours(1)
         );
 
         for (TimeRangeWithMember t : overlappingRanges) {
@@ -77,23 +76,16 @@ public class SelectedTimeServiceQueryTest {
 
         TimeRangeWithMember t1 = overlappingRanges.get(0);
         TimeRangeWithMember t2 = overlappingRanges.get(1);
-        TimeRangeWithMember t3 = overlappingRanges.get(2);
         assertAll(
                 () -> assertThat(t1.getDate()).isEqualTo(LocalDate.now().plusDays(6)),
-                () -> assertThat(t1.getStart()).isEqualTo(LocalTime.of(7, 0)),
+                () -> assertThat(t1.getStart()).isEqualTo(LocalTime.of(8, 0)),
                 () -> assertThat(t1.getEnd()).isEqualTo(LocalTime.of(10, 0)),
-                () -> assertThat(t1.getMembers()).isEqualTo(List.of(member1, member2)),
+                () -> assertThat(t1.getMembers()).isEqualTo(List.of(member1, member2, member3)),
 
                 () -> assertThat(t2.getDate()).isEqualTo(LocalDate.now().plusDays(6)),
-                () -> assertThat(t2.getStart()).isEqualTo(LocalTime.of(15, 0)),
-                () -> assertThat(t2.getEnd()).isEqualTo(LocalTime.of(17, 0)),
-                () -> assertThat(t2.getMembers()).isEqualTo(List.of(member1, member2)),
-
-                () -> assertThat(t3.getDate()).isEqualTo(LocalDate.now().plusDays(6)),
-                () -> assertThat(t3.getStart()).isEqualTo(LocalTime.of(8, 0)),
-                () -> assertThat(t3.getEnd()).isEqualTo(LocalTime.of(12, 0)),
-                () -> assertThat(t3.getMembers()).isEqualTo(List.of(member3))
-
+                () -> assertThat(t2.getStart()).isEqualTo(LocalTime.of(11, 0)),
+                () -> assertThat(t2.getEnd()).isEqualTo(LocalTime.of(13, 0)),
+                () -> assertThat(t2.getMembers()).isEqualTo(List.of(member1, member2, member3))
         );
     }
 }
