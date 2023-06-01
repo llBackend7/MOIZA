@@ -1,22 +1,29 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <style>
-        body {
-            background-size: cover;
-            height: 100vh;
-            margin: 0;
-            background: url('/static/img/main.png') no-repeat center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-family: Arial, sans-serif;
-        }
-    </style>
-</head>
-<body>
-<h1 th:text="|${name}의 일정이 확정됐습니다!|"></h1>
-<a th:href="|/room/${id}|"></a>
+<meta charset="UTF-8">
+<body style="margin: 0; padding: 0;">
+<table align="center" border="0" cellpadding="0" cellspacing="0" width="600" style="border-collapse: collapse;">
+    <tr>
+        <td align="center" style="padding: 40px 0 30px 0; background-color: #4a9ee3">
+            <div style="width:300px; height:230px;background: url('/static/img/main_sub_hd.png') no-repeat center center;background-size: cover;"></div>
+        </td>
+    </tr>
+    <tr>
+        <td bgcolor="#ffffff" style="padding: 40px 30px 40px 30px;">
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <tr>
+                    <td style="color: #153643; font-family: Arial, sans-serif; font-size: 24px;">
+                        <b th:text="|${name}의 일정이 확정됐습니다!|">일정이 확정됐습니다.</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="color: #153643; font-family: Arial, sans-serif; font-size: 16px; line-height: 20px;">
+                        <a th:href="|/room/${id}|">모임 일정 보러가기</a>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
 </body>
 </html>
