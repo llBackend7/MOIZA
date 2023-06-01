@@ -52,14 +52,12 @@ public class RoomController {
         LocalDateTime deadLine;
     }
 
-    //TODO 로그인 기능 완성되면 주석해제
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
     public String createRoom(RoomForm roomForm) {
         return "/room/create";
     }
 
-    //TODO 로그인 기능 완성되면 주석해제
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
     @ResponseBody
@@ -70,7 +68,6 @@ public class RoomController {
             return Map.of("error", bindingResult.getAllErrors());
         }
 
-        //TODO 로그인 기능 완성되면 원래대로
         Member member = memberService.loginMember(user);
         Room room = roomService.createRoom(member,
                 roomForm.name,

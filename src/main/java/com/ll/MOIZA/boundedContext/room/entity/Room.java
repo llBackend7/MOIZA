@@ -3,10 +3,7 @@ package com.ll.MOIZA.boundedContext.room.entity;
 import com.ll.MOIZA.base.entity.BaseEntity;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
@@ -30,6 +27,8 @@ public class Room extends BaseEntity {
     private LocalDateTime deadLine;
     private LocalTime meetingDuration;
     private String accessCode;
+    @Setter
+    private boolean mailSent;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "room", cascade = CascadeType.ALL)
     @ToString.Exclude
