@@ -8,6 +8,8 @@ import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -74,11 +76,15 @@ class SchedulerTest {
     void testCheckConfirmedRoom() {
         RoomRepository roomRepository = Mockito.mock(RoomRepository.class);
         MailService mailService = Mockito.mock(MailService.class);
+        SpringTemplateEngine templateEngine = Mockito.mock(SpringTemplateEngine.class);
 
         Mockito.when(roomRepository.findByDeadLineBeforeAndMailSentFalse(Mockito.any(LocalDateTime.class)))
                 .thenReturn(roomToMailSend);
 
-        Scheduler scheduler = new Scheduler(roomRepository, mailService);
+        Mockito.when(templateEngine.process(Mockito.anyString(), Mockito.any()))
+                .thenReturn("메일내용");
+
+        Scheduler scheduler = new Scheduler(roomRepository, mailService, templateEngine);
 
         scheduler.checkConfirmedRoom();
 
