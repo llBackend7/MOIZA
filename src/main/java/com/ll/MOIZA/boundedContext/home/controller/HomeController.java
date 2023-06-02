@@ -17,14 +17,36 @@ public class HomeController {
     private final MemberService memberService;
     private final Rq rq;
 
+    @GetMapping("/")
+    public String showMain(){
+        if(rq.isLogout())
+            return "redirect:/login";
+        else
+            return "redirect:/groups";
+    }
+
     @GetMapping("/login")
+    public String Login(){
+        if(rq.isLogout())
+            return "home/login";
+        else
+            return "redirect:/groups";
+    }
+
+    @GetMapping("/memberLogin")
     public String subLogin(){
-        return "home/login";
+        if(rq.isLogout())
+            return "home/memberLogin";
+        else
+            return "redirect:/groups";
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/groups")
-    public String mainHome(Model model){
+    public String home(Model model){
+        if(rq.isLogout())
+            return "redirect:/login";
+
         List<Room> rooms = rq.getMember().getRooms();
         model.addAttribute("member", rq.getMember());
         model.addAttribute("rooms", rooms);

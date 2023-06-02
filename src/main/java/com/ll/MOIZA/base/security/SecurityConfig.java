@@ -22,13 +22,14 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/").permitAll()
                                 .requestMatchers("/login").permitAll()
+                                .requestMatchers("/memberLogin").permitAll()
                                 .requestMatchers("/*.css").permitAll()
                                 .requestMatchers("/img/**").permitAll()
                                 .requestMatchers("/error").permitAll()
                                 .requestMatchers("/**").authenticated()
                 )
                 .oauth2Login(
-                        oauth2Login -> oauth2Login.loginPage("/")
+                        oauth2Login -> oauth2Login.loginPage("/login")
                                 .successHandler((request, response, authentication) ->
                                         response.sendRedirect("/groups")
                                 )
@@ -37,13 +38,13 @@ public class SecurityConfig {
                         logout -> logout
                                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                                 .logoutSuccessHandler((request, response, authentication) -> {
-                                        response.sendRedirect("/");
+                                        response.sendRedirect("/login");
                                    }
                                 )
                                 .invalidateHttpSession(true)
                 )
                 .exceptionHandling(
-                        exception -> exception.accessDeniedPage("/")
+                        exception -> exception.accessDeniedPage("/login")
                 );
 
         return http.build();

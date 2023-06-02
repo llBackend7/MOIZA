@@ -207,11 +207,11 @@ html > body {
 }
 
 .main-img {
-    background: url(img/main.png) no-repeat center;
+    background: url(../img/main.png) no-repeat center;
     background-size: cover;
 }
 
 .mainsub-img {
-    background: url(img/main_sub.png) no-repeat center;
+    background: url(../img/main_sub.png) no-repeat center;
     background-size: cover;
 }
