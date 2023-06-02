@@ -122,4 +122,12 @@ public class RoomController {
         model.addAttribute("room", room);
         return "status/place";
     }
+
+    @GetMapping("/{roomId}/chat")
+    public String showRoomChat(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
+        Room room = roomService.getRoom(roomId);
+
+        model.addAttribute("room", room);
+        return "status/chat";
+    }
 }

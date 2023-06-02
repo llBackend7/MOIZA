@@ -76,7 +76,7 @@
 <footer layout:fragment="footer">
     <a href=""><i class="far fa-thin fa-clock text-sky-600"></i></a>
     <a th:href="@{|/room/${room.id}/place|}"><i class="far fa-solid fa-location-dot text-slate-300 hover:text-sky-600"></i></a>
-    <a href="/room/status/chat"><i class="far fa-thin fa-comments hover:text-sky-600 text-slate-300"></i></a>
+    <a th:href="@{|/room/${room.id}/chat|}"><i class="far fa-thin fa-comments hover:text-sky-600 text-slate-300"></i></a>
 </footer>
 
 </html>
