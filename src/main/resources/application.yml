@@ -8,9 +8,13 @@ spring:
     include: secret
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://127.0.0.1:3306/moiza__dev?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
-    username: lldj        # ?? DB ??
-    password: ${MYSQL_PW} # ?? DB ??
+    url: jdbc:mariadb://192.168.56.101:3308/gram__dev?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
+    username: testuser
+    password: 5678
+    #driver-class-name: org.mariadb.jdbc.Driver
+    #url: jdbc:mariadb://127.0.0.1:3306/moiza__dev?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
+    #username: lldj        # ?? DB ??
+    #password: ${MYSQL_PW} # ?? DB ??
   security:
     oauth2:
       client:

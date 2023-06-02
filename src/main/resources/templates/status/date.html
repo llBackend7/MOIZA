@@ -25,7 +25,7 @@
 
         <div class="text">
             <div class="title">모임이름</div>
-            <div class="font-gsans w-56 flex justify-center text-2xl">서울 벙개</div>
+            <div class="font-gsans w-56 flex justify-center text-2xl" th:text="${room.name}">서울 벙개</div>
         </div>
 
         <div class="date-rank">
@@ -75,7 +75,7 @@
 
 <footer layout:fragment="footer">
     <a href=""><i class="far fa-thin fa-clock text-sky-600"></i></a>
-    <a href="/room/status/place"><i class="far fa-solid fa-location-dot text-slate-300 hover:text-sky-600"></i></a>
+    <a th:href="@{|/room/${room.id}/place|}"><i class="far fa-solid fa-location-dot text-slate-300 hover:text-sky-600"></i></a>
     <a href="/room/status/chat"><i class="far fa-thin fa-comments hover:text-sky-600 text-slate-300"></i></a>
 </footer>
 

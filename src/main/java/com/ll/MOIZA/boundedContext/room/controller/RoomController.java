@@ -14,6 +14,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -104,5 +105,21 @@ public class RoomController {
         mailService.sendMailTo(friend, mailContent);
 
         return "{'result':'초대링크를 발송했습니다.'}";
+    }
+
+    @GetMapping("/{roomId}/date")
+    public String showRoomDate(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
+        Room room = roomService.getRoom(roomId);
+
+        model.addAttribute("room", room);
+        return "status/date";
+    }
+
+    @GetMapping("/{roomId}/place")
+    public String showRoomPlace(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
+        Room room = roomService.getRoom(roomId);
+
+        model.addAttribute("room", room);
+        return "status/place";
     }
 }
