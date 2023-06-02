@@ -24,8 +24,7 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.handler;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -50,15 +49,13 @@ class RoomControllerTest {
                 .andExpect(status().is2xxSuccessful());
     }
 
-    //TODO 로그인 기능 구현되면 Disable 해제
     @Test
-    @Disabled
     void 인증되지_않은_사용자_방_못만듦() throws Exception {
         ResultActions resultActions = mvc
                 .perform(get("/room/create"))
                 .andDo(print());
         resultActions
-                .andExpect(status().is4xxClientError());
+                .andExpect(status().is3xxRedirection());
     }
 
     @Test
