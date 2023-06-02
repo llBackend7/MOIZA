@@ -35,7 +35,7 @@ public class MailService {
 
     private Mail buildMail(String userEmail, String mailContents) {
         Email from = new Email("mouse4786@gmail.com");
-        String subject = "모임에 초대되셨습니다.";
+        String subject = "[MOIZA] 모이자에서 발송한 메일입니다.";
         Email to = new Email(userEmail);
         Content content = new Content("text/html", mailContents);
         Mail mail = new Mail(from, subject, to, content);
