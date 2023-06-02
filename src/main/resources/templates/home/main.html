@@ -4,10 +4,10 @@
 
 <header layout:fragment="header" class="sticky top-0">
     <div class="navbar max-w-2xl mx-auto bg-base-100">
-        <div class="navbar-start text-2xl font-gsans m-5">
+        <a class="navbar-start text-2xl font-gsans m-5" href="/groups">
             <img width="35" src="https://img.icons8.com/external-flat-lima-studio/64/external-block-toys-flat-lima-studio-2.png" alt="external-block-toys-flat-lima-studio-2"/>
             <div class="ml-2 mt-1">MOIZA</div>
-        </div>
+        </a>
         <div class="navbar-center">
         </div>
         <div class="navbar-end">
@@ -35,25 +35,39 @@
                 </div>
 
                 <div>
-                    <button class="btn ml-10">+ 모임 생성</button>
+                    <a href="/room/create" class="btn ml-10">+ 모임 생성</a>
                 </div>
 
             </div>
 
-            <div class="groups w-3/5 h-48 rounded-2xl my-5 flex flex-col justify-center p-6 shadow-md text-white" style="background-color: #006BCE">
-                <div class="flex justify-between px-4 text-sm font-gsans">
-                    <span>내가 만든 모임</span>
-                    <button>X</button>
-                </div>
-
-                <div>
-                    <div class="h-20 flex justify-center items-center text-xl">고딩 동창 모임</div>
-                    <div class="text-sm text-center font-gsans">
-                        <span>마감 기한:</span>
-                        <span>~ 2023/06/02 24:00:00 까지</span>
-                    </div>
-                </div>
+            <div th:if="${#lists.isEmpty(rooms)}" class="w-full flex flex-col items-center justify-center mt-20 text-xl">
+                모임을 생성해보세요.
             </div>
+
+            <ul th:if="${!#lists.isEmpty(rooms)}" class="w-full flex flex-col items-center">
+                <li th:each="room : ${rooms}" onclick="window.location.href = '';" class="groups w-3/5 h-48 rounded-2xl mt-5 flex flex-col justify-center p-6 shadow-md text-white" style="background-color: #006BCE;">
+                        <div th:if="${room.getLeader() == member}" class="flex justify-between px-4 text-sm font-gsans">
+                            <span>내가 만든 모임</span>
+                            <a href="javascript:" onclick="if(confirm('모임을 삭제하시겠습니까?')) $(this).next().submit();">X</a>
+                            <form hidden th:action="@{|/${room.id}|}" method="POST">
+                                <input type="hidden" name="_method" value="delete">
+                            </form>
+                        </div>
+
+
+                        <div>
+                            <div th:text="${room.name}" class="h-20 flex justify-center items-center text-xl"></div>
+                            <div th:if="${!room.deadLine.isBefore(#temporals.createNow())}" class="text-sm text-center font-gsans">
+                                <span>마감 기한: ~</span>
+                                <span th:text="${#temporals.format(room.deadLine, 'yyyy.MM.dd HH:mm:ss')}">2023/06/02 24:00:00</span>
+                                <span> 까지</span>
+                            </div>
+                            <div th:if="${room.deadLine.isBefore(#temporals.createNow())}" class="text-sm text-end font-gsans mr-5">
+                                <a href="">결과 확인</a>
+                            </div>
+                        </div>
+                </li>
+            </ul>
 
         </div>
     </div>
