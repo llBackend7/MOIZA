@@ -2,6 +2,8 @@ package com.ll.MOIZA.boundedContext.member.service;
 
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
+import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.User;
@@ -17,7 +19,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final RoomRepository roomRepository;
 
     @Transactional
     public Member loginMember(User user) {
@@ -58,5 +60,11 @@ public class MemberService {
 
         memberRepository.save(member);
         return member;
+    }
+
+    @Transactional
+    public void deleteGroup(Long roomId) {
+        Optional<Room> opRoom = roomRepository.findById(roomId);
+        opRoom.ifPresent(roomRepository::delete);
     }
 }
