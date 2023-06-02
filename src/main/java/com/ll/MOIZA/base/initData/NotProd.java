@@ -11,6 +11,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,9 +25,12 @@ public class NotProd {
             MemberRepository memberRepository,
             RoomService roomService,
             EnterRoomService enterRoomService,
-            SelectedTimeService selectedTimeService
+            SelectedTimeService selectedTimeService,
+            MongoTemplate mongoTemplate
     ) {
         return args -> {
+            mongoTemplate.dropCollection("chat");
+
             Member member1 = Member.builder().name("user1").email("email").build();
             Member member2 = Member.builder().name("user2").email("email").build();
             try {

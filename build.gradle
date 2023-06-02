@@ -41,6 +41,12 @@ dependencies {
 	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.11.5'
 
 	implementation 'com.sendgrid:sendgrid-java:4.4.1'
+
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
+	implementation group: 'org.mongodb', name: 'mongodb-driver-sync', version: '4.9.1'
+
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
 }
 
 tasks.named('test') {
