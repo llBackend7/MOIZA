@@ -26,4 +26,8 @@ public class EnterRoomService {
 
         return enterRoomRepository.save(enterRoom);
     }
+
+    public boolean isRoomMember(Room room, Member member) {
+        return enterRoomRepository.findByRoomAndMember(room,member).isPresent();
+    }
 }

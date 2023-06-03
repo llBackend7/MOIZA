@@ -18,6 +18,15 @@
             <button>마감하기</button>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js" integrity="sha512-iKDtgDyTHjAitUDdLljGhenhPwrbBfqTKWO1mkhSFH3A7blITC9MhYon6SjnMhp4o0rADGw9yAC6EW4t5a4K3g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        /*<![CDATA[*/
+        let roomId = [[${roomId}]];
+        /*]]>*/
+
+        let stompClient = null;
+    </script>
 </header>
 
 <main layout:fragment="main" class="flex-grow flex items-center justify-center">
@@ -28,32 +37,56 @@
         </div>
 
         <div class="chat-box flex flex-col mx-12 pt-2.5">
-            <div class="text-center m-2 text-xl">
-                채팅창
-            </div>
-
-            <div class="message font-gsans px-2.5 text-sm">
-                <span>User 1:</span>
-                <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
-            </div>
-            <div class="message font-gsans px-2.5 text-sm">
-                <span>User 2:</span>
-                <span>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
-            </div>
+            <table>
+                <tbody id="chats">
+                <!-- 채팅내용 -->
+                </tbody>
+            </table>
             <div class="flex-grow"></div>
             <div class="chat-input p-2.5">
-                <input type="text" class="p-1 font-gsans" placeholder=" 내용 입력 후 Enter" />
+                <form>
+                    <input type="text" class="p-1 font-gsans" id="content" placeholder=" 내용 입력 후 Enter"/>
+                    <button type="submit" id="send">입력</button>
+                </form>
             </div>
         </div>
     </div>
+    <script>
+        $(document).ready(() => {
+            connect();
+            $('form').on('submit', e => e.preventDefault());
+            $('#send').click(() => send());
+        })
+
+        function connect() {
+            let socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, () => {
+
+                stompClient.subscribe(`/room/${roomId}`, chat => show(chat));
+
+            });
+        }
+
+        function send() {
+            stompClient.send(`/send/${roomId}`, {}, JSON.stringify({
+                'content': $('#content').val()
+            }));
+        }
+
+        function show(chat) {
+            let parsed = JSON.parse(chat.body);
+            $('#chats').append(`<tr><td>${parsed.writer}:${parsed.content}</td></tr>`);
+        }
+    </script>
 </main>
 
 <footer layout:fragment="footer">
     <a th:href="@{|/room/${room.id}/date|}"><i class="far fa-thin fa-clock text-slate-300 hover:text-sky-600"></i></a>
-    <a th:href="@{|/room/${room.id}/place|}"><i class="far fa-solid fa-location-dot text-slate-300 hover:text-sky-600"></i></a>
+    <a th:href="@{|/room/${room.id}/place|}"><i
+            class="far fa-solid fa-location-dot text-slate-300 hover:text-sky-600"></i></a>
     <a href=""><i class="far fa-thin fa-comments text-sky-600"></i></a>
 </footer>
-
 </body>
 
 </html>

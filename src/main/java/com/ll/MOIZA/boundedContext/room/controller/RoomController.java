@@ -1,6 +1,7 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
 import com.ll.MOIZA.base.mail.MailService;
+import com.ll.MOIZA.boundedContext.chat.service.ChatService;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
@@ -120,8 +121,11 @@ public class RoomController {
         return "status/place";
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{roomId}/chat")
-    public String showRoomChat(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
+    public String showRoomChat(@PathVariable Long roomId,
+                               @AuthenticationPrincipal User user,
+                               Model model) {
         Room room = roomService.getRoom(roomId);
 
         model.addAttribute("room", room);
