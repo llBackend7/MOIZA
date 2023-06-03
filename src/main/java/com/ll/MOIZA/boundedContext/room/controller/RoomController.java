@@ -31,6 +31,7 @@ public class RoomController {
     private final RoomService roomService;
     private final MemberService memberService;
     private final MailService mailService;
+    private final ChatService chatService;
 
     @Data
     public static class RoomForm {

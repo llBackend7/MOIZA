@@ -24,7 +24,6 @@ public class ChatController {
     private final MemberService memberService;
     private final RoomService roomService;
     private final ChatService chatService;
-    private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/{roomId}") // /send/{roomId}
     public Chat send(@Payload String content,
@@ -37,9 +36,8 @@ public class ChatController {
         Member member = memberService.findByName(username);
         Room room = roomService.getRoom(Long.parseLong(roomId));
 
-        Chat chat = chatService.saveChat(member, room, content);
+        Chat chat = chatService.sendChat(member, room, content);
 
-        messagingTemplate.convertAndSend("/room/%s".formatted(roomId), chat); // /room/{roomId}
         return chat;
     }
 }

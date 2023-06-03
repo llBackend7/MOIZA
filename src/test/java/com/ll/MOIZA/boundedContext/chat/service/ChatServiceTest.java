@@ -42,7 +42,7 @@ class ChatServiceTest {
         Member user1 = memberService.findByName("user1");
         Room room = roomService.getRoom(1L);
 
-        Chat sentChat = chatService.saveChat(user1, room, "TEST CHAT");
+        Chat sentChat = chatService.sendChat(user1, room, "TEST CHAT");
 
         assertThat(sentChat).isNotNull();
     }
@@ -52,7 +52,7 @@ class ChatServiceTest {
         Member user1 = memberService.findByName("user1");
         Room room = roomService.getRoom(1L);
         for (int i = 0; i < 100; i++) {
-            chatService.saveChat(user1, room, "TEST CHAT%s".formatted(i));
+            chatService.sendChat(user1, room, "TEST CHAT%s".formatted(i));
         }
 
         Slice<Chat> chats = chatService.getChats(room, 0);

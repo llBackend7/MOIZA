@@ -26,11 +26,7 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
 
 @Configuration
 @EnableWebSocketMessageBroker
-@RequiredArgsConstructor
 public class websocketConfig implements WebSocketMessageBrokerConfigurer {
-    private final MemberService memberService;
-    private final RoomService roomService;
-    private final EnterRoomService enterRoomService;
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -53,17 +49,7 @@ public class websocketConfig implements WebSocketMessageBrokerConfigurer {
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
                 StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
 
-
-                if (accessor.getCommand().equals(StompCommand.SUBSCRIBE) || accessor.getCommand().equals(StompCommand.SEND)) {
-                    Member member = memberService.findByName(accessor.getUser().getName());
-                    String endpoint = accessor.getDestination();
-                    Long roomId = Long.parseLong(endpoint.substring(endpoint.lastIndexOf("/") + 1));
-                    Room room = roomService.getRoom(roomId);
-
-                    if (!enterRoomService.isRoomMember(room, member)) {
-                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "권한이 없습니다.");
-                    }
-                } else if (accessor.getCommand().equals(StompCommand.CONNECT)) {
+                if (accessor.getCommand().equals(StompCommand.CONNECT)) {
                     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
                     if (auth != null) {
                         accessor.setUser(auth);
