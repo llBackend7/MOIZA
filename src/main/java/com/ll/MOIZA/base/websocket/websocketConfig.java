@@ -15,12 +15,14 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.messaging.simp.stomp.StompCommand;
 import org.springframework.messaging.simp.stomp.StompHeaderAccessor;
 import org.springframework.messaging.support.ChannelInterceptor;
+import org.springframework.messaging.support.MessageHeaderAccessor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -29,10 +31,13 @@ public class websocketConfig implements WebSocketMessageBrokerConfigurer {
     private final MemberService memberService;
     private final RoomService roomService;
     private final EnterRoomService enterRoomService;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // TODO origin 경로 수정필요
-        registry.addEndpoint("/ws").withSockJS();
+        registry.addEndpoint("/ws")
+                .withSockJS()
+                .setInterceptors(new HttpSessionHandshakeInterceptor());
     }
 
     @Override
@@ -41,28 +46,33 @@ public class websocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.enableSimpleBroker("/room");     //메시지 브로커 구독 경로 앞에 /room/이 붙음
     }
 
-//    @Override
-//    public void configureClientInboundChannel(ChannelRegistration registration) {
-//        registration.interceptors(new ChannelInterceptor() {
-//            @Override
-//            public Message<?> preSend(Message<?> message, MessageChannel channel) {
-//                StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
-//                if (accessor.getCommand().equals(StompCommand.CONNECT)) {
-//                    String destination = accessor.getDestination(); //TODO 여기가 null이 나오는 거 고치기
-//                    if (destination.startsWith("/room/")) {
-//                        String roomId = destination.substring(destination.lastIndexOf("/") + 1);
-//                        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//
-//                        Room room = roomService.getRoom(Long.parseLong(roomId));
-//                        Member member = memberService.findByName(authentication.getName());
-//
-//                        if (!enterRoomService.isRoomMember(room, member)) {
-//                            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "권한이 없습니다.");
-//                        }
-//                    }
-//                }
-//                return message;
-//            }
-//        });
-//    }
+    @Override
+    public void configureClientInboundChannel(ChannelRegistration registration) {
+        registration.interceptors(new ChannelInterceptor() {
+            @Override
+            public Message<?> preSend(Message<?> message, MessageChannel channel) {
+                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+
+
+                if (accessor.getCommand().equals(StompCommand.SUBSCRIBE) || accessor.getCommand().equals(StompCommand.SEND)) {
+                    Member member = memberService.findByName(accessor.getUser().getName());
+                    String endpoint = accessor.getDestination();
+                    Long roomId = Long.parseLong(endpoint.substring(endpoint.lastIndexOf("/") + 1));
+                    Room room = roomService.getRoom(roomId);
+
+                    if (!enterRoomService.isRoomMember(room, member)) {
+                        throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "권한이 없습니다.");
+                    }
+                } else if (accessor.getCommand().equals(StompCommand.CONNECT)) {
+                    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+                    if (auth != null) {
+                        accessor.setUser(auth);
+                    }
+                }
+
+
+                return message;
+            }
+        });
+    }
 }

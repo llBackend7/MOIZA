@@ -6,9 +6,6 @@ import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
@@ -17,11 +14,9 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.support.MessageHeaderAccessor;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.security.Principal;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,13 +27,18 @@ public class ChatController {
     private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/{roomId}") // /send/{roomId}
-    public Chat send(@Payload String content, @Headers MessageHeaders headers) {
+    public Chat send(@Payload String content,
+                     @Headers MessageHeaders headers,
+                     Principal principal) {
         SimpMessageHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(headers, SimpMessageHeaderAccessor.class);
-
+        String username = principal.getName();
         String destination = accessor.getDestination();
         String roomId = destination.substring(destination.lastIndexOf("/")+1);
+        Member member = memberService.findByName(username);
+        Room room = roomService.getRoom(Long.parseLong(roomId));
 
-        Chat chat = Chat.builder().content("asd").writer("qqq").build();
+        Chat chat = chatService.saveChat(member, room, content);
+
         messagingTemplate.convertAndSend("/room/%s".formatted(roomId), chat); // /room/{roomId}
         return chat;
     }
