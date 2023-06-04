@@ -33,9 +33,10 @@ public class ChatService {
                 .content(content)
                 .build();
 
+        chat = chatRepository.save(chat);
         messagingTemplate.convertAndSend("/room/%s".formatted(room.getId()), chat); // /room/{roomId}
 
-        return chatRepository.save(chat);
+        return chat;
     }
 
 
