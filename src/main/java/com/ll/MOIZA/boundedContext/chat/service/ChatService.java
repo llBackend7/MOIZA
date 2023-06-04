@@ -24,13 +24,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ChatService {
     private final ChatRepository chatRepository;
-    private final EnterRoomRepository enterRoomRepository;
     private final SimpMessagingTemplate messagingTemplate;
     public Chat sendChat(Member member, Room room, String content) {
-        if (enterRoomRepository.findByRoomAndMember(room, member).isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "채팅접근 권한이 없습니다.");
-        }
-
         Chat chat = Chat.builder()
                 .roomId(room.getId().toString())
                 .memberId(member.getId().toString())

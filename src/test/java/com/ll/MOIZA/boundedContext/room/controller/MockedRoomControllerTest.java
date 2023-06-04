@@ -6,6 +6,7 @@ import com.ll.MOIZA.boundedContext.chat.repository.ChatRepository;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +49,9 @@ public class MockedRoomControllerTest {
 
     @MockBean
     MailService mailService;
+
+    @MockBean
+    EnterRoomService enterRoomService;
 
     /*
     실제 메일 날라옴

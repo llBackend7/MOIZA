@@ -56,6 +56,7 @@
             connect();
             $('form').on('submit', e => e.preventDefault());
             $('#send').click(() => send());
+            getChats(0);
         })
 
         function connect() {
@@ -76,6 +77,26 @@
             let parsed = JSON.parse(chat.body);
             $('#chats').append(`<tr><td>${parsed.writer}:${parsed.content}</td></tr>`);
         }
+
+        function getChats(page) {
+            $.ajax({
+                url: `/chats?roomId=${roomId}`,
+                type: 'GET',
+                data: {
+                    page: page
+                },
+                success: function(slice) {
+                    slice.content.reverse();
+                    console.log(slice);
+                    slice.content.forEach(chat=>$('#chats').append(`<tr><td>${chat.writer}:${chat.content}</td></tr>`));
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    console.error(textStatus, errorThrown);
+                    // 오류가 발생한 경우 이곳에서 처리하십시오.
+                }
+            });
+        }
+
     </script>
 </main>
 
