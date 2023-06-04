@@ -1,5 +1,6 @@
 package com.ll.MOIZA.base.initData;
 
+import com.ll.MOIZA.boundedContext.chat.service.ChatService;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
@@ -26,7 +27,8 @@ public class NotProd {
             RoomService roomService,
             EnterRoomService enterRoomService,
             SelectedTimeService selectedTimeService,
-            MongoTemplate mongoTemplate
+            MongoTemplate mongoTemplate,
+            ChatService chatService
     ) {
         return args -> {
             mongoTemplate.dropCollection("chat");
@@ -57,6 +59,10 @@ public class NotProd {
                     LocalTime.of(3, 0),
                     LocalDateTime.now().plusDays(2));
             EnterRoom enterRoom = enterRoomService.createEnterRoom(room, member1);
+
+            for (int i = 0; i < 100; i++) {
+                chatService.sendChat(member1, room, "테스트 채팅%d".formatted(i));
+            }
 
             selectedTimeService.CreateSelectedTime(
                     LocalDate.now().plusDays(6),

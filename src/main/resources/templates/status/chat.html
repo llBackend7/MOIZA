@@ -26,6 +26,8 @@
         /*]]>*/
 
         let stompClient = null;
+
+        let curSlice;
     </script>
 </header>
 
@@ -38,6 +40,7 @@
 
         <div class="chat-box flex flex-col mx-12 pt-2.5">
             <table>
+                <button onclick="getMoreChats()">더 불러오기</button>
                 <tbody id="chats">
                 <!-- 채팅내용 -->
                 </tbody>
@@ -78,6 +81,12 @@
             $('#chats').append(`<tr><td>${parsed.writer}:${parsed.content}</td></tr>`);
         }
 
+        function getMoreChats() {
+            if (!curSlice.last) {
+                getChats(curSlice.pageable.pageNumber+1);
+            }
+        }
+
         function getChats(page) {
             $.ajax({
                 url: `/chats?roomId=${roomId}`,
@@ -86,13 +95,11 @@
                     page: page
                 },
                 success: function(slice) {
-                    slice.content.reverse();
-                    console.log(slice);
-                    slice.content.forEach(chat=>$('#chats').append(`<tr><td>${chat.writer}:${chat.content}</td></tr>`));
+                    curSlice = slice;
+                    slice.content.forEach(chat=>$('#chats').prepend(`<tr><td>${chat.writer}:${chat.content}</td></tr>`));
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     console.error(textStatus, errorThrown);
-                    // 오류가 발생한 경우 이곳에서 처리하십시오.
                 }
             });
         }
