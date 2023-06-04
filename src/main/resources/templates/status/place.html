@@ -32,29 +32,40 @@
                 장소 투표
             </div>
 
-            <div class="rank-1th">
-                <span class="rank-one text-bold">1위</span>
-                <span class="place ml-7 text-xl">서울역</span>
-                <span class="people-number ml-16"> 3명 / 7명</span>
+            <div class="rank-1th" th:each="map, iterStat : ${selectedPlaceMap}" th:if="${iterStat.first}">
+                <span class="rank-one text-bold">
+                    <span th:text="${iterStat.index + 1}">1</span>
+                    <span>위</span>
+                </span>
+                <span class="place ml-7 text-xl" th:text="${map.key.name}">서울역</span>
+                <span class="people-number ml-12">
+                    <span th:text="${map.value}">3</span>
+                    <span>명 / </span>
+                    <span th:text="${room.enterRoom.size()}">7</span>
+                    <span>명</span>
+                </span>
                 <span>
-            <button class="vote-btn ml-2">투표</button>
-          </span>
+                    <button class="vote-btn ml-2">투표</button>
+                </span>
             </div>
 
             <div class="rank-nth">
-
-                <div class="rank-content-other">
-                    <div class="rank-n text-bold">2위</div>
-                    <div class="date-n text-lg">동서울역</div>
-                    <div class="people-number-n">2명 / 7명</div>
+                <div class="rank-content-other" th:each="map, iterStat : ${selectedPlaceMap}" th:if="${!iterStat.first}">
+                    <div class="rank-n text-bold">
+                        <span th:text="${iterStat.index + 1}">2</span>
+                        <span>위</span>
+                    </div>
+                    <div class="date-n text-lg" th:text="${map.key.name}">동서울역</div>
+                    <div class="people-number-n">
+                        <span th:text="${map.value}">2</span>
+                        <span>명 / </span>
+                        <span th:text="${room.enterRoom.size()}">7</span>
+                        <span>명</span>
+                    </div>
                     <div>
                         <button class="vote-btn">투표</button>
                     </div>
                 </div>
-
-                <div class="rank-content-other">
-                </div>
-
             </div>
         </div>
 
