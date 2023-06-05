@@ -46,7 +46,6 @@
         </div>
 
         <div class="chat-box flex flex-col mx-12 pt-2.5">
-            <button onclick="getMoreChats();">더 불러오기</button>
             <div id="chats" class="overflow-auto h-72">
                 <!-- 채팅내용 -->
             </div>
@@ -79,7 +78,7 @@
         }
 
         function send() {
-            if($('#content').val()){
+            if ($('#content').val()) {
                 stompClient.send(`/send/${roomId}`, {}, $('#content').val());
             }
             $('#content').val('');
@@ -105,12 +104,18 @@
                 await getChats(curSlice.pageable.pageNumber + 1);
 
                 const newScrollHeight = chatContainer.prop('scrollHeight');
-                chatContainer.scrollTop(chatContainer.scrollTop() + newScrollHeight - oldScrollHeight);            }
+                chatContainer.scrollTop(chatContainer.scrollTop() + newScrollHeight - oldScrollHeight);
+            }
         }
 
         function chatBubble(chat) {
             return `
                     <div id="${chat.id}" class="chat chat-${chat.memberId == memberId ? "end" : "start"}">
+                        <div class="chat-image avatar">
+                                <div class="w-10 rounded-full">
+                                <img src="${chat.profile}" />
+                            </div>
+                        </div>
                         <div class="chat-header">
                             ${chat.writer}
                             <time class="text-xs opacity-50">${dateFns.format(new Date(chat.createDate), 'YYYY-MM-DD HH:mm')}</time>
@@ -121,6 +126,7 @@
         }
 
         async function getChats(page) {
+            $('#chats button:first').remove();
             await $.ajax({
                 url: `/chats?roomId=${roomId}`,
                 type: 'GET',
@@ -135,6 +141,7 @@
                     console.error(textStatus, errorThrown);
                 }
             });
+            $('#chats').prepend(`<button onclick="getMoreChats();">더 불러오기</button>`);
         }
 
     </script>

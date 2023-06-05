@@ -29,6 +29,7 @@ public class Chat {
     private String memberId;
 
     private String writer;
+    private String profile;
     private String content;
 
     @CreatedDate

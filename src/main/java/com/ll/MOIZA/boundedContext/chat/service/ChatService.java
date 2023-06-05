@@ -27,6 +27,7 @@ public class ChatService {
                 .roomId(room.getId().toString())
                 .memberId(member.getId().toString())
                 .writer(member.getName())
+                .profile(member.getProfile())
                 .content(content)
                 .build();
 
