@@ -79,7 +79,9 @@
         }
 
         function send() {
-            stompClient.send(`/send/${roomId}`, {}, $('#content').val());
+            if($('#content').val()){
+                stompClient.send(`/send/${roomId}`, {}, $('#content').val());
+            }
             $('#content').val('');
         }
 
@@ -97,8 +99,13 @@
 
         async function getMoreChats() {
             if (!curSlice.last) {
+                const chatContainer = $('#chats');
+                const oldScrollHeight = chatContainer.prop('scrollHeight');
+
                 await getChats(curSlice.pageable.pageNumber + 1);
-            }
+
+                const newScrollHeight = chatContainer.prop('scrollHeight');
+                chatContainer.scrollTop(chatContainer.scrollTop() + newScrollHeight - oldScrollHeight);            }
         }
 
         function chatBubble(chat) {
