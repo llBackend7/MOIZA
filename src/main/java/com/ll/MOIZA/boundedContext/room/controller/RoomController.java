@@ -1,8 +1,12 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
+import com.ll.MOIZA.base.appConfig.AppConfig;
 import com.ll.MOIZA.base.mail.MailService;
+import com.ll.MOIZA.base.rq.Rq;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
+import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
+import com.ll.MOIZA.boundedContext.result.service.ResultService;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import jakarta.validation.Valid;
@@ -14,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +34,7 @@ public class RoomController {
     private final RoomService roomService;
     private final MemberService memberService;
     private final MailService mailService;
+    private final ResultService resultService;
 
     @Data
     public static class RoomForm {
@@ -101,5 +107,14 @@ public class RoomController {
         mailService.sendMailTo(friend, mailContent);
 
         return "{'result':'초대링크를 발송했습니다.'}";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{roomId}/result")
+    public String showResult(Model model, @PathVariable Long roomId) {
+        DecidedResult result = resultService.getResult(roomId);
+        model.addAttribute("result", result);
+        model.addAttribute("appKey", AppConfig.getAppKey());
+        return "/room/result";
     }
 }

@@ -2,10 +2,13 @@ package com.ll.MOIZA.base.initData;
 
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
+import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
+import com.ll.MOIZA.boundedContext.result.service.ResultService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
+import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +27,9 @@ public class NotProd {
             MemberRepository memberRepository,
             RoomService roomService,
             EnterRoomService enterRoomService,
-            SelectedTimeService selectedTimeService
+            SelectedTimeService selectedTimeService,
+            SelectedPlaceService selectedPlaceService,
+            ResultService resultService
     ) {
         return args -> {
             Member member1 = Member.builder().name("user1").email("email").build();
@@ -99,6 +104,13 @@ public class NotProd {
                     LocalTime.of(13, 0),
                     enterRoom3
             );
+
+            String place = "서울역";
+
+            selectedPlaceService.CreateSelectedPlace(
+                    place, enterRoom
+            );
+           resultService.createResult(place, enterRoom.getRoom());
         };
     }
 }
