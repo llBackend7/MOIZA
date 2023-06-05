@@ -61,4 +61,13 @@ class ChatServiceTest {
         assertThat(chats.hasPrevious()).isFalse();
         assertThat(chats.hasNext()).isTrue();
     }
+
+    @Test
+    void 메시지_이스케이프() {
+        Member user1 = memberService.findByName("user1");
+        Room room = roomService.getRoom(1L);
+        Chat chat = chatService.sendChat(user1, room, "<script>alert('Hacked!')</script>");
+
+        assertThat(chat.getContent()).doesNotContain("<script>alert('Hacked!')</script>");
+    }
 }

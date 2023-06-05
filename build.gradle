@@ -47,6 +47,10 @@ dependencies {
 	implementation group: 'org.mongodb', name: 'mongodb-driver-sync', version: '4.9.1'
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb-reactive'
+
+	// 메시지 이스케이프
+	// https://mvnrepository.com/artifact/org.apache.commons/commons-text
+	implementation group: 'org.apache.commons', name: 'commons-text', version: '1.10.0'
 }
 
 tasks.named('test') {

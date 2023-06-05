@@ -5,6 +5,7 @@ import com.ll.MOIZA.boundedContext.chat.repository.ChatRepository;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -28,7 +29,7 @@ public class ChatService {
                 .memberId(member.getId().toString())
                 .writer(member.getName())
                 .profile(member.getProfile())
-                .content(content)
+                .content(StringEscapeUtils.escapeHtml4(content))
                 .build();
 
         chat = chatRepository.save(chat);

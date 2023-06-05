@@ -40,20 +40,23 @@
 
 <main layout:fragment="main" class="flex-grow flex items-center justify-center">
     <div class="max-w-2xl w-full bg-blue-50">
-        <div class="text">
-            <div class="title">모임이름</div>
-            <div class="font-gsans w-56 flex justify-center text-2xl">서울 벙개</div>
+        <div class="text flex justify-center">
+            <div class="font-gsans w-56 text-2xl text-center">서울 벙개</div>
         </div>
 
-        <div class="chat-box flex flex-col mx-12 pt-2.5">
-            <div id="chats" class="overflow-auto h-72">
-                <!-- 채팅내용 -->
+        <div class="chat-box flex flex-col mx-12 pt-2.5 h-auto">
+            <div class="!border !border-[#adcfee]">
+                <div id="chats" class="overflow-auto h-72 px-4 pt-2">
+                    <!-- 채팅내용 -->
+                </div>
             </div>
-            <div class="flex-grow"></div>
-            <div class="chat-input p-2.5">
-                <form>
-                    <input required type="text" class="p-1 font-gsans" id="content" placeholder=" 내용 입력 후 Enter"/>
-                    <button type="submit" id="send">입력</button>
+            <div class="chat-input px-2.5 bg-[#006BCE]">
+                <form class="w-full flex justify-space gap-3 p-1.5">
+                    <input type="text" class="input input-sm  input-bordered p-1 font-gsans flex-grow"
+                           id="content"
+                           placeholder=" 내용 입력 후 Enter"/>
+                    <button type="submit" id="send"><i class="fa-solid fa-paper-plane" style="color: #a3e8ff;"></i>
+                    </button>
                 </form>
             </div>
         </div>
@@ -90,7 +93,6 @@
         }
 
         function show(chat) {
-            console.log(chat);
             let parsed = JSON.parse(chat.body);
             $('#chats').append(chatBubble(parsed));
             goToRecent();
@@ -116,17 +118,17 @@
                                 <img src="${chat.profile}" />
                             </div>
                         </div>
-                        <div class="chat-header">
+                        <div class="chat-header font-gsans">
                             ${chat.writer}
-                            <time class="text-xs opacity-50">${dateFns.format(new Date(chat.createDate), 'YYYY-MM-DD HH:mm')}</time>
+                            <time class="text-xs opacity-50 font-gsans">${dateFns.format(new Date(chat.createDate), 'YYYY-MM-DD HH:mm')}</time>
                         </div>
-                        <div class="chat-bubble">${chat.content}</div>
+                        <div class="chat-bubble font-gsans">${chat.content}</div>
                     </div>
                     `;
         }
 
         async function getChats(page) {
-            $('#chats button:first').remove();
+            $('#chats #reload:first').remove();
             await $.ajax({
                 url: `/chats?roomId=${roomId}`,
                 type: 'GET',
@@ -141,7 +143,13 @@
                     console.error(textStatus, errorThrown);
                 }
             });
-            $('#chats').prepend(`<button onclick="getMoreChats();">더 불러오기</button>`);
+            if (!curSlice.last) {
+                $('#chats').prepend(`
+                <div id="reload" class="w-full flex justify-center">
+                    <button onclick="getMoreChats();"><i class="fa-solid fa-rotate-right"></i></button>
+                </div>
+                `);
+            }
         }
 
     </script>
