@@ -2,15 +2,23 @@ package com.ll.MOIZA.boundedContext.room.controller;
 
 import com.ll.MOIZA.base.exception.GlobalExceptionHandler;
 import com.ll.MOIZA.base.mail.MailService;
+import com.ll.MOIZA.boundedContext.chat.repository.ChatRepository;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
+import org.springframework.boot.autoconfigure.mongo.MongoReactiveAutoConfiguration;
+import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.jpa.mapping.JpaMetamodelMappingContext;
+import org.springframework.data.mongodb.SpringDataMongoDB;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.util.LinkedMultiValueMap;
@@ -27,7 +35,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = {RoomController.class, GlobalExceptionHandler.class})
-@MockBean(JpaMetamodelMappingContext.class)
+@AutoConfigureDataMongo
+@MockBean({JpaMetamodelMappingContext.class, SpringDataMongoDB.class})
 public class MockedRoomControllerTest {
     @Autowired
     MockMvc mockMvc;
@@ -40,6 +49,9 @@ public class MockedRoomControllerTest {
 
     @MockBean
     MailService mailService;
+
+    @MockBean
+    EnterRoomService enterRoomService;
 
     /*
     실제 메일 날라옴

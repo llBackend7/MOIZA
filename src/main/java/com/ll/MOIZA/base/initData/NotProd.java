@@ -1,5 +1,6 @@
 package com.ll.MOIZA.base.initData;
 
+import com.ll.MOIZA.boundedContext.chat.service.ChatService;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
@@ -11,6 +12,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.mongodb.core.MongoTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,9 +26,13 @@ public class NotProd {
             MemberRepository memberRepository,
             RoomService roomService,
             EnterRoomService enterRoomService,
-            SelectedTimeService selectedTimeService
+            SelectedTimeService selectedTimeService,
+            MongoTemplate mongoTemplate,
+            ChatService chatService
     ) {
         return args -> {
+            mongoTemplate.dropCollection("chat");
+
             Member member1 = Member.builder().name("user1").email("email").build();
             Member member2 = Member.builder().name("user2").email("email").build();
             try {
@@ -53,6 +59,10 @@ public class NotProd {
                     LocalTime.of(3, 0),
                     LocalDateTime.now().plusDays(2));
             EnterRoom enterRoom = enterRoomService.createEnterRoom(room, member1);
+
+            for (int i = 0; i < 100; i++) {
+                chatService.sendChat(member1, room, "테스트 채팅%d".formatted(i));
+            }
 
             selectedTimeService.CreateSelectedTime(
                     LocalDate.now().plusDays(6),
