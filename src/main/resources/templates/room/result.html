@@ -23,17 +23,10 @@
 <main layout:fragment="main" class="flex-grow flex justify-center">
     <div class="max-w-2xl w-full">
         <div class="w-full flex flex-col items-center">
-            <div class="w-3/4 h-20 flex flex-col">
-
-                <a href="" class="flex justify-end my-1 w-full">
-                    <img width="25" src="https://img.icons8.com/ios-glyphs/30/share--v1.png" alt="share--v1" />
-                    <div class="flex items-center font-gsans text-sm pl-1">공유하기</div>
-                </a>
-
+            <div class="w-3/4 h-20 flex flex-col items-center">
                 <div class="text-center">
                     <div th:text="${result.room.name}" class="text-3xl"></div>
                 </div>
-
             </div>
 
             <div class="w-full flex flex-col px-10">
@@ -142,6 +135,46 @@
                                 }
                             </script>
                         </div>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <div class="text-center">
+                        <ul class="flex justify-center">
+
+                            <li class="flex flex-col items-center py-2 mr-16">
+                                <button onclick="sendKakaoShare();">
+                                    <img src="https://blog.kakaocdn.net/dn/bpOv6u/btru1akOJSk/SWmLX4oJKrYWo03MiKDRhK/img.png" width="40" class="mb-1">
+                                </button>
+                                <div class="text-sm">카카오톡<br>공유하기</div>
+                                <script>
+                                    function sendKakaoShare() {
+                                        Kakao.init("[[${appKey}]]");
+                                        Kakao.Link.sendCustom({ templateId: 94654});
+                                    }
+                                </script>
+                            </li>
+
+                            <li class="flex flex-col items-center py-2">
+                                <button onclick="copyPageLink()">
+                                    <img src="https://img.icons8.com/external-prettycons-solid-prettycons/60/4D4D4D/external-link-social-media-prettycons-solid-prettycons.png" width="40" class="mask mask-circle mb-1">
+                                </button>
+                                <div class="text-sm">링크<br>공유하기</div>
+                                <script>
+                                    function copyPageLink() {
+                                        const pageLink = window.location.href;
+                                        navigator.clipboard.writeText(pageLink)
+                                            .then(() => {
+                                                alert("페이지 링크가 복사되었습니다.");
+                                            })
+                                            .catch((error) => {
+                                                console.error("페이지 링크 복사 실패:", error);
+                                            });
+                                    }
+                                </script>
+                            </li>
+
+                        </ul>
                     </div>
                 </div>
 
