@@ -122,6 +122,7 @@ public class RoomController {
         model.addAttribute("result", result);
         model.addAttribute("appKey", AppConfig.getAppKey());
         return "/room/result";
+    }
 
     @GetMapping("/{roomId}/date")
     public String showRoomDate(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
