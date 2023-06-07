@@ -18,42 +18,149 @@
             <button>마감하기</button>
         </div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"
+            integrity="sha512-iKDtgDyTHjAitUDdLljGhenhPwrbBfqTKWO1mkhSFH3A7blITC9MhYon6SjnMhp4o0rADGw9yAC6EW4t5a4K3g=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- date-fns -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.30.1/date_fns.min.js"></script>
+
+    <script>
+        /*<![CDATA[*/
+        let roomId = [[${roomId}]];
+        let memberId = [[${@memberRepository.findByName(#authentication.principal.name).get().id}]];
+        /*]]>*/
+
+        let stompClient = null;
+
+        let curSlice;
+    </script>
 </header>
 
 <main layout:fragment="main" class="flex-grow flex items-center justify-center">
     <div class="max-w-2xl w-full bg-blue-50">
-        <div class="text">
-            <div class="title">모임이름</div>
-            <div class="font-gsans w-56 flex justify-center text-2xl">서울 벙개</div>
+        <div class="text flex justify-center">
+            <div class="font-gsans w-56 text-2xl text-center">서울 벙개</div>
         </div>
 
-        <div class="chat-box flex flex-col mx-12 pt-2.5">
-            <div class="text-center m-2 text-xl">
-                채팅창
+        <div class="chat-box flex flex-col mx-12 pt-2.5 h-auto">
+            <div class="!border !border-[#adcfee]">
+                <div id="chats" class="overflow-auto h-72 px-4 pt-2">
+                    <!-- 채팅내용 -->
+                </div>
             </div>
-
-            <div class="message font-gsans px-2.5 text-sm">
-                <span>User 1:</span>
-                <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</span>
-            </div>
-            <div class="message font-gsans px-2.5 text-sm">
-                <span>User 2:</span>
-                <span>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</span>
-            </div>
-            <div class="flex-grow"></div>
-            <div class="chat-input p-2.5">
-                <input type="text" class="p-1 font-gsans" placeholder=" 내용 입력 후 Enter" />
+            <div class="chat-input px-2.5 bg-[#006BCE]">
+                <form class="w-full flex justify-space gap-3 p-1.5">
+                    <input type="text" class="input input-sm  input-bordered p-1 font-gsans flex-grow"
+                           id="content"
+                           placeholder=" 내용 입력 후 Enter"/>
+                    <button type="submit" id="send"><i class="fa-solid fa-paper-plane" style="color: #a3e8ff;"></i>
+                    </button>
+                </form>
             </div>
         </div>
     </div>
+    <script>
+        $(document).ready(async () => {
+            connect();
+            $('form').on('submit', e => e.preventDefault());
+            $('#send').click(() => send());
+            await getChats(0);
+            goToRecent();
+        })
+
+        function connect() {
+            let socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, () => {
+
+                stompClient.subscribe(`/room/${roomId}`, chat => show(chat));
+
+            });
+        }
+
+        function send() {
+            if ($('#content').val()) {
+                stompClient.send(`/send/${roomId}`, {}, $('#content').val());
+            }
+            $('#content').val('');
+        }
+
+        function goToRecent() {
+            const chatContainer = $('#chats');
+            chatContainer.scrollTop(chatContainer.prop('scrollHeight'));
+        }
+
+        function show(chat) {
+            let parsed = JSON.parse(chat.body);
+            $('#chats').append(chatBubble(parsed));
+            goToRecent();
+        }
+
+        async function getMoreChats() {
+            if (!curSlice.last) {
+                const chatContainer = $('#chats');
+                const oldScrollHeight = chatContainer.prop('scrollHeight');
+
+                await getChats(curSlice.pageable.pageNumber + 1);
+
+                const newScrollHeight = chatContainer.prop('scrollHeight');
+                chatContainer.scrollTop(chatContainer.scrollTop() + newScrollHeight - oldScrollHeight);
+            }
+        }
+
+        function chatBubble(chat) {
+            return `
+                    <div id="${chat.id}" class="chat chat-${chat.memberId == memberId ? "end" : "start"}">
+                        <div class="chat-image avatar">
+                                <div class="w-10 rounded-full">
+                                <img src="${chat.profile}" />
+                            </div>
+                        </div>
+                        <div class="chat-header font-gsans">
+                            ${chat.writer}
+                            <time class="text-xs opacity-50 font-gsans">${dateFns.format(new Date(chat.createDate), 'YYYY-MM-DD HH:mm')}</time>
+                        </div>
+                        <div class="chat-bubble font-gsans">${chat.content}</div>
+                    </div>
+                    `;
+        }
+
+        async function getChats(page) {
+            $('#chats #reload:first').remove();
+            await $.ajax({
+                url: `/chats?roomId=${roomId}`,
+                type: 'GET',
+                data: {
+                    page: page
+                },
+                success: function (slice) {
+                    curSlice = slice;
+                    slice.content.forEach(chat => $('#chats').prepend(chatBubble(chat)));
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error(textStatus, errorThrown);
+                }
+            });
+            if (!curSlice.last) {
+                $('#chats').prepend(`
+                <div id="reload" class="w-full flex justify-center">
+                    <button onclick="getMoreChats();"><i class="fa-solid fa-rotate-right"></i></button>
+                </div>
+                `);
+            }
+        }
+
+    </script>
 </main>
 
 <footer layout:fragment="footer">
-    <a href="/room/status/date"><i class="far fa-thin fa-clock text-slate-300 hover:text-sky-600"></i></a>
-    <a href="/room/status/place"><i class="far fa-solid fa-location-dot text-slate-300 hover:text-sky-600"></i></a>
+    <a th:href="@{|/room/${room.id}/date|}"><i class="far fa-thin fa-clock text-slate-300 hover:text-sky-600"></i></a>
+    <a th:href="@{|/room/${room.id}/place|}"><i
+            class="far fa-solid fa-location-dot text-slate-300 hover:text-sky-600"></i></a>
     <a href=""><i class="far fa-thin fa-comments text-sky-600"></i></a>
 </footer>
-
 </body>
 
 </html>

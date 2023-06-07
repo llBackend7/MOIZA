@@ -24,7 +24,7 @@
     <div class="max-w-2xl w-full bg-blue-50">
         <div class="text">
             <div class="title">모임이름</div>
-            <div class="font-gsans w-56 flex justify-center text-2xl">서울 벙개</div>
+            <div class="font-gsans w-56 flex justify-center text-2xl" th:text="${room.name}">서울 벙개</div>
         </div>
 
         <div class="place-rank">
@@ -68,9 +68,10 @@
 </body>
 
 <footer layout:fragment="footer">
-    <a href="/room/status/date"><i class="far fa-thin fa-clock text-slate-300 hover:text-sky-600"></i></a>
+    <a th:href="@{|/room/${room.id}/date|}"><i class="far fa-thin fa-clock text-slate-300 hover:text-sky-600"></i></a>
     <a href=""><i class="far fa-solid fa-location-dot text-sky-600 "></i></a>
-    <a href="/room/status/chat"><i class="far fa-thin fa-comments text-slate-300 hover:text-sky-600"></i></a>
+    <a th:href="@{|/room/${room.id}/chat|}"><i class="far fa-thin fa-comments text-slate-300 hover:text-sky-600"></i></a>
 </footer>
 
 </html>
+

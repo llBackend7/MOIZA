@@ -3,17 +3,20 @@ package com.ll.MOIZA.boundedContext.room.controller;
 import com.ll.MOIZA.base.appConfig.AppConfig;
 import com.ll.MOIZA.base.mail.MailService;
 import com.ll.MOIZA.base.rq.Rq;
+import com.ll.MOIZA.boundedContext.chat.service.ChatService;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
 import com.ll.MOIZA.boundedContext.result.service.ResultService;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -21,6 +24,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,6 +39,8 @@ public class RoomController {
     private final MemberService memberService;
     private final MailService mailService;
     private final ResultService resultService;
+
+    private final EnterRoomService enterRoomService;
 
     @Data
     public static class RoomForm {
@@ -68,8 +74,8 @@ public class RoomController {
     @PostMapping("/create")
     @ResponseBody
     public Map<String, Object> createRoom(@AuthenticationPrincipal User user,
-                          @Valid RoomForm roomForm,
-                          BindingResult bindingResult) {
+                                          @Valid RoomForm roomForm,
+                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return Map.of("error", bindingResult.getAllErrors());
         }
@@ -86,7 +92,7 @@ public class RoomController {
                 roomForm.deadLine);
         String accessToken = roomService.getAccessToken(room);
         Long roomId = room.getId();
-        return Map.of("link", "http://localhost:8080/room/enter?roomId=%d&accessToken=%s".formatted(roomId,accessToken));
+        return Map.of("link", "http://localhost:8080/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken));
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -116,5 +122,36 @@ public class RoomController {
         model.addAttribute("result", result);
         model.addAttribute("appKey", AppConfig.getAppKey());
         return "/room/result";
+
+    @GetMapping("/{roomId}/date")
+    public String showRoomDate(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
+        Room room = roomService.getRoom(roomId);
+
+        model.addAttribute("room", room);
+        return "status/date";
+    }
+
+    @GetMapping("/{roomId}/place")
+    public String showRoomPlace(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
+        Room room = roomService.getRoom(roomId);
+
+        model.addAttribute("room", room);
+        return "status/place";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{roomId}/chat")
+    public String showRoomChat(@PathVariable Long roomId,
+                               @AuthenticationPrincipal User user,
+                               Model model) {
+        Room room = roomService.getRoom(roomId);
+        Member member = memberService.loginMember(user);
+
+        if (enterRoomService.isNotRoomMember(room, member)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "채팅 입장 권한이 없습니다.");
+        }
+
+        model.addAttribute("room", room);
+        return "status/chat";
     }
 }
