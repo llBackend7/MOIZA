@@ -1,10 +1,12 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
 import com.ll.MOIZA.base.mail.MailService;
+import com.ll.MOIZA.boundedContext.chat.service.ChatService;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import jakarta.validation.Valid;
@@ -12,6 +14,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -19,6 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,6 +40,8 @@ public class RoomController {
     private final RoomService roomService;
     private final MemberService memberService;
     private final MailService mailService;
+
+    private final EnterRoomService enterRoomService;
 
     @Data
     public static class RoomForm {
@@ -59,25 +65,22 @@ public class RoomController {
         LocalDateTime deadLine;
     }
 
-    //TODO 로그인 기능 완성되면 주석해제
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
     public String createRoom(RoomForm roomForm) {
         return "/room/create";
     }
 
-    //TODO 로그인 기능 완성되면 주석해제
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
     @ResponseBody
     public Map<String, Object> createRoom(@AuthenticationPrincipal User user,
-                          @Valid RoomForm roomForm,
-                          BindingResult bindingResult) {
+                                          @Valid RoomForm roomForm,
+                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return Map.of("error", bindingResult.getAllErrors());
         }
 
-        //TODO 로그인 기능 완성되면 원래대로
         Member member = memberService.loginMember(user);
         Room room = roomService.createRoom(member,
                 roomForm.name,
@@ -145,9 +148,17 @@ public class RoomController {
         return "status/place";
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{roomId}/chat")
-    public String showRoomChat(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
+    public String showRoomChat(@PathVariable Long roomId,
+                               @AuthenticationPrincipal User user,
+                               Model model) {
         Room room = roomService.getRoom(roomId);
+        Member member = memberService.loginMember(user);
+
+        if (enterRoomService.isNotRoomMember(room, member)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "채팅 입장 권한이 없습니다.");
+        }
 
         model.addAttribute("room", room);
         return "status/chat";

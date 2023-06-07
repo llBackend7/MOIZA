@@ -22,6 +22,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/").permitAll()
                                 .requestMatchers("/login").permitAll()
+                                .requestMatchers("/css/**").permitAll()
+                                .requestMatchers("/img/**").permitAll()
+                                .requestMatchers("/error").permitAll()
                                 .requestMatchers("/**").authenticated()
                 )
                 .oauth2Login(
@@ -34,9 +37,6 @@ public class SecurityConfig {
                         logout -> logout
                                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                                 .logoutSuccessHandler((request, response, authentication) -> {
-                                        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-                                        response.setHeader("Pragma", "no-cache");
-                                        response.setHeader("Expires", "0");
                                         response.sendRedirect("/");
                                    }
                                 )

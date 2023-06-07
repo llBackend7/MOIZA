@@ -143,12 +143,6 @@ html > body {
     box-shadow: 5px 7px 2px 1px rgba(0, 0, 0, 0.09);
 }
 
-.chat-box {
-    border: 2px solid #adcfee;
-    height: 87%;
-    overflow-y: scroll;
-}
-
 .chat-input {
     background-color: #006bce;
 }
@@ -208,11 +202,11 @@ html > body {
 }
 
 .main-img {
-    background: url(img/main.png) no-repeat center;
+    background: url(../img/main.png) no-repeat center;
     background-size: cover;
 }
 
 .mainsub-img {
-    background: url(img/main_sub.png) no-repeat center;
+    background: url(../img/main_sub.png) no-repeat center;
     background-size: cover;
 }
