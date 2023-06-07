@@ -1,7 +1,6 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
 import com.ll.MOIZA.base.mail.MailService;
-import com.ll.MOIZA.boundedContext.chat.service.ChatService;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
@@ -14,7 +13,6 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -22,7 +20,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -150,14 +147,7 @@ public class RoomController {
 
     @PreAuthorize("isAuthenticated() && hasAuthority('ROOM#' + #roomId + '_MEMBER')")
     @GetMapping("/{roomId}/chat")
-    public String showRoomChat(@PathVariable Long roomId,
-                               @AuthenticationPrincipal User user) {
-//        Room room = roomService.getRoom(roomId);
-//        Member member = memberService.loginMember(user);
-//
-//        if (enterRoomService.isNotRoomMember(room, member)) {
-//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "채팅 입장 권한이 없습니다.");
-//        }
+    public String showRoomChat(@PathVariable Long roomId) {
         return "status/chat";
     }
 }

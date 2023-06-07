@@ -24,18 +24,7 @@ public class ChatService {
     private final ChatRepository chatRepository;
     private final SimpMessagingTemplate messagingTemplate;
     public Chat sendChat(Member member, Room room, String content) {
-        Chat chat = Chat.builder()
-                .roomId(room.getId().toString())
-                .memberId(member.getId().toString())
-                .writer(member.getName())
-                .profile(member.getProfile())
-                .content(StringEscapeUtils.escapeHtml4(content))
-                .build();
-
-        chat = chatRepository.save(chat);
-        messagingTemplate.convertAndSend("/room/%s".formatted(room.getId()), chat); // /room/{roomId}
-
-        return chat;
+        return sendChat(member.getId().toString(), member.getName(), member.getProfile(), room.getId().toString(), content);
     }
 
 
@@ -44,5 +33,20 @@ public class ChatService {
         sorts.add(Sort.Order.desc("createDate"));
         Pageable pageable = PageRequest.of(page, 20, Sort.by(sorts));
         return chatRepository.findByRoomId(room.getId().toString(), pageable);
+    }
+
+    public Chat sendChat(String memberId, String username, String profile, String roomId, String content) {
+        Chat chat = Chat.builder()
+                .roomId(roomId)
+                .memberId(memberId)
+                .writer(username)
+                .profile(profile)
+                .content(StringEscapeUtils.escapeHtml4(content))
+                .build();
+
+        chat = chatRepository.save(chat);
+        messagingTemplate.convertAndSend("/room/%s".formatted(roomId), chat); // /room/{roomId}
+
+        return chat;
     }
 }
