@@ -49,8 +49,8 @@
                 </span>
             </div>
 
-            <div class="rank-nth">
-                <div class="rank-content-other" th:each="map, iterStat : ${selectedPlaceMap}" th:if="${!iterStat.first}">
+            <div class="rank-nth w-full justify-items-center mt-4">
+                <div class="rank-content-other py-4" th:each="map, iterStat : ${selectedPlaceMap}" th:if="${!iterStat.first}">
                     <div class="rank-n text-bold">
                         <span th:text="${iterStat.index + 1}">2</span>
                         <span>위</span>

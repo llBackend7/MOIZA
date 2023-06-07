@@ -111,6 +111,8 @@ public class NotProd {
             );
 
             selectedPlaceService.CreateSelectedPlace("서울역", enterRoom3);
+            selectedPlaceService.CreateSelectedPlace("대구역", enterRoom3);
+            selectedPlaceService.CreateSelectedPlace("익산역", enterRoom3);
         };
     }
 }
