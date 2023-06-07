@@ -1,6 +1,7 @@
 package com.ll.MOIZA.base.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -23,24 +24,19 @@ public class SecurityConfig {
                         request.requestMatchers("/").permitAll()
                                 .requestMatchers("/login").permitAll()
                                 .requestMatchers("/memberLogin").permitAll()
-                                .requestMatchers("/*.css").permitAll()
+                                .requestMatchers("/css/**").permitAll()
                                 .requestMatchers("/img/**").permitAll()
-                                .requestMatchers("/error").permitAll()
+                                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .requestMatchers("/**").authenticated()
                 )
                 .oauth2Login(
                         oauth2Login -> oauth2Login.loginPage("/login")
-                                .successHandler((request, response, authentication) ->
-                                        response.sendRedirect("/groups")
-                                )
+                                .defaultSuccessUrl("/groups", true)
                 )
                 .logout(
                         logout -> logout
                                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-                                .logoutSuccessHandler((request, response, authentication) -> {
-                                        response.sendRedirect("/login");
-                                   }
-                                )
+                                .logoutSuccessUrl("/login")
                                 .invalidateHttpSession(true)
                 )
                 .exceptionHandling(

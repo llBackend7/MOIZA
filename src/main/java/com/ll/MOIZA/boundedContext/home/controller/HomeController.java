@@ -20,13 +20,13 @@ public class HomeController {
     @GetMapping("/")
     public String showMain(){
         if(rq.isLogout())
-            return "redirect:/login";
+            return "home/login";
         else
             return "redirect:/groups";
     }
 
     @GetMapping("/login")
-    public String Login(){
+    public String login(){
         if(rq.isLogout())
             return "home/login";
         else
@@ -45,7 +45,7 @@ public class HomeController {
     @GetMapping("/groups")
     public String home(Model model){
         if(rq.isLogout())
-            return "redirect:/login";
+            return "home/login";
 
         List<Room> rooms = rq.getMember().getRooms();
         model.addAttribute("member", rq.getMember());
