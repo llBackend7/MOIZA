@@ -148,19 +148,16 @@ public class RoomController {
         return "status/place";
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() && hasAuthority('ROOM#' + #roomId + '_MEMBER')")
     @GetMapping("/{roomId}/chat")
     public String showRoomChat(@PathVariable Long roomId,
-                               @AuthenticationPrincipal User user,
-                               Model model) {
-        Room room = roomService.getRoom(roomId);
-        Member member = memberService.loginMember(user);
-
-        if (enterRoomService.isNotRoomMember(room, member)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "채팅 입장 권한이 없습니다.");
-        }
-
-        model.addAttribute("room", room);
+                               @AuthenticationPrincipal User user) {
+//        Room room = roomService.getRoom(roomId);
+//        Member member = memberService.loginMember(user);
+//
+//        if (enterRoomService.isNotRoomMember(room, member)) {
+//            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "채팅 입장 권한이 없습니다.");
+//        }
         return "status/chat";
     }
 }
