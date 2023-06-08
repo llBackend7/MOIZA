@@ -2,11 +2,11 @@ package com.ll.MOIZA.boundedContext.chat.controller;
 
 import com.ll.MOIZA.base.security.CustomOAuth2User;
 import com.ll.MOIZA.boundedContext.chat.document.Chat;
+import com.ll.MOIZA.boundedContext.chat.repository.Cursor;
 import com.ll.MOIZA.boundedContext.chat.service.ChatService;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Slice;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.handler.annotation.Headers;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -47,9 +47,9 @@ public class ChatController {
 
     @PreAuthorize("isAuthenticated() && hasAuthority('ROOM#' + #roomId + '_MEMBER')")
     @GetMapping("/chats")
-    public Slice<Chat> loadChats(@RequestParam(defaultValue = "0") int page, @RequestParam Long roomId) {
+    public Cursor<Chat> loadChats(@RequestParam(required = false) String nextCursor, @RequestParam Long roomId) {
         Room room = roomService.getRoom(roomId);
-        return chatService.getChats(room, page);
+        return chatService.getChats(room, nextCursor);
     }
 
     private String extractRoomId(MessageHeaders headers) {

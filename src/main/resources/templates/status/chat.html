@@ -66,7 +66,7 @@
             connect();
             $('form').on('submit', e => e.preventDefault());
             $('#send').click(() => send());
-            await getChats(0);
+            await getChats();
             goToRecent();
         })
 
@@ -103,7 +103,7 @@
                 const chatContainer = $('#chats');
                 const oldScrollHeight = chatContainer.prop('scrollHeight');
 
-                await getChats(curSlice.pageable.pageNumber + 1);
+                await getChats(curSlice.nextCursor);
 
                 const newScrollHeight = chatContainer.prop('scrollHeight');
                 chatContainer.scrollTop(chatContainer.scrollTop() + newScrollHeight - oldScrollHeight);
@@ -127,13 +127,13 @@
                     `;
         }
 
-        async function getChats(page) {
+        async function getChats(nextCursor) {
             $('#chats #reload:first').remove();
             await $.ajax({
                 url: `/chats?roomId=${roomId}`,
                 type: 'GET',
                 data: {
-                    page: page
+                    nextCursor: nextCursor
                 },
                 success: function (slice) {
                     curSlice = slice;
