@@ -27,9 +27,6 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
-  data:
-      mongodb:
-        uri: mongodb+srv://chungsanghwa:tjddud11@cluster0.cejyzhu.mongodb.net/moiza?retryWrites=true&w=majority
   jpa:
     properties:
       hibernate:
