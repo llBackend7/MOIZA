@@ -8,6 +8,12 @@ import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
+import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +33,9 @@ public class NotProd {
             RoomService roomService,
             EnterRoomService enterRoomService,
             SelectedTimeService selectedTimeService,
+
+            SelectedPlaceService selectedPlaceService
+
             MongoTemplate mongoTemplate,
             ChatService chatService
     ) {
@@ -78,6 +87,9 @@ public class NotProd {
                     enterRoom
             );
 
+            selectedPlaceService.CreateSelectedPlace("서울역", enterRoom);
+            selectedPlaceService.CreateSelectedPlace("용산역", enterRoom);
+
             EnterRoom enterRoom2 = enterRoomService.createEnterRoom(room, member2);
 
             selectedTimeService.CreateSelectedTime(
@@ -94,6 +106,10 @@ public class NotProd {
                     enterRoom2
             );
 
+            selectedPlaceService.CreateSelectedPlace("서울역", enterRoom2);
+            selectedPlaceService.CreateSelectedPlace("용산역", enterRoom2);
+            selectedPlaceService.CreateSelectedPlace("사당역", enterRoom2);
+
             EnterRoom enterRoom3 = enterRoomService.createEnterRoom(room, member3);
 
             selectedTimeService.CreateSelectedTime(
@@ -109,6 +125,10 @@ public class NotProd {
                     LocalTime.of(13, 0),
                     enterRoom3
             );
+
+            selectedPlaceService.CreateSelectedPlace("서울역", enterRoom3);
+            selectedPlaceService.CreateSelectedPlace("대구역", enterRoom3);
+            selectedPlaceService.CreateSelectedPlace("익산역", enterRoom3);
         };
     }
 }
