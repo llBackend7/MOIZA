@@ -54,6 +54,9 @@ public class MockedRoomControllerTest {
     @MockBean
     ResultService resultService;
 
+    @MockBean
+    ResultService resultService;
+
     /*
     실제 메일 날라옴
     테스트는 성공
