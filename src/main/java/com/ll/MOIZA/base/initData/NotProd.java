@@ -34,7 +34,7 @@ public class NotProd {
             EnterRoomService enterRoomService,
             SelectedTimeService selectedTimeService,
 
-            SelectedPlaceService selectedPlaceService
+            SelectedPlaceService selectedPlaceService,
 
             MongoTemplate mongoTemplate,
             ChatService chatService
