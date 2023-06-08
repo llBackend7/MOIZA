@@ -21,6 +21,10 @@ html > body {
     margin: 0;
 }
 
+body::-webkit-scrollbar {
+    display: none;
+}
+
 .bg-blue-50 {
     height: 100vh;
     overflow: auto;

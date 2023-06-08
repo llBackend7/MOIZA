@@ -38,17 +38,16 @@ public class NotProd {
         return args -> {
             mongoTemplate.dropCollection("chat");
 
-            Member member1 = Member.builder().name("user1").email("email").build();
-            Member member2 = Member.builder().name("user2").email("email").build();
+            Member member1 = Member.builder().name("user1").email("user1@email.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
+            Member member2 = Member.builder().name("user2").email("user2@email.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
+            Member member3 = Member.builder().name("이은혜").email("lutea67@naver.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
             try {
                 memberRepository.save(member1);
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
             try {
                 memberRepository.save(member2);
             } catch (Exception e) {}
 
-            Member member3 = Member.builder().name("user3").email("email").build();
             memberRepository.save(member1);
             memberRepository.save(member2);
             memberRepository.save(member3);
@@ -115,12 +114,34 @@ public class NotProd {
                     enterRoom3
             );
 
-            String place = "서울역";
+            Room room2 = roomService.createRoom(
+                    member1,
+                    "room2 test(마감기한 지남)",
+                    "testtesttest",
+                    LocalDate.now().plusDays(5),
+                    LocalDate.now().plusDays(7),
+                    LocalTime.of(0, 0),
+                    LocalTime.of(23, 0),
+                    LocalTime.of(3, 0),
+                    LocalDateTime.now().plusSeconds(5));
 
-            selectedPlaceService.CreateSelectedPlace(
-                    place, enterRoom
-            );
-           resultService.createResult(place, enterRoom.getRoom());
+            Room room3 = roomService.createRoom(
+                    member3,
+                    "room3 test(마감기한 안지남)",
+                    "testtesttest",
+                    LocalDate.now().plusDays(5),
+                    LocalDate.now().plusDays(7),
+                    LocalTime.of(0, 0),
+                    LocalTime.of(23, 0),
+                    LocalTime.of(3, 0),
+                    LocalDateTime.now().plusDays(3));
+
+            enterRoomService.createEnterRoom(room2, member1);
+            enterRoomService.createEnterRoom(room2, member3);
+            enterRoomService.createEnterRoom(room3, member3);
+
+            // TODO: 시간 현황 페이지 만들어지고 나서 고쳐야함.
+            resultService.createResult("강남역", room2);
         };
     }
 }

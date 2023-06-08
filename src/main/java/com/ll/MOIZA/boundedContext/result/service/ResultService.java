@@ -22,7 +22,7 @@ public class ResultService {
     @Transactional
     public DecidedResult createResult(String place, Room room) {
         DecidedResult result = DecidedResult.builder()
-                                            .decidedDayTime(LocalDateTime.now())
+                                            .decidedDayTime(LocalDateTime.now()) // TODO: 시간 현황 페이지 만들어지고 나서 고쳐야함.
                                             .decidedPlace(place)
                                             .room(room)
                                             .build();
