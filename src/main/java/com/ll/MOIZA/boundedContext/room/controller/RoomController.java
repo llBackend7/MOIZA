@@ -8,9 +8,11 @@ import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
 import com.ll.MOIZA.boundedContext.result.service.ResultService;
+import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
+import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -29,7 +31,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -92,7 +98,8 @@ public class RoomController {
                 roomForm.deadLine);
         String accessToken = roomService.getAccessToken(room);
         Long roomId = room.getId();
-        return Map.of("link", "http://localhost:8080/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken));
+
+        return Map.of("link", "http://localhost:8080/room/enter?roomId=%d&accessToken=%s".formatted(roomId,accessToken));
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -135,7 +142,22 @@ public class RoomController {
     @GetMapping("/{roomId}/place")
     public String showRoomPlace(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
         Room room = roomService.getRoom(roomId);
+        List<EnterRoom> enterRooms = room.getEnterRoom();
 
+        Map<SelectedPlace, Long> selectedPlaceMap = enterRooms.stream()
+                .flatMap(enterRoom -> enterRoom.getSelectedPlaces().stream())
+                .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.<SelectedPlace, Long>comparingByValue().reversed())
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        Map.Entry::getValue,
+                        (e1, e2) -> e1,
+                        LinkedHashMap::new
+                ));
+
+        model.addAttribute("selectedPlaceMap", selectedPlaceMap);
         model.addAttribute("room", room);
         return "status/place";
     }
