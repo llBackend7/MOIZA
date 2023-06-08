@@ -1,0 +1,29 @@
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<header layout:fragment="header" class="sticky top-0">
+  <div class="navbar max-w-2xl mx-auto bg-base-100">
+    <div class="navbar-start text-2xl font-gsans m-5">
+      <img width="35" src="https://img.icons8.com/external-flat-lima-studio/64/external-block-toys-flat-lima-studio-2.png" alt="external-block-toys-flat-lima-studio-2"/>
+      <div class="ml-2 mt-1">MOIZA</div>
+    </div>
+    <div class="navbar-center">
+    </div>
+    <div class="navbar-end">
+    </div>
+  </div>
+</header>
+
+<main layout:fragment="main" class="flex-grow flex items-center justify-center">
+  <div class="max-w-2xl w-full flex justify-center mainsub-img">
+    <div class="h-screen flex flex-col items-center justify-center">
+      <div class="text-white text-5xl mb-3 text-shadow">MOIZA</div>
+      <div class="font-gsans text-white text-2xl">로그인 후 서비스를 이용해주세요</div>
+      <a href="/oauth2/authorization/kakao" class="btn btn-warning max-w-[80%] w-full h-11 shadow-md mt-3">카카오 계정으로 로그인<i class="fa-solid fa-comment ml-2"></i></a>
+    </div>
+  </div>
+</main>
+
+</body>
+</html>
