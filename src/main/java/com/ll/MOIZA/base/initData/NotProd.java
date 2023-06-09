@@ -30,6 +30,7 @@ public class NotProd {
             RoomService roomService,
             EnterRoomService enterRoomService,
             SelectedTimeService selectedTimeService,
+
             SelectedPlaceService selectedPlaceService,
             ResultService resultService,
             MongoTemplate mongoTemplate,
@@ -150,7 +151,6 @@ public class NotProd {
 
             // TODO: 시간 현황 페이지 만들어지고 나서 고쳐야함.
             resultService.createResult("강남역", room2);
-
 
             selectedPlaceService.CreateSelectedPlace("서울역", enterRoom3);
             selectedPlaceService.CreateSelectedPlace("대구역", enterRoom3);
