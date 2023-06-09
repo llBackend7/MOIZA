@@ -34,14 +34,14 @@
 
             <div class="rank-1th" th:each="map, iterStat : ${selectedPlaceMap}" th:if="${iterStat.first}">
                 <span class="rank-one text-bold">
-                    <span th:text="${iterStat.index + 1}">1</span>
+                    <span th:text="${iterStat.index + 1}"></span>
                     <span>위</span>
                 </span>
-                <span class="place ml-7 text-xl" th:text="${map.key.name}">서울역</span>
+                <span class="place ml-7 text-xl" th:text="${map.key.name}"></span>
                 <span class="people-number ml-12">
-                    <span th:text="${map.value}">3</span>
+                    <span th:text="${map.value}"></span>
                     <span>명 / </span>
-                    <span th:text="${room.enterRoom.size()}">7</span>
+                    <span th:text="${room.enterRoom.size()}"></span>
                     <span>명</span>
                 </span>
                 <span>
@@ -52,14 +52,14 @@
             <div class="rank-nth w-full justify-items-center mt-4">
                 <div class="rank-content-other py-4" th:each="map, iterStat : ${selectedPlaceMap}" th:if="${!iterStat.first}">
                     <div class="rank-n text-bold">
-                        <span th:text="${iterStat.index + 1}">2</span>
+                        <span th:text="${iterStat.index + 1}"></span>
                         <span>위</span>
                     </div>
-                    <div class="date-n text-lg" th:text="${map.key.name}">동서울역</div>
+                    <div class="date-n text-lg" th:text="${map.key.name}"></div>
                     <div class="people-number-n">
-                        <span th:text="${map.value}">2</span>
+                        <span th:text="${map.value}"></span>
                         <span>명 / </span>
-                        <span th:text="${room.enterRoom.size()}">7</span>
+                        <span th:text="${room.enterRoom.size()}"></span>
                         <span>명</span>
                     </div>
                     <div>
