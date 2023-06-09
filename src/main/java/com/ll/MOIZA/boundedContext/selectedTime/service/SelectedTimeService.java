@@ -76,18 +76,41 @@ public class SelectedTimeService {
         }
     }
 
-    public List<TimeRangeWithMember> findOverlappingTimeRanges(
+    public List<TimeRangeWithMember> findOverlappingTimeRanges(Room room) {
+        List<TimeRangeWithMember> timeRangeWithMembers = new LinkedList<>();
+
+        LocalDate startDay = room.getAvailableStartDay();
+        LocalDate endDay = room.getAvailableEndDay();
+
+        while (!startDay.isAfter(endDay)) {
+            List<TimeRangeWithMember> getTimeRangesWhitRoomAndDay = findOverlappingTimeRanges(room,
+                    startDay);
+
+            timeRangeWithMembers.addAll(getTimeRangesWhitRoomAndDay);
+
+            startDay = startDay.plusDays(1);
+        }
+
+        Collections.sort(timeRangeWithMembers);
+
+        if (timeRangeWithMembers.size() > 10) {
+            return new ArrayList<>(timeRangeWithMembers.subList(0, 10));
+        }
+
+        return timeRangeWithMembers;
+    }
+
+    public List<TimeRangeWithMember>findOverlappingTimeRanges(
             Room room, LocalDate date) {
 
         List<SelectedTime> selectedTimeList = selectedTimeRepository.searchSelectedTimeByRoom(room,
                 date);
 
         if (selectedTimeList.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "선택된 시간이 없습니다. 선택한 시간을 확인해 주세요.");
+            return new ArrayList<>();
         }
 
-        List<TimeRangeWithMember> overlappingRanges = new ArrayList<>();
+        List<TimeRangeWithMember> overlappingRanges = new LinkedList<>();
 
         // 탐색 시간 기준 시작점
         LocalTime startTime = room.getAvailableStartTime();
@@ -109,14 +132,15 @@ public class SelectedTimeService {
                         new TimeRangeWithMember(date, basicStartTime, basicEndTime, members));
             }
 
-            if (overlappingRanges.size() >= 10) {
-                break;
-            }
-
             startTime = basicStartTime.plusMinutes(30);
         }
 
         Collections.sort(overlappingRanges);
+
+        if (overlappingRanges.size() > 10) {
+            return new ArrayList<>(overlappingRanges.subList(0, 10));
+        }
+
         return overlappingRanges;
     }
 
@@ -153,7 +177,10 @@ public class SelectedTimeService {
         @Override
         public int compareTo(TimeRangeWithMember o1) {
             if (o1.members.size() == members.size()) {
-                return start.compareTo(o1.start);
+                if (o1.date.isEqual(date)) {
+                    return start.compareTo(o1.start);
+                }
+                return date.compareTo(o1.date);
             }
             return o1.members.size() - members.size();
         }
