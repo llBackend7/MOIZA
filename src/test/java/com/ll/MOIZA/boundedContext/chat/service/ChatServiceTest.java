@@ -55,7 +55,7 @@ class ChatServiceTest {
             chatService.sendChat(user1, room, "TEST CHAT%s".formatted(i));
         }
 
-        Slice<Chat> chats = chatService.getChats(room, 0);
+        Slice<Chat> chats = chatService.getChats(room, null);
 
         assertThat(chats.getSize()).isEqualTo(20);
         assertThat(chats.hasPrevious()).isFalse();

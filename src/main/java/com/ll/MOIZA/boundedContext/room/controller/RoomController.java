@@ -1,9 +1,13 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
+import com.ll.MOIZA.base.appConfig.AppConfig;
 import com.ll.MOIZA.base.mail.MailService;
+import com.ll.MOIZA.base.rq.Rq;
 import com.ll.MOIZA.boundedContext.chat.service.ChatService;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
+import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
+import com.ll.MOIZA.boundedContext.result.service.ResultService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.form.PlaceCreateForm;
@@ -16,8 +20,11 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+<<<<<<< HEAD
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+=======
+>>>>>>> 47f0c25c058e961e0df62a20c0630ffd75430232
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -25,7 +32,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -44,6 +50,7 @@ public class RoomController {
     private final RoomService roomService;
     private final MemberService memberService;
     private final MailService mailService;
+    private final ResultService resultService;
 
     private final EnterRoomService enterRoomService;
     private final SelectedPlaceService selectedPlaceService;
@@ -122,6 +129,15 @@ public class RoomController {
         return "{'result':'초대링크를 발송했습니다.'}";
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{roomId}/result")
+    public String showResult(Model model, @PathVariable Long roomId) {
+        DecidedResult result = resultService.getResult(roomId);
+        model.addAttribute("result", result);
+        model.addAttribute("appKey", AppConfig.getAppKey());
+        return "/room/result";
+    }
+
     @GetMapping("/{roomId}/date")
     public String showRoomDate(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
         Room room = roomService.getRoom(roomId);
@@ -153,19 +169,9 @@ public class RoomController {
         return "status/place";
     }
 
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("isAuthenticated() && hasAuthority('ROOM#' + #roomId + '_MEMBER')")
     @GetMapping("/{roomId}/chat")
-    public String showRoomChat(@PathVariable Long roomId,
-                               @AuthenticationPrincipal User user,
-                               Model model) {
-        Room room = roomService.getRoom(roomId);
-        Member member = memberService.loginMember(user);
-
-        if (enterRoomService.isNotRoomMember(room, member)) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "채팅 입장 권한이 없습니다.");
-        }
-
-        model.addAttribute("room", room);
+    public String showRoomChat(@PathVariable Long roomId) {
         return "status/chat";
     }
 

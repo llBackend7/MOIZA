@@ -38,15 +38,20 @@
     </script>
 </header>
 
-<main layout:fragment="main" class="flex-grow flex items-center justify-center">
-    <div class="max-w-2xl w-full bg-blue-50">
-        <div class="text flex justify-center">
-            <div class="font-gsans w-56 text-2xl text-center">서울 벙개</div>
+<main layout:fragment="main" class="flex flex-grow justify-center">
+    <div class="max-w-2xl w-full h-screen bg-blue-50">
+        <div class="text">
+            <div class="title">모임이름</div>
+            <div class="font-gsans w-56 flex justify-center text-2xl" th:text="${room.name}"></div>
         </div>
 
-        <div class="chat-box flex flex-col mx-12 pt-2.5 h-auto">
-            <div class="!border !border-[#adcfee]">
-                <div id="chats" class="overflow-auto h-72 px-4 pt-2">
+        <div class="chat-box flex flex-col mx-12 mb-4 h-[83%]">
+            <div class="!border !border-[#adcfee] h-[80%]">
+                <div class="text-center m-2 text-xl">
+                    채팅방
+                </div>
+
+                <div id="chats" class="overflow-auto px-4 pt-2 h-[95%]">
                     <!-- 채팅내용 -->
                 </div>
             </div>
@@ -66,7 +71,7 @@
             connect();
             $('form').on('submit', e => e.preventDefault());
             $('#send').click(() => send());
-            await getChats(0);
+            await getChats();
             goToRecent();
         })
 
@@ -103,7 +108,7 @@
                 const chatContainer = $('#chats');
                 const oldScrollHeight = chatContainer.prop('scrollHeight');
 
-                await getChats(curSlice.pageable.pageNumber + 1);
+                await getChats(curSlice.nextCursor);
 
                 const newScrollHeight = chatContainer.prop('scrollHeight');
                 chatContainer.scrollTop(chatContainer.scrollTop() + newScrollHeight - oldScrollHeight);
@@ -127,13 +132,13 @@
                     `;
         }
 
-        async function getChats(page) {
+        async function getChats(nextCursor) {
             $('#chats #reload:first').remove();
             await $.ajax({
                 url: `/chats?roomId=${roomId}`,
                 type: 'GET',
                 data: {
-                    page: page
+                    nextCursor: nextCursor
                 },
                 success: function (slice) {
                     curSlice = slice;
@@ -156,8 +161,8 @@
 </main>
 
 <footer layout:fragment="footer">
-    <a th:href="@{|/room/${room.id}/date|}"><i class="far fa-thin fa-clock text-slate-300 hover:text-sky-600"></i></a>
-    <a th:href="@{|/room/${room.id}/place|}"><i
+    <a th:href="@{|/room/${roomId}/date|}"><i class="far fa-thin fa-clock text-slate-300 hover:text-sky-600"></i></a>
+    <a th:href="@{|/room/${roomId}/place|}"><i
             class="far fa-solid fa-location-dot text-slate-300 hover:text-sky-600"></i></a>
     <a href=""><i class="far fa-thin fa-comments text-sky-600"></i></a>
 </footer>

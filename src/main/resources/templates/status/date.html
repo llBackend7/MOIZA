@@ -1,4 +1,4 @@
-<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml" xmlns="">
 
 <body>
 
@@ -28,44 +28,46 @@
             <div class="font-gsans w-56 flex justify-center text-2xl" th:text="${room.name}"></div>
         </div>
 
-        <div class="date-rank">
+        <div class="date-rank overflow-auto">
 
             <div class="text-center m-2 text-xl">
                 날짜 현황
             </div>
 
-            <div class="rank-1th content">
-                <span class="rank-one text-bold">1위</span>
-                <span class="rank-content font-gsans">
-            <div class="date">2023년 6월 3일 토요일</div>
-            <div class="ml-10">03:00 PM ~ 05:00 PM</div>
-          </span>
-                <span>
-            <div class="people-number">3명 / 7명</div>
-          </span>
-            </div>
+            <ul class="flex flex-col items-center">
+                <li class="my-2">
+                    <div class="rank font-gsans">
+                        <span class="rank-number text-bold text-xl" style="border: 6px solid #006bce; border-radius: 50%;">1위</span>
+                        <span class="rank-content">
+                            <div>2023년 6월 3일 토요일</div>
+                            <div class="ml-5">03:00 PM ~ 05:00 PM</div>
+                        </span>
+                        <span><div class="people-number text-sm">3명 / 7명</div></span>
+                    </div>
+                </li>
 
-            <div class="rank-nth w-full justify-items-center mt-4">
-
-                <div class="rank-content-other font-gsans">
-                    <div class="rank-n mb-2 text-bold">2위</div>
-                    <div>2023년 6월 3일 토요일</div>
-                    <div>04:00 PM ~ 06:00 PM</div>
-                    <div class="mt-2">2명 / 7명</div>
-                </div>
-
-                <div class="rank-content-other font-gsans">
-                </div>
-
-            </div>
-
+                <li class="my-2">
+                    <div class="rank font-gsans">
+                        <span class="rank-number text-bold text-lg" style="color: #006bce;">2위</span>
+                        <span class="rank-content">
+                            <div>2023년 6월 3일 토요일</div>
+                            <div class="ml-5">03:00 PM ~ 05:00 PM</div>
+                        </span>
+                        <span><div class="people-number text-sm">3명 / 7명</div></span>
+                    </div>
+                </li>
+            </ul>
         </div>
 
         <div class="participate-status font-bold content">
             <div class="my-2">참여 멤버</div>
-            <div class="m-2">프로필 사진</div>
+            <ul class="m-2">
+                프로필 사진
+            </ul>
             <div class="my-2">참여 불가능 멤버</div>
-            <div class="m-2">프로필 사진</div>
+            <ul class="m-2">
+                프로필 사진
+            </ul>
         </div>
 
     </div>

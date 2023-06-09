@@ -46,6 +46,16 @@ public class Rq {
         }
     }
 
+    // 로그인 되어 있는지 체크
+    public boolean isLogin() {
+        return user != null;
+    }
+
+    // 로그아웃 되어 있는지 체크
+    public boolean isLogout() {
+        return !isLogin();
+    }
+
     // 로그인 된 회원의 객체
     public Member getMember() {
         return memberService.findByName(user.getUsername());
