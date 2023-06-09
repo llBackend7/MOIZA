@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -33,5 +35,9 @@ public class EnterRoomService {
 
     private boolean isRoomMember(Room room, Member member) {
         return enterRoomRepository.findByRoomAndMember(room, member).isPresent();
+    }
+
+    public Optional<EnterRoom> findByMemberIdAndRoomId(Long memberId, Long roomId) {
+        return enterRoomRepository.findByMemberIdAndRoomId(memberId, roomId);
     }
 }

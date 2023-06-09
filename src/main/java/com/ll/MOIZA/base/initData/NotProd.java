@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,6 +28,10 @@ import java.time.LocalTime;
 @Configuration
 @Profile({"test", "dev"})
 public class NotProd {
+
+    @Value("${custom.user.name}")
+    private String name;
+
     @Bean
     CommandLineRunner commandLineRunner(
             MemberRepository memberRepository,
@@ -34,16 +39,18 @@ public class NotProd {
             EnterRoomService enterRoomService,
             SelectedTimeService selectedTimeService,
 
-            SelectedPlaceService selectedPlaceService
+            SelectedPlaceService selectedPlaceService,
 
             MongoTemplate mongoTemplate,
             ChatService chatService
     ) {
         return args -> {
             mongoTemplate.dropCollection("chat");
-
-            Member member1 = Member.builder().name("user1").email("email").build();
+            Member member1 = Member.builder()
+                    .name(name)
+                    .build();
             Member member2 = Member.builder().name("user2").email("email").build();
+
             try {
                 memberRepository.save(member1);
             } catch (Exception e) {
@@ -69,9 +76,9 @@ public class NotProd {
                     LocalDateTime.now().plusDays(2));
             EnterRoom enterRoom = enterRoomService.createEnterRoom(room, member1);
 
-            for (int i = 0; i < 100; i++) {
+            /*for (int i = 0; i < 100; i++) {
                 chatService.sendChat(member1, room, "테스트 채팅%d".formatted(i));
-            }
+            }*/
 
             selectedTimeService.CreateSelectedTime(
                     LocalDate.now().plusDays(6),

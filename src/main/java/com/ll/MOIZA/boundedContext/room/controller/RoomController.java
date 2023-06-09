@@ -6,15 +6,18 @@ import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.form.PlaceCreateForm;
 import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
+import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -30,6 +33,7 @@ import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -42,6 +46,7 @@ public class RoomController {
     private final MailService mailService;
 
     private final EnterRoomService enterRoomService;
+    private final SelectedPlaceService selectedPlaceService;
 
     @Data
     public static class RoomForm {
@@ -162,5 +167,19 @@ public class RoomController {
 
         model.addAttribute("room", room);
         return "status/chat";
+    }
+
+    @PostMapping("/{roomId}/place")
+    public String createPlace(@PathVariable Long roomId, PlaceCreateForm form, @AuthenticationPrincipal User user) {
+        Member member = memberService.loginMember(user);
+        Optional<EnterRoom> opEnterRoom = enterRoomService.findByMemberIdAndRoomId(member.getId(), roomId);
+
+        if (opEnterRoom.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "투표 권한이 없습니다.");
+        }
+
+        selectedPlaceService.CreateSelectedPlace(form.getName(), opEnterRoom.get());
+
+        return "redirect:/room/" + roomId + "/place";
     }
 }

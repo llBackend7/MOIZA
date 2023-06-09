@@ -44,9 +44,10 @@
                     <span th:text="${room.enterRoom.size()}">7</span>
                     <span>명</span>
                 </span>
-                <span>
-                    <button class="vote-btn ml-2">투표</button>
-                </span>
+                <form th:action th:method="POST">
+                    <input type="hidden" name="name" th:value="${map.key.name}">
+                    <button type="submit" class="vote-btn ml-2 !bg-[#006bce]">투표</button>
+                </form>
             </div>
 
             <div class="rank-nth w-full justify-items-center mt-4">
@@ -63,16 +64,19 @@
                         <span>명</span>
                     </div>
                     <div>
-                        <button class="vote-btn">투표</button>
+                        <form th:action th:method="POST">
+                            <input type="hidden" name="name" th:value="${map.key.name}">
+                            <button type="submit" class="vote-btn ml-2 !bg-[#006bce]">투표</button>
+                        </form>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="place-input">
-            <input type="text" placeholder=" 원하는 장소 입력 후 장소 추가 버튼을 눌러주세요." />
+        <form class="place-input" th:action th:method="post">
+            <input type="text" name="name" placeholder=" 원하는 장소 입력 후 장소 추가 버튼을 눌러주세요." />
             <button class="add-place">+ 장소 추가</button>
-        </div>
+        </form>
     </div>
 </main>
 
