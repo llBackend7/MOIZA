@@ -14,6 +14,7 @@ import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepositor
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService.TimeRangeWithMember;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class SelectedTimeServiceQueryTest {
 
         for (TimeRangeWithMember t : overlappingRanges) {
             System.out.println(t.date + " | " + t.start + "~" + t.end);
-            for (Member m : t.getMembers()) {
+            for (Member m : t.getParticipationMembers()) {
                 System.out.print(m.getName()+ " ");
             }
             System.out.println();
@@ -71,12 +72,12 @@ public class SelectedTimeServiceQueryTest {
                 () -> assertThat(t1.getDate()).isEqualTo(LocalDate.now().plusDays(6)),
                 () -> assertThat(t1.getStart()).isEqualTo(LocalTime.of(7, 0)),
                 () -> assertThat(t1.getEnd()).isEqualTo(LocalTime.of(10, 0)),
-                () -> assertThat(t1.getMembers()).isEqualTo(List.of(member1, member2, member3)),
+                () -> assertThat(t1.getParticipationMembers()).isEqualTo(List.of(member1, member2, member3)),
 
                 () -> assertThat(t2.getDate()).isEqualTo(LocalDate.now().plusDays(6)),
                 () -> assertThat(t2.getStart()).isEqualTo(LocalTime.of(11, 0)),
                 () -> assertThat(t2.getEnd()).isEqualTo(LocalTime.of(14, 0)),
-                () -> assertThat(t2.getMembers()).isEqualTo(List.of(member1, member2, member3))
+                () -> assertThat(t2.getParticipationMembers()).isEqualTo(List.of(member1, member2, member3))
         );
     }
 
@@ -93,7 +94,13 @@ public class SelectedTimeServiceQueryTest {
 
         for (TimeRangeWithMember t : overlappingRanges) {
             System.out.println(t.date + " | " + t.start + "~" + t.end);
-            for (Member m : t.getMembers()) {
+            System.out.print("참가자 : ");
+            for (Member m : t.getParticipationMembers()) {
+                System.out.print(m.getName()+ " ");
+            }
+            System.out.println();
+            System.out.print("불참자 : ");
+            for (Member m : t.getNonParticipationMembers()) {
                 System.out.print(m.getName()+ " ");
             }
             System.out.println();
@@ -103,26 +110,33 @@ public class SelectedTimeServiceQueryTest {
         TimeRangeWithMember t2 = overlappingRanges.get(1);
         TimeRangeWithMember t3 = overlappingRanges.get(2);
         TimeRangeWithMember t4 = overlappingRanges.get(3);
+        TimeRangeWithMember t5 = overlappingRanges.get(4);
         assertAll(
                 () -> assertThat(t1.getDate()).isEqualTo(LocalDate.now().plusDays(5)),
                 () -> assertThat(t1.getStart()).isEqualTo(LocalTime.of(7, 0)),
                 () -> assertThat(t1.getEnd()).isEqualTo(LocalTime.of(10, 0)),
-                () -> assertThat(t1.getMembers()).isEqualTo(List.of(member1, member2, member3)),
+                () -> assertThat(t1.getParticipationMembers()).isEqualTo(List.of(member1, member2, member3)),
 
                 () -> assertThat(t2.getDate()).isEqualTo(LocalDate.now().plusDays(5)),
                 () -> assertThat(t2.getStart()).isEqualTo(LocalTime.of(11, 0)),
                 () -> assertThat(t2.getEnd()).isEqualTo(LocalTime.of(14, 0)),
-                () -> assertThat(t2.getMembers()).isEqualTo(List.of(member1, member2, member3)),
+                () -> assertThat(t2.getParticipationMembers()).isEqualTo(List.of(member1, member2, member3)),
 
                 () -> assertThat(t3.getDate()).isEqualTo(LocalDate.now().plusDays(6)),
                 () -> assertThat(t3.getStart()).isEqualTo(LocalTime.of(7, 0)),
                 () -> assertThat(t3.getEnd()).isEqualTo(LocalTime.of(10, 0)),
-                () -> assertThat(t3.getMembers()).isEqualTo(List.of(member1, member2, member3)),
+                () -> assertThat(t3.getParticipationMembers()).isEqualTo(List.of(member1, member2, member3)),
 
                 () -> assertThat(t4.getDate()).isEqualTo(LocalDate.now().plusDays(6)),
                 () -> assertThat(t4.getStart()).isEqualTo(LocalTime.of(11, 0)),
                 () -> assertThat(t4.getEnd()).isEqualTo(LocalTime.of(14, 0)),
-                () -> assertThat(t4.getMembers()).isEqualTo(List.of(member1, member2, member3))
+                () -> assertThat(t4.getParticipationMembers()).isEqualTo(List.of(member1, member2, member3)),
+
+                () -> assertThat(t5.getDate()).isEqualTo(LocalDate.now().plusDays(5)),
+                () -> assertThat(t5.getStart()).isEqualTo(LocalTime.of(7, 30)),
+                () -> assertThat(t5.getEnd()).isEqualTo(LocalTime.of(10, 30)),
+                () -> assertThat(t5.getParticipationMembers()).isEqualTo(List.of(member1, member2)),
+                () -> assertThat(t5.getNonParticipationMembers()).isEqualTo(List.of(member3))            // 불참자
         );
     }
 }

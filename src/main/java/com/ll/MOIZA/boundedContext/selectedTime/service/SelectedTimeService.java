@@ -3,6 +3,8 @@ package com.ll.MOIZA.boundedContext.selectedTime.service;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
+import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
@@ -29,7 +31,7 @@ public class SelectedTimeService {
 
     private final SelectedTimeRepository selectedTimeRepository;
 
-    private final RoomService roomService;
+    private final EnterRoomRepository enterRoomRepository;
 
     @Transactional
     public SelectedTime CreateSelectedTime(
@@ -123,13 +125,15 @@ public class SelectedTimeService {
             LocalTime basicEndTime = startTime.plusHours(meetingDuration.getHour())
                     .plusMinutes(meetingDuration.getMinute());
 
-            List<Member> members = getContainedMember(selectedTimeList, meetingDuration,
+            List<Member> participationMembers = getContainedMember(selectedTimeList, meetingDuration,
                     basicStartTime,
                     basicEndTime);
 
-            if (members.size() > 1) {
+            List<Member> nonParticipationMembers = getNonParticipationMembers(room, participationMembers);
+
+            if (participationMembers.size() > 1) {
                 overlappingRanges.add(
-                        new TimeRangeWithMember(date, basicStartTime, basicEndTime, members));
+                        new TimeRangeWithMember(date, basicStartTime, basicEndTime, participationMembers, nonParticipationMembers));
             }
 
             startTime = basicStartTime.plusMinutes(30);
@@ -164,6 +168,14 @@ public class SelectedTimeService {
                 .collect(Collectors.toCollection(LinkedList::new));
     }
 
+    public List<Member> getNonParticipationMembers(Room room, List<Member> participationMembers) {
+        List<Member> allMembers = enterRoomRepository.findMembersByRoom(room);
+
+        return allMembers.stream()
+                .filter(m -> !participationMembers.contains(m))
+                .collect(Collectors.toList());
+    }
+
 
     @Getter
     @AllArgsConstructor
@@ -172,17 +184,18 @@ public class SelectedTimeService {
         LocalDate date;
         LocalTime start;
         LocalTime end;
-        List<Member> members;
+        List<Member> participationMembers;
+        List<Member> nonParticipationMembers;
 
         @Override
         public int compareTo(TimeRangeWithMember o1) {
-            if (o1.members.size() == members.size()) {
+            if (o1.participationMembers.size() == participationMembers.size()) {
                 if (o1.date.isEqual(date)) {
                     return start.compareTo(o1.start);
                 }
                 return date.compareTo(o1.date);
             }
-            return o1.members.size() - members.size();
+            return o1.participationMembers.size() - participationMembers.size();
         }
     }
 
