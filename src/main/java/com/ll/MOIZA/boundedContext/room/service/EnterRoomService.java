@@ -41,10 +41,8 @@ public class EnterRoomService {
         return enterRoomRepository.findByRoomAndMember(room, member).isPresent();
     }
 
-<<<<<<< HEAD
-    public Optional<EnterRoom> findByMemberIdAndRoomId(Long memberId, Long roomId) {
-        return enterRoomRepository.findByMemberIdAndRoomId(memberId, roomId);
-=======
+
+
     @Transactional
     public void enterRoomWithSelectedTime(Room room, Member member,
             List<SelectedDayWhitTimes> selectedDayWhitTimesList) {
@@ -58,6 +56,8 @@ public class EnterRoomService {
                     enterRoom
             );
         }
->>>>>>> 47f0c25c058e961e0df62a20c0630ffd75430232
+    }
+    public Optional<EnterRoom> findByMemberIdAndRoomId(Long memberId, Long roomId) {
+        return enterRoomRepository.findByMemberIdAndRoomId(memberId, roomId);
     }
 }

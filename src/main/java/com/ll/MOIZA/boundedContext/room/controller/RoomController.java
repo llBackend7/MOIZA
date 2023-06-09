@@ -15,16 +15,13 @@ import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
+import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
+import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-<<<<<<< HEAD
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-=======
->>>>>>> 47f0c25c058e961e0df62a20c0630ffd75430232
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
@@ -33,15 +30,16 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -180,9 +178,6 @@ public class RoomController {
         Member member = memberService.loginMember(user);
         Optional<EnterRoom> opEnterRoom = enterRoomService.findByMemberIdAndRoomId(member.getId(), roomId);
 
-        if (opEnterRoom.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "투표 권한이 없습니다.");
-        }
 
         selectedPlaceService.CreateSelectedPlace(form.getName(), opEnterRoom.get());
 
