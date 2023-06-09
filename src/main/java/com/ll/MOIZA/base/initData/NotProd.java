@@ -50,6 +50,8 @@ public class NotProd {
                     .name(name)
                     .build();
             Member member2 = Member.builder().name("user2").email("email").build();
+            Member member3 = Member.builder().name("user3").email("email").build();
+            Member member4 = Member.builder().name("user4").email("email").build();
 
             try {
                 memberRepository.save(member1);
@@ -59,10 +61,11 @@ public class NotProd {
                 memberRepository.save(member2);
             } catch (Exception e) {}
 
-            Member member3 = Member.builder().name("user3").email("email").build();
+
             memberRepository.save(member1);
             memberRepository.save(member2);
             memberRepository.save(member3);
+            memberRepository.save(member4);
 
             Room room = roomService.createRoom(
                     member1,
@@ -76,9 +79,9 @@ public class NotProd {
                     LocalDateTime.now().plusDays(2));
             EnterRoom enterRoom = enterRoomService.createEnterRoom(room, member1);
 
-            /*for (int i = 0; i < 100; i++) {
+            for (int i = 0; i < 100; i++) {
                 chatService.sendChat(member1, room, "테스트 채팅%d".formatted(i));
-            }*/
+            }
 
             selectedTimeService.CreateSelectedTime(
                     LocalDate.now().plusDays(6),
@@ -136,6 +139,26 @@ public class NotProd {
             selectedPlaceService.CreateSelectedPlace("서울역", enterRoom3);
             selectedPlaceService.CreateSelectedPlace("대구역", enterRoom3);
             selectedPlaceService.CreateSelectedPlace("익산역", enterRoom3);
+
+            EnterRoom enterRoom4 = enterRoomService.createEnterRoom(room, member4);
+
+            selectedTimeService.CreateSelectedTime(
+                    LocalDate.now().plusDays(6),
+                    LocalTime.of(9, 0),
+                    LocalTime.of(10, 0),
+                    enterRoom4
+            );
+
+            selectedTimeService.CreateSelectedTime(
+                    LocalDate.now().plusDays(6),
+                    LocalTime.of(11, 0),
+                    LocalTime.of(16, 0),
+                    enterRoom4
+            );
+
+            selectedPlaceService.CreateSelectedPlace("신도림역", enterRoom4);
+            selectedPlaceService.CreateSelectedPlace("부산역", enterRoom4);
+            selectedPlaceService.CreateSelectedPlace("오송역", enterRoom4);
         };
     }
 }
