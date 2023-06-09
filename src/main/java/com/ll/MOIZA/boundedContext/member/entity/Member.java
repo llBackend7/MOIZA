@@ -14,10 +14,12 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
@@ -41,6 +43,13 @@ public class Member extends BaseEntity {
     private List<Room> rooms = new ArrayList<>();
 
     public Collection<? extends GrantedAuthority> getGrantedAuthorities() {
-        return List.of(new SimpleGrantedAuthority("USER"));
+        List<SimpleGrantedAuthority> authorities = new ArrayList<>(enterRooms.stream()
+                .map(EnterRoom::getRoom)
+                .mapToLong(BaseEntity::getId)
+                .mapToObj(id -> new SimpleGrantedAuthority("ROOM#%d_MEMBER".formatted(id)))
+                .toList());
+        authorities.add(new SimpleGrantedAuthority("USER"));
+
+        return authorities;
     }
 }
