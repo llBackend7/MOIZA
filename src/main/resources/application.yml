@@ -32,6 +32,9 @@ spring:
       hibernate:
         default_batch_fetch_size: 50
         dialect: org.hibernate.dialect.MySQL8Dialect
+  data:
+    redis:
+      url: redis://default:redispw@localhost:55000
   sendgrid:
     api-key: ${SENDGRID_MOIZA}
 custom:

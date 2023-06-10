@@ -11,6 +11,7 @@ import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,15 +25,15 @@ public class SelectedTimeController {
 
     private final RoomService roomService;
 
-    @Data
-    public static class TimeRangesForm {
-        @NotNull
-        LocalDate date;
-    }
     @PreAuthorize("isAuthenticated()")
     @GetMapping()
-    public List<TimeRangeWithMember> getOverlappingTimeRanges(@RequestParam long roomId, TimeRangesForm timeRangesForm) {
+    public String getOverlappingTimeRanges(@RequestParam long roomId, Model model) {
         Room room = roomService.getRoom(roomId);
-        return selectedTimeService.findOverlappingTimeRanges(room, timeRangesForm.date);
+        List<TimeRangeWithMember> timeWithMember = selectedTimeService.findOverlappingTimeRanges(room);
+
+        model.addAttribute("room", room);
+        model.addAttribute("timeWithMember", timeWithMember);
+
+        return "room/status";
     }
 }
