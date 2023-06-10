@@ -11,6 +11,9 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Set;
+import java.util.stream.IntStream;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
@@ -91,5 +94,22 @@ class CachedChatRepositoryTest {
         assertThat(third.hasNext()).isFalse();
 
         assertThat(first.getContent().get(0).getCreateDate()).isAfter(third.getContent().get(0).getCreateDate());
+    }
+
+    @Test
+    void  _500개_넘으면_반을_벌크연산() throws JsonProcessingException {
+        // 결과적으로 350개가 레디스에 존재해야함(250부터 599번 메시지까지 있어야힘)
+        for (int i = 0; i < 600; i++) {
+            Chat testChat = Chat.builder().roomId("TEST").memberId("%d".formatted(i)).content("테스트메시지%d".formatted(i)).build();
+            cachedChatRepository.save(testChat);
+        }
+
+        Set<Chat> test = redisTemplate.opsForZSet().range("ROOM#TEST_CHAT", 0, -1);
+        IntStream chatMemberIdStreams = test.stream().mapToInt(chat -> Integer.parseInt(chat.getMemberId()));
+        assertThat(chatMemberIdStreams.toArray()).isEqualTo(descendingStream(250, 600).toArray());
+    }
+
+    private IntStream descendingStream(int small, int big) {
+        return IntStream.range(small, big).map(i -> small + big - i - 1);
     }
 }

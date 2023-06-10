@@ -6,13 +6,10 @@ import com.ll.MOIZA.boundedContext.chat.document.Chat;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
-import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.stereotype.Repository;
 
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
@@ -22,6 +19,7 @@ import java.util.*;
 public class CachedChatRepository {
     private final RedisTemplate<String, Chat> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final ChatRepository chatRepository;
     private ZSetOperations<String, Chat> operations;
 
     private static final int PAGE_SIZE = 20;
@@ -42,7 +40,11 @@ public class CachedChatRepository {
         operations.add(key, chat, -chat.getCreateDate().toInstant(ZoneOffset.UTC).toEpochMilli());
 
         //TODO MAX_CHATS 넘으면 벌크삽입
-
+        if (operations.size(key) >= MAX_CACHE) {
+            Set<Chat> half = operations.range(key, MAX_CACHE / 2, -1);
+            operations.removeRange(key, MAX_CACHE / 2, -1);
+            chatRepository.saveAll(half);
+        }
         return chat;
     }
 

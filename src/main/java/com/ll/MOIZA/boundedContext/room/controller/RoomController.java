@@ -44,8 +44,6 @@ public class RoomController {
     private final MailService mailService;
     private final ResultService resultService;
 
-    private final EnterRoomService enterRoomService;
-
     @Data
     public static class RoomForm {
         @NotNull
