@@ -10,7 +10,10 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -26,11 +29,15 @@ class CachedChatRepositoryTest {
     RedisTemplate<String, Chat> redisTemplate;
 
     @Autowired
+    ChatRepository chatRepository;
+
+    @Autowired
     ObjectMapper objectMapper;
 
     @AfterEach
     void clear() {
         cachedChatRepository.clear("TEST");
+        chatRepository.deleteAll();
     }
 
     @Test
@@ -50,25 +57,6 @@ class CachedChatRepositoryTest {
     void 채팅_저장() {
         Chat testChat = Chat.builder().roomId("TEST").content("테스트용").build();
         Chat save = cachedChatRepository.save(testChat);
-    }
-
-    @Test
-    void 채팅_페이지네이션() throws JsonProcessingException {
-        for (int i = 0; i < 55; i++) {
-            Chat testChat = Chat.builder().roomId("TEST").memberId("%d".formatted(i)).content("테스트메시지%d".formatted(i)).build();
-            cachedChatRepository.save(testChat);
-        }
-
-        Cursor<Chat> first = cachedChatRepository.findByRoom("TEST", null);
-        Cursor<Chat> second = cachedChatRepository.findByRoom("TEST", first.getNextCursor());
-        Cursor<Chat> third = cachedChatRepository.findByRoom("TEST", second.getNextCursor());
-
-        assertThat(first).hasSize(20);
-        assertThat(first.hasNext()).isTrue();
-        assertThat(second).hasSize(20);
-        assertThat(second.hasNext()).isTrue();
-        assertThat(third).hasSize(15);
-        assertThat(third.hasNext()).isFalse();
     }
 
     @Test
@@ -109,7 +97,42 @@ class CachedChatRepositoryTest {
         assertThat(chatMemberIdStreams.toArray()).isEqualTo(descendingStream(250, 600).toArray());
     }
 
+    @Test
+    void _캐시에서_다_읽으면_메모리에서_읽기() {
+        for (int i = 0; i < 30; i++) {
+            Chat chat = Chat.builder().roomId("TEST").memberId("%d".formatted(i)).content("몽고db테스트용%d".formatted(i)).build();
+
+            chatRepository.save(chat);
+        }
+
+        for (int i = 0; i < 35; i++) {
+            Chat testChat = Chat.builder().roomId("TEST").memberId("%d".formatted(i)).content("redis테스트용%d".formatted(i)).build();
+            cachedChatRepository.save(testChat);
+        }
+                                                                                                     // redis        mongo
+        Cursor<Chat> first = cachedChatRepository.findByRoom("TEST", null);            // 34 ~ 15
+        Cursor<Chat> second = cachedChatRepository.findByRoom("TEST", first.getNextCursor()); // 14 ~ 0       29~25
+        Cursor<Chat> third = cachedChatRepository.findByRoom("TEST", second.getNextCursor()); //              24~5
+        Cursor<Chat> fourth = cachedChatRepository.findByRoom("TEST", third.getNextCursor()); //              4 ~ 0   noNext
+
+        assertMemberIdStream(first, 15 ,35);
+        int[] memberIds = second.stream().mapToInt(this::memberIdOfChat).toArray();
+        assertThat(memberIds).isEqualTo(new int[]{14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0, 29, 28, 27, 26, 25});
+        assertThat(second.hasNext()).isTrue();
+        assertMemberIdStream(third, 5 ,25);
+        assertMemberIdStream(fourth, 0 ,5);
+        assertThat(fourth.hasNext()).isFalse();
+    }
+
+    private void assertMemberIdStream(Cursor<Chat> first, int small, int big) {
+        assertThat(first.stream().mapToInt(this::memberIdOfChat).toArray()).isEqualTo(descendingStream(small, big).toArray());
+    }
+
     private IntStream descendingStream(int small, int big) {
         return IntStream.range(small, big).map(i -> small + big - i - 1);
+    }
+
+    private int memberIdOfChat(Chat chat) {
+        return Integer.parseInt(chat.getMemberId());
     }
 }

@@ -6,7 +6,9 @@ import com.ll.MOIZA.boundedContext.chat.document.Chat;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Repository;
@@ -50,36 +52,79 @@ public class CachedChatRepository {
     }
 
     @SneakyThrows
-    public Cursor<Chat> findByRoom(String roomId, String serializedChat){
+    public Cursor<Chat> findByRoom(String roomId, String cursor) {
         String key = getKey(roomId);
 
-        Chat deserializedCursor = null;
-        if (serializedChat != null) {
-            deserializedCursor = objectMapper.readValue(serializedChat, Chat.class);
+        List<Chat> chats;
+        boolean hasNext;
+        String nextCursor;
+
+        try {
+            Chat deserializedCursor = null;
+
+            if (cursor != null) {
+                deserializedCursor = objectMapper.readValue(cursor, Chat.class);
+            }
+
+            // 커서의 위치를 찾기 위해 커서 이전까지의 개수를 구함
+            Long offset = getOffset(key, deserializedCursor);
+
+            Set<Chat> chatSet = Optional.ofNullable(operations.range(key, offset, offset + PAGE_SIZE))
+                    .orElse(new LinkedHashSet<>());
+
+            hasNext = chatSet.size() > PAGE_SIZE;
+            chats = new ArrayList<>(chatSet);
+            Chat nextCursorChat = chats.get(chats.size() - 1);
+            nextCursor = objectMapper.writeValueAsString(nextCursorChat);
+
+            if (hasNext) {
+                chats = chats.subList(0, PAGE_SIZE);
+            } else {
+                // db에서 데이터 긁어와서 붙이기
+                int deficiency = PAGE_SIZE - chats.size();
+
+                Pageable pageable = PageRequest.of(0, deficiency + 1);
+
+                List<Chat> appendChats;
+                appendChats = chatRepository.findByRoomId(roomId, pageable);
+
+                if (appendChats.size() == deficiency + 1) {
+                    hasNext = true;
+                    nextCursor = appendChats.get(deficiency).getId();
+                    appendChats = appendChats.subList(0, deficiency);
+                } else {
+                    hasNext = false;
+                    nextCursor = null;
+                }
+
+                chats.addAll(appendChats);
+            }
+        } catch (JsonProcessingException e) {
+            // 이 경우 cursor는 redis의 value가 아니라 몽고db의 다큐멘트 id임.
+            Pageable pageable = PageRequest.of(0, PAGE_SIZE + 1);
+            chats = chatRepository.findByRoomIdWithCursor(roomId, new ObjectId(cursor), pageable);
+
+            if (chats.size() == PAGE_SIZE + 1) {
+                hasNext = true;
+                nextCursor = chats.get(PAGE_SIZE).getId();
+                chats = chats.subList(0, PAGE_SIZE);
+            } else {
+                hasNext = false;
+                nextCursor = null;
+            }
         }
 
-        // 커서의 위치를 찾기 위해 커서 이전까지의 개수를 구함
+
+        return new Cursor<>(chats, PageRequest.of(0, PAGE_SIZE), hasNext, nextCursor);
+    }
+
+    private Long getOffset(String key, Chat deserializedCursor) {
         Long offset = operations.rank(key, deserializedCursor);
 
         if (offset == null) {
             offset = 0L; // 커서가 존재하지 않는 경우, 첫 페이지로 설정
         }
-
-        Set<Chat> chatSet = Optional.ofNullable(operations.range(key, offset, offset + PAGE_SIZE))
-                .orElse(new LinkedHashSet<>());
-
-
-        boolean hasNext = chatSet.size() > PAGE_SIZE;
-
-        List<Chat> chats = new ArrayList<>(chatSet);
-        Chat nextCursorChat = chats.get(chats.size() - 1);
-        String serializedNextCursor = objectMapper.writeValueAsString(nextCursorChat);
-
-        if (hasNext) {
-            chats = chats.subList(0, PAGE_SIZE);
-        }
-
-        return new Cursor<>(chats, PageRequest.of(0, PAGE_SIZE), hasNext, serializedNextCursor);
+        return offset;
     }
 
     private String getKey(String roomId) {
