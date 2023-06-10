@@ -84,6 +84,20 @@ public class NotProd {
                     enterRoom
             );
 
+            selectedTimeService.CreateSelectedTime(
+                    LocalDate.now().plusDays(5),
+                    LocalTime.of(7, 0),
+                    LocalTime.of(14, 0),
+                    enterRoom
+            );
+
+            selectedTimeService.CreateSelectedTime(
+                    LocalDate.now().plusDays(5),
+                    LocalTime.of(14, 0),
+                    LocalTime.of(19, 0),
+                    enterRoom
+            );
+
             selectedPlaceService.CreateSelectedPlace("서울역", enterRoom);
             selectedPlaceService.CreateSelectedPlace("용산역", enterRoom);
 
@@ -98,6 +112,20 @@ public class NotProd {
 
             selectedTimeService.CreateSelectedTime(
                     LocalDate.now().plusDays(6),
+                    LocalTime.of(15, 0),
+                    LocalTime.of(17, 0),
+                    enterRoom2
+            );
+
+            selectedTimeService.CreateSelectedTime(
+                    LocalDate.now().plusDays(5),
+                    LocalTime.of(6, 0),
+                    LocalTime.of(14, 0),
+                    enterRoom2
+            );
+
+            selectedTimeService.CreateSelectedTime(
+                    LocalDate.now().plusDays(5),
                     LocalTime.of(15, 0),
                     LocalTime.of(17, 0),
                     enterRoom2
@@ -118,6 +146,20 @@ public class NotProd {
 
             selectedTimeService.CreateSelectedTime(
                     LocalDate.now().plusDays(6),
+                    LocalTime.of(11, 0),
+                    LocalTime.of(14, 0),
+                    enterRoom3
+            );
+
+            selectedTimeService.CreateSelectedTime(
+                    LocalDate.now().plusDays(5),
+                    LocalTime.of(7, 0),
+                    LocalTime.of(10, 0),
+                    enterRoom3
+            );
+
+            selectedTimeService.CreateSelectedTime(
+                    LocalDate.now().plusDays(5),
                     LocalTime.of(11, 0),
                     LocalTime.of(14, 0),
                     enterRoom3
