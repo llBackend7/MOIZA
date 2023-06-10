@@ -11,8 +11,8 @@
         <div class="navbar-center">
         </div>
         <div class="navbar-end">
-            <a href="/logout" class="text-gray-300 text-md mr-5">
-                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            <a href="/logout" class="text-gray-300 text-md mr-5 flex items-center justify-center">
+                <i class="fa-solid fa-arrow-right-from-bracket mr-1"></i>
                 로그아웃
             </a>
         </div>
@@ -44,7 +44,7 @@
                 모임을 생성해보세요.
             </div>
 
-            <ul th:if="${!#lists.isEmpty(rooms)}" class="w-full flex flex-col items-center">
+            <ul th:if="${!#lists.isEmpty(rooms)}" class="w-full flex flex-col items-center overflow-auto">
                 <li th:each="room : ${rooms}" onclick="window.location.href = '';" class="groups w-3/5 h-48 rounded-2xl mt-5 flex flex-col justify-center p-6 shadow-md text-white" style="background-color: #006BCE;">
 
                         <div th:if="${room.getLeader() == member}" class="flex justify-between px-4 text-sm font-gsans">

@@ -15,10 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Transactional(readOnly = true)
@@ -72,7 +69,7 @@ public class SelectedTimeService {
         }
     }
 
-    public List<SelectedTime> findSelectedTimeByEnterRoomAndDate(Room room, LocalDate date) {
+    public List<SelectedTime> findSelectedTimeByRoomAndDate(Room room, LocalDate date) {
         List<SelectedTime> selectedTimes = selectedTimeRepository.searchSelectedTimeByRoom(
                 room, date);
         return selectedTimes;
@@ -133,22 +130,17 @@ public class SelectedTimeService {
         Collections.sort(overlappingRanges);
         return overlappingRanges;
     }
-}
 
-@Getter
-@AllArgsConstructor
-class TimeRangeWithMember implements Comparable<TimeRangeWithMember>{
+    public Set<LocalDate> findOverlappingDates(List<EnterRoom> enterRooms) {
+        Set<LocalDate> overlappingDates = new LinkedHashSet<>();
 
-    LocalDate date;
-    LocalTime start;
-    LocalTime end;
-    List<Member> members;
-
-    @Override
-    public int compareTo(TimeRangeWithMember o1) {
-        if (o1.members.size() == members.size()) {
-            return start.compareTo(o1.start);
+        for(EnterRoom enterRoom : enterRooms) {
+            List<SelectedTime> selectedTimes = selectedTimeRepository.findAllByEnterRoom(enterRoom);
+            for(SelectedTime selectedTime : selectedTimes) {
+                overlappingDates.add(selectedTime.getDate());
+            }
         }
-        return o1.members.size() - members.size();
+
+        return overlappingDates;
     }
 }

@@ -125,7 +125,7 @@ public class NotProd {
 
             Room room2 = roomService.createRoom(
                     member1,
-                    "room2 test(마감기한 지남)",
+                    "room2 (마감기한 지남)",
                     "testtesttest",
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(7),
@@ -136,7 +136,7 @@ public class NotProd {
 
             Room room3 = roomService.createRoom(
                     member3,
-                    "room3 test(마감기한 안지남)",
+                    "room3 (마감기한 안지남)",
                     "testtesttest",
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(7),

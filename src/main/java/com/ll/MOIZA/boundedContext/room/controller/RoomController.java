@@ -2,8 +2,6 @@ package com.ll.MOIZA.boundedContext.room.controller;
 
 import com.ll.MOIZA.base.appConfig.AppConfig;
 import com.ll.MOIZA.base.mail.MailService;
-import com.ll.MOIZA.base.rq.Rq;
-import com.ll.MOIZA.boundedContext.chat.service.ChatService;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
@@ -13,6 +11,9 @@ import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
+import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
+import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
+import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -29,9 +30,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -43,8 +42,7 @@ public class RoomController {
     private final MemberService memberService;
     private final MailService mailService;
     private final ResultService resultService;
-
-    private final EnterRoomService enterRoomService;
+    private final SelectedTimeService selectedTimeService;
 
     @Data
     public static class RoomForm {
@@ -129,11 +127,27 @@ public class RoomController {
         return "/room/result";
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{roomId}/date")
     public String showRoomDate(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
         Room room = roomService.getRoom(roomId);
+        Member actor = memberService.loginMember(user);
+        List<EnterRoom> enterRooms = room.getEnterRoom();
+        List<Member> membersInRoom = enterRooms.stream().map(EnterRoom::getMember).toList();
+
+        Set<LocalDate> overlappingDates = selectedTimeService.findOverlappingDates(enterRooms);
+        List<TimeRangeWithMember> overlappingTimes = new ArrayList<>();
+
+        for(LocalDate date : overlappingDates){
+            List<SelectedTime> selectedTimes = selectedTimeService.findSelectedTimeByRoomAndDate(room, date);
+            List<TimeRangeWithMember> timeRanges = selectedTimeService.findOverlappingTimeRanges(selectedTimes, room.getMeetingDuration());
+            overlappingTimes.addAll(timeRanges);
+        }
 
         model.addAttribute("room", room);
+        model.addAttribute("actor", actor);
+        model.addAttribute("overlappingTimes", overlappingTimes);
+        model.addAttribute("membersInRoom", membersInRoom);
         return "status/date";
     }
 

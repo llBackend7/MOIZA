@@ -2,6 +2,7 @@ package com.ll.MOIZA.boundedContext.room.service;
 
 import com.ll.MOIZA.base.jwt.JwtProvider;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
+import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
 import java.util.ArrayList;

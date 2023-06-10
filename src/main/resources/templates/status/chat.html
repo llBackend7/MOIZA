@@ -15,7 +15,9 @@
         </span>
         </div>
         <div class="navbar-end">
-            <button>마감하기</button>
+            <a id="close-btn" href="javascript:" th:if="${room.getLeader() != actor}" class="flex items-center justify-center">마감하기</a>
+            <form hidden th:action="@{|/|}" method="POST">
+            </form>
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>

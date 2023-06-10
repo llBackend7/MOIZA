@@ -49,7 +49,7 @@ public class SelectedTimeServiceQueryTest {
     @Test
     void 조회_선택_날짜() {
         Room room = roomRepository.getReferenceById(1L);
-        System.out.println(selectedTimeService.findSelectedTimeByEnterRoomAndDate(
+        System.out.println(selectedTimeService.findSelectedTimeByRoomAndDate(
                 room, LocalDate.now().plusDays(6)).size());
     }
 
@@ -60,7 +60,7 @@ public class SelectedTimeServiceQueryTest {
         Member member3 = memberRepository.findByName("user3").get();
         Room room = roomRepository.getReferenceById(1L);
 
-        List<SelectedTime> selectedTimeList = selectedTimeService.findSelectedTimeByEnterRoomAndDate(
+        List<SelectedTime> selectedTimeList = selectedTimeService.findSelectedTimeByRoomAndDate(
                 room,
                 LocalDate.now().plusDays(6));
 
