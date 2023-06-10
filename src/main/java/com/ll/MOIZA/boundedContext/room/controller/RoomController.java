@@ -10,9 +10,13 @@ import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
 import com.ll.MOIZA.boundedContext.result.service.ResultService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.form.PlaceCreateForm;
 import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
+import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
+import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
+import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -26,6 +30,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -34,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -43,7 +49,9 @@ public class RoomController {
     private final MemberService memberService;
     private final MailService mailService;
     private final ResultService resultService;
-
+    private final EnterRoomService enterRoomService;
+    private final SelectedPlaceService selectedPlaceService;
+  
     @Data
     public static class RoomForm {
         @NotNull
@@ -164,5 +172,16 @@ public class RoomController {
         Room room = roomService.getRoom(roomId);
         model.addAttribute("room", room);
         return "status/chat";
+    }
+
+    @PostMapping("/{roomId}/place")
+    public String createPlace(@PathVariable Long roomId, PlaceCreateForm form, @AuthenticationPrincipal User user) {
+        Member member = memberService.loginMember(user);
+        Optional<EnterRoom> opEnterRoom = enterRoomService.findByMemberIdAndRoomId(member.getId(), roomId);
+
+
+        selectedPlaceService.CreateSelectedPlace(form.getName(), opEnterRoom.get());
+
+        return "redirect:/room/" + roomId + "/place";
     }
 }

@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneOffset;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,6 +29,10 @@ import org.springframework.data.redis.core.ZSetOperations;
 @Configuration
 @Profile({"test", "dev"})
 public class NotProd {
+
+    @Value("${custom.user.name}")
+    private String name;
+
     @Bean
     CommandLineRunner commandLineRunner(
             MemberRepository memberRepository,
@@ -36,6 +41,7 @@ public class NotProd {
             SelectedTimeService selectedTimeService,
             SelectedPlaceService selectedPlaceService,
             ResultService resultService,
+
             MongoTemplate mongoTemplate,
             RedisTemplate<String, Chat> redisTemplate,
             ChatService chatService
@@ -60,6 +66,7 @@ public class NotProd {
             memberRepository.save(member1);
             memberRepository.save(member2);
             memberRepository.save(member3);
+            memberRepository.save(member4);
 
             Room room = roomService.createRoom(
                     member1,
@@ -222,7 +229,6 @@ public class NotProd {
             selectedPlaceService.CreateSelectedPlace("서울역", enterRoom3);
             selectedPlaceService.CreateSelectedPlace("대구역", enterRoom3);
             selectedPlaceService.CreateSelectedPlace("익산역", enterRoom3);
-
         };
     }
 }

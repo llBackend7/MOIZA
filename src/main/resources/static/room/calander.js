@@ -134,4 +134,9 @@ function validateTime(time) {
     return true;
 }
 
+function increaseVoteCount(button) {
+    var voteCountElement = button.parentElement.previousElementSibling.querySelector('.vote-count');
+    var currentCount = parseInt(voteCountElement.textContent);
+    voteCountElement.textContent = currentCount + 1;
+}
 
