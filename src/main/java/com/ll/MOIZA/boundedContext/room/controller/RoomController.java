@@ -44,8 +44,6 @@ public class RoomController {
     private final MailService mailService;
     private final ResultService resultService;
 
-    private final EnterRoomService enterRoomService;
-
     @Data
     public static class RoomForm {
         @NotNull
@@ -162,7 +160,9 @@ public class RoomController {
 
     @PreAuthorize("isAuthenticated() && hasAuthority('ROOM#' + #roomId + '_MEMBER')")
     @GetMapping("/{roomId}/chat")
-    public String showRoomChat(@PathVariable Long roomId) {
+    public String showRoomChat(@PathVariable Long roomId, Model model) {
+        Room room = roomService.getRoom(roomId);
+        model.addAttribute("room", room);
         return "status/chat";
     }
 }

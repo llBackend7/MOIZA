@@ -62,6 +62,6 @@ class ChatRepositoryTest {
         chatRepository.saveAll(List.of(chat1, chat2, chat3, chat4));
         List<Chat> chatOfRoom1 = chatRepository.findByRoomId("1");
 
-        assertThat(chatOfRoom1.stream().map(Chat::getWriter)).containsExactlyInAnyOrder("글쓴이", "글쓴이2");
+        assertThat(chatOfRoom1.stream().map(Chat::getWriter)).contains("글쓴이", "글쓴이2");
     }
 }

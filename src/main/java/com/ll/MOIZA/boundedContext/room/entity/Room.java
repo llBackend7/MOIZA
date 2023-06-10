@@ -2,6 +2,7 @@ package com.ll.MOIZA.boundedContext.room.entity;
 
 import com.ll.MOIZA.base.entity.BaseEntity;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
+import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -38,4 +39,8 @@ public class Room extends BaseEntity {
     @ManyToOne
     @JoinColumn(name = "leaderId")
     private Member leader;
+
+    @OneToOne(mappedBy = "room", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    private DecidedResult result;
 }

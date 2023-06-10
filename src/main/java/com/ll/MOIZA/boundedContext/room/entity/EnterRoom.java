@@ -4,10 +4,7 @@ import com.ll.MOIZA.base.entity.BaseEntity;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,11 +25,11 @@ public class EnterRoom extends BaseEntity {
     @ManyToOne
     private Member member;
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "enterRoom")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "enterRoom", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
     private List<SelectedTime> selectedTimes = new ArrayList<>();
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "enterRoom")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "enterRoom", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
     private List<SelectedPlace> selectedPlaces = new ArrayList<>();

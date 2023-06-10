@@ -22,6 +22,8 @@ class RoomRepositoryTest {
 
     @BeforeEach
     void 데이터셋_준비() {
+        roomRepository.deleteAll();
+
         Room room1 = Room.builder()
                 .name("needToSendMail1")
                 .deadLine(LocalDateTime.now().minus(1, ChronoUnit.MINUTES))

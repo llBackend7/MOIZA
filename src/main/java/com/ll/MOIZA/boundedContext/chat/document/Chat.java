@@ -1,10 +1,7 @@
 package com.ll.MOIZA.boundedContext.chat.document;
 
 import jakarta.persistence.EntityListeners;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -20,7 +17,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class Chat {
+public class Chat implements Comparable<Chat>{
     @Id
     private String id;
 
@@ -33,8 +30,15 @@ public class Chat {
     private String content;
 
     @CreatedDate
+    @Setter
     private LocalDateTime createDate;
 
     @LastModifiedDate
+    @Setter
     private LocalDateTime modifyDate;
+
+    @Override
+    public int compareTo(Chat o) {
+        return createDate.isBefore(o.createDate) ? -1 : 1;
+    }
 }
