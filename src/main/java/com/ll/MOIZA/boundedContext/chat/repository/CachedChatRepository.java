@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ll.MOIZA.boundedContext.chat.document.Chat;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -48,7 +49,8 @@ public class CachedChatRepository {
         return chat;
     }
 
-    public Cursor<Chat> findByRoom(String roomId, String serializedChat) throws JsonProcessingException {
+    @SneakyThrows
+    public Cursor<Chat> findByRoom(String roomId, String serializedChat){
         String key = getKey(roomId);
 
         Chat deserializedCursor = null;
