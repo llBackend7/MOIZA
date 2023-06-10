@@ -9,7 +9,10 @@ import com.ll.MOIZA.boundedContext.result.service.ResultService;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
+import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
+import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -69,7 +72,13 @@ public class MockedRoomControllerTest {
     ResultService resultService;
 
     @MockBean
-    ResultService resultService;
+    EnterRoomService enterRoomService;
+
+    @MockBean
+    SelectedTimeService selectedTimeService;
+
+    @MockBean
+    SelectedPlaceService selectedPlaceService;
 
     /*
     실제 메일 날라옴

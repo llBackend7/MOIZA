@@ -54,6 +54,7 @@ public class RoomController {
     private final EnterRoomService enterRoomService;
     private final SelectedPlaceService selectedPlaceService;
 
+
     @Data
     public static class RoomForm {
         @NotNull
