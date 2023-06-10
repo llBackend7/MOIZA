@@ -176,7 +176,9 @@ public class RoomController {
 
     @PreAuthorize("isAuthenticated() && hasAuthority('ROOM#' + #roomId + '_MEMBER')")
     @GetMapping("/{roomId}/chat")
-    public String showRoomChat(@PathVariable Long roomId) {
+    public String showRoomChat(@PathVariable Long roomId, Model model) {
+        Room room = roomService.getRoom(roomId);
+        model.addAttribute("room", room);
         return "status/chat";
     }
 }

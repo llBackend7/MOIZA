@@ -41,8 +41,8 @@
             </div>
 
             <ul th:if="${!#lists.isEmpty(overlappingTimes)}" class="flex flex-col items-center">
-                <li th:each="time, index : ${overlappingTimes}" class="my-2 hover:bg-slate-100 active:bg-slate-200" onclick="showAttendanceInTime('${time}')">
-                    <div class="rank font-gsans">
+                <li th:each="time, index : ${overlappingTimes}" class="my-2">
+                    <div class="rank font-gsans hover:bg-slate-100 active:bg-slate-200">
                         <span th:if="${index.index == 0}" class="rank-number text-bold text-xl" style="border: 6px solid #006bce; border-radius: 50%;">1위</span>
                         <span th:if="${index.index > 0}" th:text="${index.index + 1 + '위'}" class="rank-number text-bold text-lg" style="color: #006bce;"></span>
                         <span class="rank-content">
@@ -52,11 +52,6 @@
                         <span><div th:text="${time.members.size()} + '명 / ' + ${membersInRoom.size()} + '명'" class="people-number text-sm"></div></span>
                     </div>
                 </li>
-                <script>
-                    function showAttendanceInTime(time) {
-
-                    }
-                </script>
             </ul>
         </div>
 
