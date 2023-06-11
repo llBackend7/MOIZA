@@ -15,7 +15,7 @@
         </span>
         </div>
         <div class="navbar-end">
-            <a id="close-btn" href="javascript:" th:if="${room.getLeader() != actor}" class="flex items-center justify-center">마감하기</a>
+            <a id="close-btn" href="javascript:" th:if="${room.getLeader() == actor}" class="flex items-center justify-center">마감하기</a>
             <form hidden th:action="@{|/|}" method="POST">
             </form>
         </div>
