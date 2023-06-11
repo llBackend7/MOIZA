@@ -1,7 +1,7 @@
 package com.ll.MOIZA.boundedContext.room.service;
 
 import com.ll.MOIZA.boundedContext.member.entity.Member;
-import com.ll.MOIZA.boundedContext.room.controller.EnterRoomController.SelectedDayWhitTimes;
+import com.ll.MOIZA.boundedContext.room.controller.RoomController;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
@@ -32,23 +32,12 @@ public class EnterRoomService {
 
         return enterRoomRepository.save(enterRoom);
     }
-
-    public boolean isNotRoomMember(Room room, Member member) {
-        return !isRoomMember(room, member);
-    }
-
-    private boolean isRoomMember(Room room, Member member) {
-        return enterRoomRepository.findByRoomAndMember(room, member).isPresent();
-    }
-
-
-
     @Transactional
     public void enterRoomWithSelectedTime(Room room, Member member,
-            List<SelectedDayWhitTimes> selectedDayWhitTimesList) {
+            List<RoomController.SelectedDayWithTime> selectedDayWhitTimesList) {
         EnterRoom enterRoom = createEnterRoom(room, member);
 
-        for (SelectedDayWhitTimes selectedDayWhitTime : selectedDayWhitTimesList) {
+        for (RoomController.SelectedDayWithTime selectedDayWhitTime : selectedDayWhitTimesList) {
             selectedTimeService.CreateSelectedTime(
                     selectedDayWhitTime.getDate(),
                     selectedDayWhitTime.getStartTime(),

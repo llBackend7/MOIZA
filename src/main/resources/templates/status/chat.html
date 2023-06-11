@@ -15,7 +15,8 @@
         </span>
         </div>
         <div class="navbar-end">
-            <a id="close-btn" href="javascript:" th:if="${room.getLeader() == actor}" class="flex items-center justify-center">마감하기</a>
+            <a id="close-btn" href="javascript:" th:if="${room.getLeader() == actor}"
+               class="flex items-center justify-center">마감하기</a>
             <form hidden th:action="@{|/|}" method="POST">
             </form>
         </div>
@@ -49,15 +50,12 @@
 
         <div class="chat-box flex flex-col mx-12 mb-4 h-[83%]">
             <div class="!border !border-[#adcfee] h-[80%]">
-                <div class="text-center m-2 text-xl">
-                    채팅방
+                <div class="h-[10%]">
+                    <p class="text-center text-xl py-2">
+                        채팅방
+                    </p>
                 </div>
-
-<<<<<<< HEAD
-                <div id="chats" class="overflow-auto px-4 py-4 h-[95%]">
-=======
-                <div id="chats" class="overflow-auto px-4 pt-2 h-72">
->>>>>>> 517d686226aeb5039f16543433580363b9e79aed
+                <div id="chats" class="overflow-auto h-[90%] py-2 px-3">
                     <!-- 채팅내용 -->
                 </div>
             </div>
