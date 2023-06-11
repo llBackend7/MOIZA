@@ -15,13 +15,17 @@ public class TimeRangeWithMember implements Comparable<TimeRangeWithMember> {
     LocalDate date;
     LocalTime start;
     LocalTime end;
-    List<Member> members;
+    List<Member> participationMembers;
+    List<Member> nonParticipationMembers;
 
     @Override
     public int compareTo(TimeRangeWithMember o1) {
-        if (o1.members.size() == members.size()) {
-            return start.compareTo(o1.start);
+        if (o1.participationMembers.size() == participationMembers.size()) {
+            if (o1.date.isEqual(date)) {
+                return start.compareTo(o1.start);
+            }
+            return date.compareTo(o1.date);
         }
-        return o1.members.size() - members.size();
+        return o1.participationMembers.size() - participationMembers.size();
     }
 }

@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -39,6 +41,8 @@ public class EnterRoomService {
         return enterRoomRepository.findByRoomAndMember(room, member).isPresent();
     }
 
+
+
     @Transactional
     public void enterRoomWithSelectedTime(Room room, Member member,
             List<SelectedDayWhitTimes> selectedDayWhitTimesList) {
@@ -52,5 +56,8 @@ public class EnterRoomService {
                     enterRoom
             );
         }
+    }
+    public Optional<EnterRoom> findByMemberIdAndRoomId(Long memberId, Long roomId) {
+        return enterRoomRepository.findByMemberIdAndRoomId(memberId, roomId);
     }
 }

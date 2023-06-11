@@ -8,3 +8,6 @@ spring:
     properties:
       hibernate:
         dialect:
+logging:
+  level:
+    org.mongodb.driver: DEBUG

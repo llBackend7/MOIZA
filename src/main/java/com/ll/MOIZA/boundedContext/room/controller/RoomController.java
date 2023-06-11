@@ -8,12 +8,16 @@ import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
 import com.ll.MOIZA.boundedContext.result.service.ResultService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.form.PlaceCreateForm;
 import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
+
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
+import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
+
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -27,12 +31,14 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -43,6 +49,8 @@ public class RoomController {
     private final MailService mailService;
     private final ResultService resultService;
     private final SelectedTimeService selectedTimeService;
+    private final EnterRoomService enterRoomService;
+    private final SelectedPlaceService selectedPlaceService;
 
     @Data
     public static class RoomForm {
@@ -132,22 +140,21 @@ public class RoomController {
     public String showRoomDate(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
         Room room = roomService.getRoom(roomId);
         Member actor = memberService.loginMember(user);
-        List<EnterRoom> enterRooms = room.getEnterRoom();
-        List<Member> membersInRoom = enterRooms.stream().map(EnterRoom::getMember).toList();
+        List<TimeRangeWithMember> overlappingTimes = selectedTimeService.findOverlappingTimeRanges(room);
 
-        Set<LocalDate> overlappingDates = selectedTimeService.findOverlappingDates(enterRooms);
-        List<TimeRangeWithMember> overlappingTimes = new ArrayList<>();
+        List<List<Member>> availableMembers = overlappingTimes.stream()
+                .map(TimeRangeWithMember::getParticipationMembers)
+                .toList();
 
-        for(LocalDate date : overlappingDates){
-            List<SelectedTime> selectedTimes = selectedTimeService.findSelectedTimeByRoomAndDate(room, date);
-            List<TimeRangeWithMember> timeRanges = selectedTimeService.findOverlappingTimeRanges(selectedTimes, room.getMeetingDuration());
-            overlappingTimes.addAll(timeRanges);
-        }
+        List<List<Member>> unavailableMembers = overlappingTimes.stream()
+                .map(TimeRangeWithMember::getNonParticipationMembers)
+                .toList();
 
         model.addAttribute("room", room);
         model.addAttribute("actor", actor);
         model.addAttribute("overlappingTimes", overlappingTimes);
-        model.addAttribute("membersInRoom", membersInRoom);
+        model.addAttribute("availableMembers", availableMembers);
+        model.addAttribute("unavailableMembers", unavailableMembers);
         return "status/date";
     }
 
@@ -180,5 +187,16 @@ public class RoomController {
         Room room = roomService.getRoom(roomId);
         model.addAttribute("room", room);
         return "status/chat";
+    }
+
+    @PostMapping("/{roomId}/place")
+    public String createPlace(@PathVariable Long roomId, PlaceCreateForm form, @AuthenticationPrincipal User user) {
+        Member member = memberService.loginMember(user);
+        Optional<EnterRoom> opEnterRoom = enterRoomService.findByMemberIdAndRoomId(member.getId(), roomId);
+
+
+        selectedPlaceService.CreateSelectedPlace(form.getName(), opEnterRoom.get());
+
+        return "redirect:/room/" + roomId + "/place";
     }
 }

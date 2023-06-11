@@ -11,7 +11,7 @@ import java.util.List;
 
 public interface SelectedTimeRepository extends JpaRepository<SelectedTime, Long> {
 
-    @Query(" select st from SelectedTime as st where st.enterRoom.room = ?1 and st.date = ?2")
+    @Query(" select st from SelectedTime as st where st.enterRoom.room = ?1 and st.date = ?2 order by st.startTime")
     List<SelectedTime> searchSelectedTimeByRoom(Room room, LocalDate date);
 
     List<SelectedTime> findAllByEnterRoom(EnterRoom enterRoom);

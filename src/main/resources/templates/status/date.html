@@ -40,22 +40,25 @@
                 가능한 시간이 없습니다. 가능 시간을 수정해보세요.
             </div>
 
-            <ul th:if="${!#lists.isEmpty(overlappingTimes)}" class="flex flex-col items-center">
-                <li th:each="time, index : ${overlappingTimes}" class="my-2">
-                    <a href="javascript:" onclick="$(this).next().submit()">
+            <div id="app">
+                <ul th:if="${!#lists.isEmpty(overlappingTimes)}" class="flex flex-col items-center">
+                    <li th:each="time, index : ${overlappingTimes}" class="my-2" onclick="updateMemberStatus()">
                         <div class="rank font-gsans hover:bg-slate-100 active:bg-slate-200">
                             <span th:if="${index.index == 0}" class="rank-number text-bold text-xl" style="border: 6px solid #006bce; border-radius: 50%;">1위</span>
                             <span th:if="${index.index > 0}" th:text="${index.index + 1 + '위'}" class="rank-number text-bold text-lg" style="color: #006bce;"></span>
                             <span class="rank-content">
-                            <div th:text="${#temporals.format(time.date, 'yyyy년 M월 d일 EEEE')}"></div>
-                            <div th:text="${time.start + ' ~ ' +time.end}" class="ml-5"></div>
-                        </span>
-                            <span><div th:text="${time.members.size()} + '명 / ' + ${membersInRoom.size()} + '명'" class="people-number text-sm"></div></span>
+                        <div th:text="${#temporals.format(time.date, 'yyyy년 M월 d일 EEEE')}"></div>
+                        <div th:text="${time.start + ' ~ ' +time.end}" class="ml-5"></div>
+                    </span>
+                            <span><div th:text="${time.participationMembers.size()} + '명 / ' + ${time.participationMembers.size()+time.nonParticipationMembers.size()} + '명'" class="people-number text-sm"></div></span>
                         </div>
-                    </a>
-                    <form hidden th:action="@{|/selectedTime?rooomId=${room.id}&availableMemers=${time.members}|}" method="POST"></form>
-                </li>
-            </ul>
+                    </li>
+
+                    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+                    <script th:inline="javascript">
+                    </script>
+                </ul>
+            </div>
         </div>
 
         <div class="font-bold attend-status">
@@ -63,18 +66,22 @@
                 <li class="flex flex-col">
                     <div>
                         <div class="mb-2">참여 멤버</div>
-                        <div class="flex flex-col items-center">
-                            <img src="" width="50" class="mask mask-circle">
-                            <div></div>
-                        </div>
+                        <ul id="available-members" class="flex justify-center">
+                            <li class="mr-2">
+                                <img width="50" class="mask mask-circle">
+                                <div></div>
+                            </li>
+                        </ul>
                     </div>
 
                     <div>
                         <div class="mb-2">참여 불가능 멤버</div>
-                        <div class="flex flex-col items-center">
-                            <img src="" width="50" class="mask mask-circle">
-                            <div></div>
-                        </div>
+                        <ul id="unavailable-members" class="flex justify-center">
+                            <li class="mr-2">
+                                <img width="50" class="mask mask-circle">
+                                <div></div>
+                            </li>
+                        </ul>
                     </div>
                 </li>
             </ul>
