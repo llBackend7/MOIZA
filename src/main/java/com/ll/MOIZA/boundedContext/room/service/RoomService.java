@@ -5,10 +5,13 @@ import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -37,7 +40,7 @@ public class RoomService {
                            LocalTime availableEndTime,
                            LocalTime duration,
                            LocalDateTime deadLine) {
-        validateTimes(startDay, endDay, availableStartTime, availableEndTime,duration, deadLine);
+        validateTimes(startDay, endDay, availableStartTime, availableEndTime, duration, deadLine);
 
         Room room = Room.builder()
                 .leader(member)
@@ -85,10 +88,17 @@ public class RoomService {
         return token;
     }
 
+    public boolean validateToken(Room room, String accessToken) {
+        String accessCode = room.getAccessCode();
+
+        return jwtProvider.verify(accessToken)
+                && jwtProvider.getClaims(accessToken).get("accessCode").equals(accessCode);
+    }
+
     public Room getRoom(Long roomId) {
         return roomRepository
                 .findById(roomId)
-                .orElseThrow(()->new ResponseStatusException(HttpStatus.NOT_FOUND, "모임을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "모임을 찾을 수 없습니다."));
     }
 
     public List<LocalDate> getAvailableDayList(Long roomId) {
@@ -107,7 +117,7 @@ public class RoomService {
         return availableDayList;
     }
 
-    public List<LocalTime> getAvailableTimeList(Long roomId){
+    public List<LocalTime> getAvailableTimeList(Long roomId) {
         Room room = getRoom(roomId);
 
         LocalTime availableStartTime = room.getAvailableStartTime();

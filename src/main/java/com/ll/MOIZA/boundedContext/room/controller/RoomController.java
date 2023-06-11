@@ -12,25 +12,28 @@ import com.ll.MOIZA.boundedContext.room.form.PlaceCreateForm;
 import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
-
-import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
+import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
-import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -38,7 +41,6 @@ import java.time.LocalTime;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.Optional;
 
 @Controller
 @RequiredArgsConstructor
@@ -103,7 +105,7 @@ public class RoomController {
         String accessToken = roomService.getAccessToken(room);
         Long roomId = room.getId();
 
-        return Map.of("link", "http://localhost:8080/room/enter?roomId=%d&accessToken=%s".formatted(roomId,accessToken));
+        return Map.of("link", "http://localhost:8080/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken));
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -198,5 +200,64 @@ public class RoomController {
         selectedPlaceService.CreateSelectedPlace(form.getName(), opEnterRoom.get());
 
         return "redirect:/room/" + roomId + "/place";
+    }
+    @Data
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SelectedDayWithTime {
+        @NotNull
+        LocalDate date;
+        @NotNull
+        LocalTime startTime;
+        @NotNull
+        LocalTime endTime;
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/enter")
+    public String enterRoom(@RequestParam long roomId, @RequestParam String accessToken, Model model) {
+        Room room = roomService.getRoom(roomId);
+
+        if (roomService.validateToken(room,accessToken)) {
+            model.addAttribute("room", room);
+            model.addAttribute("availableDayList", roomService.getAvailableDayList(roomId));
+            model.addAttribute("availableTimeList", roomService.getAvailableTimeList(roomId));
+
+            return "/room/enter";
+        }
+
+        throw new AuthorizationServiceException("토큰값이 유효하지 않습니다.");
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/enter")
+    public String enterRoom(@AuthenticationPrincipal User user,
+                            @RequestParam long roomId,
+                            @RequestParam String accessToken,
+                            @RequestBody List<SelectedDayWithTime> selectedDayWhitTimeList,
+                            Model model) {
+        Room room = roomService.getRoom(roomId);
+
+        if (roomService.validateToken(room,accessToken)) {
+            Member member = memberService.loginMember(user);
+            enterRoomService.enterRoomWithSelectedTime(room, member, selectedDayWhitTimeList);
+
+            addUserAuthority(user, roomId);
+
+            return "redirect:/room/%d/date".formatted(roomId);
+        }
+
+        throw new AuthorizationServiceException("토큰값이 유효하지 않습니다.");
+    }
+
+    private void addUserAuthority(User user, long roomId) {
+        // 사용자 권한 추가
+        List<GrantedAuthority> updatedAuthorities = new ArrayList<>(user.getAuthorities());
+        updatedAuthorities.add(new SimpleGrantedAuthority("ROOM#%d_MEMBER".formatted(roomId)));
+
+        User updatedUser = new User(user.getUsername(), user.getPassword(), updatedAuthorities);
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(updatedUser, user.getPassword(), updatedAuthorities));
     }
 }
