@@ -15,14 +15,9 @@
         </span>
         </div>
         <div class="navbar-end">
-<<<<<<< HEAD
             <!-- 조건문 수정해야함 -->
             <a id="close-btn" href="javascript:" th:if="${room.getLeader() != actor}" onclick="$(this).next().submit();" class="flex items-center justify-center">마감하기</a>
             <form hidden th:action="@{|/room/${room.id}/close|}" method="POST">
-=======
-            <a id="close-btn" href="javascript:" th:if="${room.getLeader() == actor}" class="flex items-center justify-center">마감하기</a>
-            <form hidden th:action="@{|/|}" method="POST">
->>>>>>> a0a05009d5ede31652aaaed0718bc2a5c84b070c
             </form>
         </div>
     </div>
@@ -54,11 +49,7 @@
                 </span>
                 <form th:action th:method="POST">
                     <input type="hidden" name="name" th:value="${map.key.name}">
-<<<<<<< HEAD
                     <button type="submit" class="vote-btn !bg-[#006bce] ml-10">투표</button>
-=======
-                    <button type="submit" class="vote-btn ml-2 !bg-[#006bce]">투표</button>
->>>>>>> a0a05009d5ede31652aaaed0718bc2a5c84b070c
                 </form>
             </div>
 
@@ -78,11 +69,7 @@
                     <div>
                         <form th:action th:method="POST">
                             <input type="hidden" name="name" th:value="${map.key.name}">
-<<<<<<< HEAD
                             <button type="submit" class="vote-btn !bg-[#006bce]">투표</button>
-=======
-                            <button type="submit" class="vote-btn ml-2 !bg-[#006bce]">투표</button>
->>>>>>> a0a05009d5ede31652aaaed0718bc2a5c84b070c
                         </form>
                     </div>
                 </div>
