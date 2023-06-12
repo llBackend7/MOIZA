@@ -31,7 +31,12 @@ public class SelectedPlaceService {
                 .name(name)
                 .enterRoom(enterRoom)
                 .build();
-        return selectedPlaceRepository.save(selectedPlace);
+
+        if (!selectedPlaceRepository.findEnterRoomsByPlaceName(name).contains(enterRoom)) {
+            return selectedPlaceRepository.save(selectedPlace);
+        } else {
+            return null;
+        }
     }
 
     public Map<SelectedPlace, Long> getSelectedPlaces(Room room) {
