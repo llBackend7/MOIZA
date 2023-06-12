@@ -175,7 +175,7 @@ public class SelectedTimeService {
                 .filter(selectedTime -> !selectedTime.getStartTime().isAfter(endTime))
                 .filter(selectedTime ->
                         !selectedTime.getStartTime().isAfter(startTime) &&
-                                !selectedTime.getEndTime().isBefore(endTime)
+                                !endTime.isAfter(selectedTime.getEndTime())
                 )
                 .map(SelectedTime::getEnterRoom)
                 .map(EnterRoom::getMember)
