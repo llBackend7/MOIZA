@@ -31,7 +31,7 @@
     <script>
         /*<![CDATA[*/
         let roomId = [[${roomId}]];
-        let memberId = [[${@memberRepository.findByName(#authentication.principal.name).get().id}]];
+        let memberId = [[${actor.id}]];
         /*]]>*/
 
         let stompClient = null;
