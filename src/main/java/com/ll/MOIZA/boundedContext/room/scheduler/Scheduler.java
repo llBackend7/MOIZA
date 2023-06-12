@@ -33,7 +33,7 @@ public class Scheduler {
     private final SelectedPlaceService selectedPlaceService;
     private final ResultRepository resultRepository;
 
-    // 2분 간격으로 마감된 모임 탐색
+    // 1분 간격으로 마감된 모임 탐색
     @Scheduled(fixedRate = 10_000)
     public void checkConfirmedRoom() {
         List<Room> roomToConfirm = roomRepository.findByDeadLineBeforeAndMailSentFalse(LocalDateTime.now());
@@ -42,6 +42,8 @@ public class Scheduler {
             List<TimeRangeWithMember> overlappingTimes = selectedTimeService.findOverlappingTimeRanges(room);
             LocalDateTime decidedDateTime = null;
             TimeRangeWithMember timeRangeWithMember = null;
+            List<Member> availableMembers = null;
+            List<Member> unavailableMembers = null;
             String place="";
 
             if (!overlappingTimes.isEmpty()) {
@@ -55,13 +57,15 @@ public class Scheduler {
                 }
 
                 decidedDateTime = timeRangeWithMember.getDate().atTime(timeRangeWithMember.getStart());
+                availableMembers = timeRangeWithMember.getParticipationMembers();
+                unavailableMembers = timeRangeWithMember.getNonParticipationMembers();
             }
 
             DecidedResult result = DecidedResult.builder()
                     .decidedDayTime(decidedDateTime)
                     .decidedPlace(place)
-                    .participationMembers(timeRangeWithMember.getParticipationMembers())
-                    .nonParticipationMembers(timeRangeWithMember.getNonParticipationMembers())
+                    .participationMembers(availableMembers)
+                    .nonParticipationMembers(unavailableMembers)
                     .room(room)
                     .build();
 
