@@ -1,0 +1,15 @@
+.label{
+    color: #10022d;
+}
+
+select{
+    background-color: transparent;
+}
+
+select{
+    font-family: GmarketSansMedium;
+}
+
+input[type="time"]{
+    width: 6rem;
+}

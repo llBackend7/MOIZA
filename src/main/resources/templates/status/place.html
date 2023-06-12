@@ -1,0 +1,95 @@
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<header layout:fragment="header" class="sticky top-0">
+    <div class="navbar max-w-2xl mx-auto bg-base-100">
+        <div class="navbar-start">
+            <button>
+                <i class="fas fa-thin fa-arrow-left fa-2xl ml-1"></i>
+            </button>
+        </div>
+        <div class="navbar-center">
+        <span class="text-2xl">
+          투표 및 현황
+        </span>
+        </div>
+        <div class="navbar-end">
+            <!-- 조건문 수정해야함 -->
+            <a id="close-btn" href="javascript:" th:if="${room.getLeader() != actor}" onclick="$(this).next().submit();" class="flex items-center justify-center">마감하기</a>
+            <form hidden th:action="@{|/room/${room.id}/close|}" method="POST">
+            </form>
+        </div>
+    </div>
+</header>
+
+<main layout:fragment="main" class="flex-grow flex justify-center">
+    <div class="max-w-2xl w-full bg-blue-50">
+        <div class="text">
+            <div class="title">모임이름</div>
+            <div class="font-gsans w-56 flex justify-center text-2xl" th:text="${room.name}">서울 벙개</div>
+        </div>
+
+        <div class="place-rank">
+            <div class="text-center m-2 text-xl">
+                장소 투표
+            </div>
+
+            <div class="rank-1th" th:each="map, iterStat : ${selectedPlaceMap}" th:if="${iterStat.first}">
+                <span class="rank-one text-bold">
+                    <span th:text="${iterStat.index + 1}"></span>
+                    <span>위</span>
+                </span>
+                <span class="place ml-7 text-xl" th:text="${map.key.name}"></span>
+                <span class="people-number ml-12">
+                    <span th:text="${map.value}"></span>
+                    <span>명 / </span>
+                    <span th:text="${room.enterRoom.size()}"></span>
+                    <span>명</span>
+                </span>
+                <form th:action th:method="POST">
+                    <input type="hidden" name="name" th:value="${map.key.name}">
+                    <button type="submit" class="vote-btn !bg-[#006bce] ml-10">투표</button>
+                </form>
+            </div>
+
+            <div class="rank-nth w-full justify-items-center mt-4">
+                <div class="rank-content-other py-4" th:each="map, iterStat : ${selectedPlaceMap}" th:if="${!iterStat.first}">
+                    <div class="rank-n text-bold">
+                        <span th:text="${iterStat.index + 1}"></span>
+                        <span>위</span>
+                    </div>
+                    <div class="date-n text-lg" th:text="${map.key.name}"></div>
+                    <div class="people-number-n">
+                        <span th:text="${map.value}"></span>
+                        <span>명 / </span>
+                        <span th:text="${room.enterRoom.size()}"></span>
+                        <span>명</span>
+                    </div>
+                    <div>
+                        <form th:action th:method="POST">
+                            <input type="hidden" name="name" th:value="${map.key.name}">
+                            <button type="submit" class="vote-btn !bg-[#006bce]">투표</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <form class="place-input" th:action th:method="post">
+            <input type="text" name="name" placeholder=" 원하는 장소 입력 후 장소 추가 버튼을 눌러주세요." />
+            <button class="add-place">+ 장소 추가</button>
+        </form>
+    </div>
+</main>
+
+</body>
+
+<footer layout:fragment="footer">
+    <a th:href="@{|/room/${room.id}/date|}"><i class="far fa-thin fa-clock text-slate-300 hover:text-sky-600"></i></a>
+    <a href=""><i class="far fa-solid fa-location-dot text-sky-600 "></i></a>
+    <a th:href="@{|/room/${room.id}/chat|}"><i class="far fa-thin fa-comments text-slate-300 hover:text-sky-600"></i></a>
+</footer>
+
+</html>
+

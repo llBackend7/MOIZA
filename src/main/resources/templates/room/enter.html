@@ -1,0 +1,84 @@
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<header layout:fragment="header" class="sticky top-0">
+  <div class="navbar max-w-2xl mx-auto bg-base-100">
+    <div class="navbar-start">
+      <button>
+        <i class="fas fa-thin fa-arrow-left fa-2xl ml-1"></i>
+      </button>
+    </div>
+    <div class="navbar-center">
+      <i class="fa-solid fa-location-dot fa-2xl" style="color: #1960ef;"></i>
+      <span class="ml-2 text-xl">
+          모임 참여
+        </span>
+    </div>
+    <div class="navbar-end">
+    </div>
+  </div>
+</header>
+
+<main layout:fragment="main" class="flex-grow flex items-center justify-center">
+  <div class="max-w-2xl w-full bg-blue-50">
+    <div class="m-10">
+      <div>
+        <span class="title">모임 이름</span>
+        <span class="font-gsans text-xl"></span>
+      </div>
+
+      <div class="mt-5">
+        <span class="title">가능한 날짜 선택</span>
+        <div class="text-center text-xl">(달력)</div>
+      </div>
+
+      <div class="font-gsans mt-5 text-center text-xl">
+        <span>2023년 6월 1일</span>
+      </div>
+
+      <div class="mt-5">
+        <span class="title">시간</span>
+        <div class="font-gsans text-center text-xl">
+          <select>
+            <option class="am-pm">AM/PM</option>
+            <option>AM</option>
+            <option>PM</option>
+          </select>
+          <select class="w-1/6 text-end">
+            <option></option>
+            <option>1</option>
+            <option>2</option>
+            <option>3</option>
+            <option>4</option>
+            <option>5</option>
+            <option>6</option>
+            <option>7</option>
+            <option>8</option>
+            <option>9</option>
+            <option>10</option>
+            <option>11</option>
+            <option>12</option>
+          </select>
+          <span>시</span>
+          <select class="w-1/6 text-end">
+            <option></option>
+            <option>0</option>
+            <option>15</option>
+            <option>30</option>
+            <option>45</option>
+          </select>
+          <span>분</span>
+        </div>
+      </div>
+
+      <div class="text-center">
+        <button class="room-btn mt-16">선택완료</button>
+      </div>
+
+    </div>
+  </div>
+</main>
+
+</body>
+</html>

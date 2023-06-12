@@ -1,0 +1,175 @@
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<header layout:fragment="header" class="sticky top-0">
+    <div class="navbar max-w-2xl mx-auto bg-base-100">
+        <div class="navbar-start">
+            <button>
+                <i class="fas fa-thin fa-arrow-left fa-2xl ml-1"></i>
+            </button>
+        </div>
+        <div class="navbar-center">
+        <span class="text-2xl">
+          투표 및 현황
+        </span>
+        </div>
+        <div class="navbar-end">
+            <!-- 조건문 수정해야함 -->
+            <a id="close-btn" href="javascript:" th:if="${room.getLeader() != actor}" onclick="$(this).next().submit();" class="flex items-center justify-center">마감하기</a>
+            <form hidden th:action="@{|/room/${room.id}/close|}" method="POST">
+            </form>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"
+            integrity="sha512-iKDtgDyTHjAitUDdLljGhenhPwrbBfqTKWO1mkhSFH3A7blITC9MhYon6SjnMhp4o0rADGw9yAC6EW4t5a4K3g=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- date-fns -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/date-fns/1.30.1/date_fns.min.js"></script>
+
+    <script>
+        /*<![CDATA[*/
+        let roomId = [[${roomId}]];
+        let memberId = [[${@memberRepository.findByName(#authentication.principal.name).get().id}]];
+        /*]]>*/
+
+        let stompClient = null;
+
+        let curSlice;
+    </script>
+</header>
+
+<main layout:fragment="main" class="flex flex-grow justify-center">
+    <div class="max-w-2xl w-full h-screen bg-blue-50">
+        <div class="text">
+            <div class="title">모임이름</div>
+            <div class="font-gsans w-56 flex justify-center text-2xl" th:text="${room.name}"></div>
+        </div>
+
+        <div class="chat-box flex flex-col mx-12 mb-4 h-[83%]">
+            <div class="!border !border-[#adcfee] h-[80%]">
+                <div class="h-[10%]">
+                    <p class="text-center text-xl py-2">
+                        채팅방
+                    </p>
+                </div>
+                <div id="chats" class="overflow-auto h-[90%] py-2 px-3">
+                    <!-- 채팅내용 -->
+                </div>
+            </div>
+            <div class="chat-input px-2.5 bg-[#006BCE]">
+                <form class="w-full flex justify-space gap-3 p-1.5">
+                    <input type="text" class="input input-sm  input-bordered p-1 font-gsans flex-grow"
+                           id="content"
+                           placeholder=" 내용 입력 후 Enter"/>
+                    <button type="submit" id="send"><i class="fa-solid fa-paper-plane" style="color: #a3e8ff;"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(async () => {
+            connect();
+            $('form').on('submit', e => e.preventDefault());
+            $('#send').click(() => send());
+            await getChats();
+            goToRecent();
+        })
+
+        function connect() {
+            let socket = new SockJS('/ws');
+            stompClient = Stomp.over(socket);
+            stompClient.connect({}, () => {
+
+                stompClient.subscribe(`/room/${roomId}`, chat => show(chat));
+
+            });
+        }
+
+        function send() {
+            if ($('#content').val()) {
+                stompClient.send(`/send/${roomId}`, {}, $('#content').val());
+            }
+            $('#content').val('');
+        }
+
+        function goToRecent() {
+            const chatContainer = $('#chats');
+            chatContainer.scrollTop(chatContainer.prop('scrollHeight'));
+        }
+
+        function show(chat) {
+            let parsed = JSON.parse(chat.body);
+            $('#chats').append(chatBubble(parsed));
+            goToRecent();
+        }
+
+        async function getMoreChats() {
+            if (!curSlice.last) {
+                const chatContainer = $('#chats');
+                const oldScrollHeight = chatContainer.prop('scrollHeight');
+
+                await getChats(curSlice.nextCursor);
+
+                const newScrollHeight = chatContainer.prop('scrollHeight');
+                chatContainer.scrollTop(chatContainer.scrollTop() + newScrollHeight - oldScrollHeight);
+            }
+        }
+
+        function chatBubble(chat) {
+            return `
+                    <div id="${chat.id}" class="chat chat-${chat.memberId == memberId ? "end" : "start"}">
+                        <div class="chat-image avatar">
+                                <div class="w-10 rounded-full">
+                                <img src="${chat.profile}" />
+                            </div>
+                        </div>
+                        <div class="chat-header font-gsans">
+                            ${chat.writer}
+                            <time class="text-xs opacity-50 font-gsans">${dateFns.format(new Date(chat.createDate), 'YYYY-MM-DD HH:mm')}</time>
+                        </div>
+                        <div class="chat-bubble font-gsans">${chat.content}</div>
+                    </div>
+                    `;
+        }
+
+        async function getChats(nextCursor) {
+            $('#chats #reload:first').remove();
+            await $.ajax({
+                url: `/chats?roomId=${roomId}`,
+                type: 'GET',
+                data: {
+                    nextCursor: nextCursor
+                },
+                success: function (slice) {
+                    curSlice = slice;
+                    slice.content.forEach(chat => $('#chats').prepend(chatBubble(chat)));
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error(textStatus, errorThrown);
+                }
+            });
+            if (!curSlice.last) {
+                $('#chats').prepend(`
+                <div id="reload" class="w-full flex justify-center">
+                    <button onclick="getMoreChats();"><i class="fa-solid fa-rotate-right"></i></button>
+                </div>
+                `);
+            }
+        }
+
+    </script>
+</main>
+
+<footer layout:fragment="footer">
+    <a th:href="@{|/room/${roomId}/date|}"><i class="far fa-thin fa-clock text-slate-300 hover:text-sky-600"></i></a>
+    <a th:href="@{|/room/${roomId}/place|}"><i
+            class="far fa-solid fa-location-dot text-slate-300 hover:text-sky-600"></i></a>
+    <a href=""><i class="far fa-thin fa-comments text-sky-600"></i></a>
+</footer>
+</body>
+
+</html>

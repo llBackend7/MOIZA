@@ -1,0 +1,193 @@
+package com.ll.MOIZA.boundedContext.selectedTime.service;
+
+import com.ll.MOIZA.boundedContext.member.entity.Member;
+import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
+import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
+import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
+import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+import java.util.*;
+
+@Service
+@Transactional(readOnly = true)
+@RequiredArgsConstructor
+public class SelectedTimeService {
+
+    private final SelectedTimeRepository selectedTimeRepository;
+
+    private final EnterRoomRepository enterRoomRepository;
+
+    @Transactional
+    public SelectedTime CreateSelectedTime(
+            LocalDate day,
+            LocalTime startTime,
+            LocalTime endTime,
+            EnterRoom enterRoom
+    ) {
+        validDate(enterRoom.getRoom(), day);
+        validTime(enterRoom.getRoom(), startTime, endTime);
+        SelectedTime selectedTime = SelectedTime.builder()
+                .date(day)
+                .startTime(startTime)
+                .endTime(endTime)
+                .enterRoom(enterRoom)
+                .build();
+
+        return selectedTimeRepository.save(selectedTime);
+    }
+
+    private void validDate(Room room, LocalDate day) {
+        if (room.getAvailableStartDay().isAfter(day)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "선택할 수 있는 날짜이 아닙니다. 선택한 날짜이 가능한 날짜보다 이릅니다.");
+        }
+        if (room.getAvailableEndDay().isBefore(day)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "선택할 수 있는 날짜이 아닙니다. 선택한 날짜이 가능한 날짜보다 늦습니다.");
+        }
+    }
+
+    private void validTime(Room room, LocalTime startTime, LocalTime endTime) {
+        if (startTime.isAfter(endTime)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "시작하는 시간은 끝나는 시간보다 빠를 수 없습니다.");
+        }
+        if (room.getAvailableStartTime().isAfter(startTime)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "선택할 수 있는 시간이 아닙니다. 선택한 시간이 가능한 시간보다 이릅니다.");
+        }
+        if (room.getAvailableEndTime().isBefore(endTime)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "선택할 수 있는 시간이 아닙니다. 선택한 시간이 가능한 시간보다 늦습니다.");
+        }
+    }
+
+    public List<SelectedTime> findSelectedTimeByRoomAndDate(Room room, LocalDate date) {
+        List<SelectedTime> selectedTimes = selectedTimeRepository.searchSelectedTimeByRoom(
+                room, date);
+        return selectedTimes;
+    }
+
+    public List<TimeRangeWithMember> findOverlappingTimeRanges(Room room) {
+        List<TimeRangeWithMember> timeRangeWithMembers = new LinkedList<>();
+        LocalDate startDay = room.getAvailableStartDay();
+        LocalDate endDay = room.getAvailableEndDay();
+
+        while (!startDay.isAfter(endDay)) {
+            List<TimeRangeWithMember> getTimeRangesWhitRoomAndDay = findOverlappingTimeRanges(room,
+                    startDay);
+
+            timeRangeWithMembers.addAll(getTimeRangesWhitRoomAndDay);
+
+            startDay = startDay.plusDays(1);
+        }
+
+        Collections.sort(timeRangeWithMembers);
+
+        if (timeRangeWithMembers.size() > 10) {
+            return new ArrayList<>(timeRangeWithMembers.subList(0, 10));
+        }
+
+        return timeRangeWithMembers;
+    }
+
+    public List<TimeRangeWithMember>findOverlappingTimeRanges(
+            Room room, LocalDate date) {
+
+        List<SelectedTime> selectedTimeList = selectedTimeRepository.searchSelectedTimeByRoom(room,
+                date);
+
+        if (selectedTimeList.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        List<TimeRangeWithMember> overlappingRanges = new LinkedList<>();
+
+        // 탐색 시간 기준 시작점
+        LocalTime startTime = room.getAvailableStartTime();
+
+        LocalTime meetingDuration = room.getMeetingDuration();
+
+        while (startTime.isBefore(room.getAvailableEndTime())) {
+
+            LocalTime basicStartTime = startTime;
+            LocalTime basicEndTime = startTime.plusHours(meetingDuration.getHour())
+                    .plusMinutes(meetingDuration.getMinute());
+
+            List<Member> participationMembers = getContainedMember(selectedTimeList, meetingDuration,
+                    basicStartTime,
+                    basicEndTime);
+
+            List<Member> nonParticipationMembers = getNonParticipationMembers(room, participationMembers);
+
+            if (participationMembers.size() > 1) {
+                overlappingRanges.add(
+                        new TimeRangeWithMember(date, basicStartTime, basicEndTime, participationMembers, nonParticipationMembers));
+            }
+
+            startTime = basicStartTime.plusMinutes(30);
+        }
+
+        Collections.sort(overlappingRanges);
+
+        if (overlappingRanges.size() > 10) {
+            return new ArrayList<>(overlappingRanges.subList(0, 10));
+        }
+
+        return overlappingRanges;
+    }
+
+    public Set<LocalDate> findOverlappingDates(List<EnterRoom> enterRooms) {
+        Set<LocalDate> overlappingDates = new LinkedHashSet<>();
+
+        for (EnterRoom enterRoom : enterRooms) {
+            List<SelectedTime> selectedTimes = selectedTimeRepository.findAllByEnterRoom(enterRoom);
+            for (SelectedTime selectedTime : selectedTimes) {
+                overlappingDates.add(selectedTime.getDate());
+            }
+        }
+
+        return overlappingDates;
+    }
+
+    public List<Member> getContainedMember (List<SelectedTime> selectedTimeList,
+            LocalTime meetingDuration, LocalTime startTime, LocalTime endTime) {
+        return selectedTimeList.stream()
+                .filter(selectedTime ->
+                        !selectedTime.getEndTime()
+                                .minusHours(selectedTime.getStartTime().getHour())
+                                .minusMinutes(selectedTime.getStartTime().getMinute())
+                                .isBefore(meetingDuration)
+                )
+                .filter(selectedTime -> !selectedTime.getStartTime().isAfter(endTime))
+                .filter(selectedTime ->
+                        !selectedTime.getStartTime().isAfter(startTime) &&
+                                !selectedTime.getEndTime().isBefore(endTime)
+                )
+                .map(SelectedTime::getEnterRoom)
+                .map(EnterRoom::getMember)
+                .sorted(Comparator.comparing(Member::getName))
+                .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    public List<Member> getNonParticipationMembers(Room room, List<Member> participationMembers) {
+        List<Member> allMembers = enterRoomRepository.findMembersByRoom(room);
+
+        return allMembers.stream()
+                .filter(m -> !participationMembers.contains(m))
+                .collect(Collectors.toList());
+    }
+}

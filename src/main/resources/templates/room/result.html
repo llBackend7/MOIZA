@@ -1,0 +1,189 @@
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<header layout:fragment="header" class="sticky top-0">
+    <div class="navbar max-w-2xl mx-auto bg-base-100">
+        <a href="/" class="navbar-start text-2xl font-gsans m-5">
+            <img width="35" src="https://img.icons8.com/external-flat-lima-studio/64/external-block-toys-flat-lima-studio-2.png" alt="external-block-toys-flat-lima-studio-2"/>
+            <div class="ml-2 mt-1">MOIZA</div>
+        </a>
+        <div class="navbar-center">
+        </div>
+        <div class="navbar-end">
+            <a href="/logout" class="text-gray-300 text-md mr-3">
+                <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                로그아웃
+            </a>
+            <img th:src="${@rq.member.profile}" width="45" class="mr-7 mask mask-circle">
+        </div>
+    </div>
+</header>
+
+<main layout:fragment="main" class="flex-grow flex justify-center">
+    <div class="max-w-2xl w-full">
+        <div class="w-full flex flex-col items-center">
+            <div class="w-3/4 h-20 flex flex-col items-center">
+                <div class="text-center">
+                    <div th:text="${result.room.name}" class="text-3xl"></div>
+                </div>
+            </div>
+
+            <div class="w-full flex flex-col px-10">
+                <div class="my-2">
+                    <div class="ml-4">모임 설명</div>
+                    <div th:text="${result.room.description}" class="border-l-4 border-neutral-300 text-center text-xl font-gsans"></div>
+                </div>
+
+                <div class="my-2">
+                    <div class="ml-4">참여 멤버</div>
+                    <div class="border-l-4 border-neutral-300">
+                        <ul class="flex justify-center">
+                            <li class="flex flex-col items-center mr-2 py-2 font-gsans">
+                                <div>
+                                    <img width="55" class="mask mask-circle">
+                                </div>
+                                <div></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="my-2">
+                    <div class="ml-4">참여 불가 멤버</div>
+                    <div class="border-l-4 border-neutral-300 text-center">
+                        <div>
+
+                        </div>
+                        <ul class="flex justify-center">
+                            <li class="flex flex-col items-center mr-2 py-2 font-gsans">
+                                <div>
+                                    <img width="55" class="mask mask-circle">
+                                </div>
+                                <div></div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="my-2">
+                    <div class="ml-4">약속 시간</div>
+                    <div class="border-l-4 border-neutral-300 text-center text-xl font-gsans">
+                        <span th:text="${#temporals.format(result.decidedDayTime, 'yyyy년 MM월 dd일 a hh:mm')}"></span>
+                    </div>
+                </div>
+
+                <div class="my-2">
+                    <div class="ml-4">약속 장소</div>
+                    <div class="border-l-4 border-neutral-300 text-center text-xl font-gsans">
+                        <div th:text="${result.decidedPlace}"></div>
+                        <div>
+                            <div class="m-3" id="map" style="width:100%;height:350px;"></div>
+
+                            <script type="text/javascript" th:src="@{'//dapi.kakao.com/v2/maps/sdk.js?appkey='+${appKey}+'&libraries=services'}"></script>
+
+                            <script>
+                                // 마커를 클릭하면 장소명을 표출할 인포윈도우 입니다
+                                const infowindow = new kakao.maps.InfoWindow({zIndex: 1});
+
+                                const mapContainer = document.getElementById('map'), // 지도를 표시할 div
+                                    mapOption = {
+                                        center: new kakao.maps.LatLng(37.566826, 126.9786567), // 지도의 중심좌표
+                                        level: 3 // 지도의 확대 레벨
+                                    };
+
+                                // 지도를 생성합니다
+                                const map = new kakao.maps.Map(mapContainer, mapOption);
+
+                                // 장소 검색 객체를 생성합니다
+                                const ps = new kakao.maps.services.Places();
+
+                                // 키워드로 장소를 검색합니다
+                                ps.keywordSearch("[[${result.decidedPlace}]]", placesSearchCB);
+
+                                // 키워드 검색 완료 시 호출되는 콜백함수 입니다
+                                function placesSearchCB (data, status, pagination) {
+                                    if (status === kakao.maps.services.Status.OK) {
+
+                                        // 검색된 장소 위치를 기준으로 지도 범위를 재설정하기위해
+                                        // LatLngBounds 객체에 좌표를 추가합니다
+                                        var bounds = new kakao.maps.LatLngBounds();
+
+                                        for (var i=0; i<data.length; i++) {
+                                            displayMarker(data[i]);
+                                            bounds.extend(new kakao.maps.LatLng(data[i].y, data[i].x));
+                                        }
+
+                                        // 검색된 장소 위치를 기준으로 지도 범위를 재설정합니다
+                                        map.setBounds(bounds);
+                                    }
+                                }
+
+                                // 지도에 마커를 표시하는 함수입니다
+                                function displayMarker(place) {
+
+                                    // 마커를 생성하고 지도에 표시합니다
+                                    var marker = new kakao.maps.Marker({
+                                        map: map,
+                                        position: new kakao.maps.LatLng(place.y, place.x)
+                                    });
+
+                                    // 마커에 클릭이벤트를 등록합니다
+                                    kakao.maps.event.addListener(marker, 'click', function() {
+                                        // 마커를 클릭하면 장소명이 인포윈도우에 표출됩니다
+                                        infowindow.setContent('<div style="padding:5px;font-size:12px;">' + place.place_name + '</div>');
+                                        infowindow.open(map, marker);
+                                    });
+                                }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-2">
+                    <div class="text-center">
+                        <ul class="flex justify-center">
+
+                            <li class="flex flex-col items-center py-2 mr-16">
+                                <button onclick="sendKakaoShare();">
+                                    <img src="https://blog.kakaocdn.net/dn/bpOv6u/btru1akOJSk/SWmLX4oJKrYWo03MiKDRhK/img.png" width="40" class="mb-1">
+                                </button>
+                                <div class="text-sm">카카오톡<br>공유하기</div>
+                                <script>
+                                    function sendKakaoShare() {
+                                        Kakao.init("[[${appKey}]]");
+                                        Kakao.Link.sendCustom({ templateId: 94654});
+                                    }
+                                </script>
+                            </li>
+
+                            <li class="flex flex-col items-center py-2">
+                                <button onclick="copyPageLink()">
+                                    <img src="https://img.icons8.com/external-prettycons-solid-prettycons/60/4D4D4D/external-link-social-media-prettycons-solid-prettycons.png" width="40" class="mask mask-circle mb-1">
+                                </button>
+                                <div class="text-sm">링크<br>공유하기</div>
+                                <script>
+                                    function copyPageLink() {
+                                        const pageLink = window.location.href;
+                                        navigator.clipboard.writeText(pageLink)
+                                            .then(() => {
+                                                alert("페이지 링크가 복사되었습니다.");
+                                            })
+                                            .catch((error) => {
+                                                console.error("페이지 링크 복사 실패:", error);
+                                            });
+                                    }
+                                </script>
+                            </li>
+
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>
