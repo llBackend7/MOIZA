@@ -272,7 +272,7 @@ public class RoomController {
 
             Map<String, String> response = new HashMap<>();
             response.put("redirectUrl", String.format("/room/%d/date", roomId));
-            return new ResponseEntity<>(response, HttpStatus.TEMPORARY_REDIRECT);
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
         throw new AuthorizationServiceException("토큰값이 유효하지 않습니다.");
