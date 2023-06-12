@@ -226,7 +226,6 @@ public class NotProd {
             EnterRoom enterRoom6 = enterRoomService.createEnterRoom(room3, member3);
             enterRoomService.createEnterRoom(room2, member4);
             enterRoomService.createEnterRoom(room3, member4);
-            enterRoomService.createEnterRoom(room, member4);
 
             selectedPlaceService.CreateSelectedPlace("서울역", enterRoom3);
             selectedPlaceService.CreateSelectedPlace("대구역", enterRoom3);
