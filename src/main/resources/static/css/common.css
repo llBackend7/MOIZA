@@ -238,3 +238,8 @@ body::-webkit-scrollbar {
     background: url(../img/main_sub.png) no-repeat center;
     background-size: cover;
 }
+
+main img {
+    position: relative;
+    z-index: -1;
+}

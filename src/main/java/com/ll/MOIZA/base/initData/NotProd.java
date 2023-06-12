@@ -18,6 +18,7 @@ import java.time.LocalTime;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
 
@@ -50,7 +51,7 @@ public class NotProd {
 
             Member member1 = Member.builder().name("user1").email("user1@email.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
             Member member2 = Member.builder().name("user2").email("user2@email.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
-            Member member3 = Member.builder().name("이은혜").email("lutea67@naver.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
+            Member member3 = Member.builder().name("으네").email("lutea67@naver.com").profile("http://k.kakaocdn.net/dn/CcQvQ/btsjJSVUxLW/n0JWhg5VeAjvcTQEy12G00/img_640x640.jpg").build();
             try {
                 memberRepository.save(member1);
             } catch (Exception e) {
@@ -66,7 +67,7 @@ public class NotProd {
 
             Room room = roomService.createRoom(
                     member1,
-                    "테스트룸",
+                    "테스트1",
                     "테스트룸임",
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(7),
@@ -194,9 +195,12 @@ public class NotProd {
                     enterRoom3
             );
 
+            Optional<EnterRoom> opEnterRoom = enterRoomService.findByMemberIdAndRoomId(1L, 1L);
+            Optional<EnterRoom> opEnterRoom2 = enterRoomService.findByMemberIdAndRoomId(2L, 1L);
+
             Room room2 = roomService.createRoom(
                     member1,
-                    "room2 (마감기한 지남)",
+                    "테스트2 (마감기한 지남)",
                     "testtesttest",
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(7),
@@ -207,7 +211,7 @@ public class NotProd {
 
             Room room3 = roomService.createRoom(
                     member3,
-                    "room3 (마감기한 안지남)",
+                    "테스트3 (마감기한 안지남)",
                     "testtesttest",
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(7),
@@ -238,6 +242,14 @@ public class NotProd {
                     LocalTime.of(19, 0),
                     enterRoom5
             );
+
+            LocalDate date = LocalDate.of(2023, 6, 12);
+            LocalTime start = LocalTime.of(10, 0);
+            LocalTime end = LocalTime.of(12, 0);
+            List<Member> participationMembers = Arrays.asList(member1, member3);
+            List<Member> nonParticipationMembers = List.of(member2);
+            TimeRangeWithMember timeRangeWithMember = new TimeRangeWithMember(date, start, end, participationMembers, nonParticipationMembers);
+            resultService.createResult(room2, timeRangeWithMember, "강남역");
         };
     }
 }

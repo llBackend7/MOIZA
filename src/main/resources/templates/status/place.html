@@ -48,7 +48,7 @@
                 </span>
                 <form th:action th:method="POST">
                     <input type="hidden" name="name" th:value="${map.key.name}">
-                    <button type="submit" class="vote-btn !bg-[#006bce] ml-10">투표</button>
+                    <button type="submit" class="vote-btn !bg-[#006bce] ml-10" th:disabled="${map.value + 1 > room.enterRoom.size()}">투표</button>
                 </form>
             </div>
 
@@ -68,7 +68,7 @@
                     <div>
                         <form th:action th:method="POST">
                             <input type="hidden" name="name" th:value="${map.key.name}">
-                            <button type="submit" class="vote-btn !bg-[#006bce]">투표</button>
+                            <button type="submit" class="vote-btn !bg-[#006bce]" th:disabled="${map.value + 1 > room.enterRoom.size()}">투표</button>
                         </form>
                     </div>
                 </div>

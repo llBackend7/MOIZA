@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -31,7 +32,12 @@ public class SelectedPlaceService {
                 .name(name)
                 .enterRoom(enterRoom)
                 .build();
-        return selectedPlaceRepository.save(selectedPlace);
+
+        if (!selectedPlaceRepository.findEnterRoomsByPlaceName(name).contains(enterRoom)) {
+            return selectedPlaceRepository.save(selectedPlace);
+        } else {
+            return null;
+        }
     }
 
     public Map<SelectedPlace, Long> getSelectedPlaces(Room room) {

@@ -1,5 +1,6 @@
 package com.ll.MOIZA.boundedContext.result.service;
 
+import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
 import com.ll.MOIZA.boundedContext.result.repository.ResultRepository;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
@@ -23,12 +25,14 @@ public class ResultService {
     @Transactional
     public void createResult(Room room, TimeRangeWithMember timeRangeWithMember, String decidedPlace) {
         LocalDateTime decidedDateTime = timeRangeWithMember.getDate().atTime(timeRangeWithMember.getStart());
+        List<Member> participationMembers = timeRangeWithMember.getParticipationMembers();
+        List<Member> nonParticipationMembers = timeRangeWithMember.getNonParticipationMembers();
 
         DecidedResult result = DecidedResult.builder()
                 .decidedDayTime(decidedDateTime)
                 .decidedPlace(decidedPlace)
-                .participationMembers(timeRangeWithMember.getParticipationMembers())
-                .nonParticipationMembers(timeRangeWithMember.getNonParticipationMembers())
+                .participationMembers(participationMembers)
+                .nonParticipationMembers(nonParticipationMembers)
                 .room(room)
                 .build();
 

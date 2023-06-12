@@ -45,8 +45,8 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.hamcrest.Matchers.is;
 
 @WebMvcTest(controllers = {RoomController.class, GlobalExceptionHandler.class})
 @AutoConfigureDataMongo
@@ -155,7 +155,7 @@ public class MockedRoomControllerTest {
                         .content(selectedDaysJSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
-                .andExpect(redirectedUrl("/room/1/date"));
+                .andExpect(jsonPath("$.redirectUrl", is("/room/1/date")));
 
         MvcResult mvcResult = mockMvc.perform(get("/test-authority")
                         .param("authority", "ROOM#1_MEMBER")

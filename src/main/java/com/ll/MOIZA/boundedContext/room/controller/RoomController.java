@@ -22,6 +22,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -176,6 +178,15 @@ public class RoomController {
         return "status/place";
     }
 
+    @PostMapping("/{roomId}/place")
+    public String createPlace(@PathVariable Long roomId, PlaceCreateForm form, @AuthenticationPrincipal User user) {
+        Member member = memberService.loginMember(user);
+        Optional<EnterRoom> opEnterRoom = enterRoomService.findByMemberIdAndRoomId(member.getId(), roomId);
+        selectedPlaceService.CreateSelectedPlace(form.getName(), opEnterRoom.get());
+
+        return "redirect:/room/" + roomId + "/place";
+    }
+
     @PreAuthorize("isAuthenticated() && hasAuthority('ROOM#' + #roomId + '_MEMBER')")
     @GetMapping("/{roomId}/chat")
     public String showRoomChat(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
@@ -184,16 +195,6 @@ public class RoomController {
         model.addAttribute("room", room);
         model.addAttribute("actor", actor);
         return "status/chat";
-    }
-
-    @PostMapping("/{roomId}/place")
-    public String createPlace(@PathVariable Long roomId, PlaceCreateForm form, @AuthenticationPrincipal User user) {
-        Member member = memberService.loginMember(user);
-        Optional<EnterRoom> opEnterRoom = enterRoomService.findByMemberIdAndRoomId(member.getId(), roomId);
-
-        selectedPlaceService.CreateSelectedPlace(form.getName(), opEnterRoom.get());
-
-        return "redirect:/room/" + roomId + "/place";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -254,11 +255,12 @@ public class RoomController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/enter")
-    public String enterRoom(@AuthenticationPrincipal User user,
-                            @RequestParam long roomId,
-                            @RequestParam String accessToken,
-                            @RequestBody List<SelectedDayWithTime> selectedDayWhitTimeList,
-                            Model model) {
+    @ResponseBody
+    public ResponseEntity enterRoom(@AuthenticationPrincipal User user,
+                                    @RequestParam long roomId,
+                                    @RequestParam String accessToken,
+                                    @RequestBody List<SelectedDayWithTime> selectedDayWhitTimeList,
+                                    Model model) {
         Room room = roomService.getRoom(roomId);
 
         if (roomService.validateToken(room,accessToken)) {
@@ -267,7 +269,9 @@ public class RoomController {
 
             addUserAuthority(user, roomId);
 
-            return "redirect:/room/%d/date".formatted(roomId);
+            Map<String, String> response = new HashMap<>();
+            response.put("redirectUrl", String.format("/room/%d/date", roomId));
+            return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
         throw new AuthorizationServiceException("토큰값이 유효하지 않습니다.");
@@ -278,9 +282,9 @@ public class RoomController {
         List<GrantedAuthority> updatedAuthorities = new ArrayList<>(user.getAuthorities());
         updatedAuthorities.add(new SimpleGrantedAuthority("ROOM#%d_MEMBER".formatted(roomId)));
 
-        User updatedUser = new User(user.getUsername(), user.getPassword(), updatedAuthorities);
+        User updatedUser = new User(user.getUsername(), "", updatedAuthorities);
 
         SecurityContextHolder.getContext().setAuthentication(
-                new UsernamePasswordAuthenticationToken(updatedUser, user.getPassword(), updatedAuthorities));
+                new UsernamePasswordAuthenticationToken(updatedUser, "", updatedAuthorities));
     }
 }
