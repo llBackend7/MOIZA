@@ -74,7 +74,13 @@ public class CachedChatRepository {
 
             hasNext = chatSet.size() > PAGE_SIZE;
             chats = new ArrayList<>(chatSet);
-            Chat nextCursorChat = chats.get(chats.size() - 1);
+            int contetSize = chats.size() - 1;
+            Chat nextCursorChat;
+            if (contetSize >= 0) {
+                nextCursorChat = chats.get(contetSize);
+            } else {
+                nextCursorChat = new Chat();
+            }
             nextCursor = objectMapper.writeValueAsString(nextCursorChat);
 
             if (hasNext) {

@@ -51,6 +51,7 @@ public class NotProd {
             Member member1 = Member.builder().name("user1").email("user1@email.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
             Member member2 = Member.builder().name("user2").email("user2@email.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
             Member member3 = Member.builder().name("이은혜").email("lutea67@naver.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
+            Member member4 = Member.builder().name("정상화").email("mouse4786@gmail.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
             try {
                 memberRepository.save(member1);
             } catch (Exception e) {
@@ -61,6 +62,10 @@ public class NotProd {
             }
             try {
                 memberRepository.save(member3);
+            } catch (Exception e) {
+            }
+            try {
+                memberRepository.save(member4);
             } catch (Exception e) {
             }
 
@@ -219,6 +224,8 @@ public class NotProd {
             EnterRoom enterRoom4 = enterRoomService.createEnterRoom(room2, member1);
             EnterRoom enterRoom5 = enterRoomService.createEnterRoom(room2, member3);
             EnterRoom enterRoom6 = enterRoomService.createEnterRoom(room3, member3);
+            enterRoomService.createEnterRoom(room2, member4);
+            enterRoomService.createEnterRoom(room3, member4);
 
             selectedPlaceService.CreateSelectedPlace("서울역", enterRoom3);
             selectedPlaceService.CreateSelectedPlace("대구역", enterRoom3);
