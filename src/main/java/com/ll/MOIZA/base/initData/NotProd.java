@@ -15,19 +15,17 @@ import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.ZoneOffset;
+
 import java.util.Arrays;
 import java.util.List;
 
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
-import org.springframework.beans.factory.annotation.Value;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ZSetOperations;
 
 @Configuration
 @Profile({"test", "dev"})

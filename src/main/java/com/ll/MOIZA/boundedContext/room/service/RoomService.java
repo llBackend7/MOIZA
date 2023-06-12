@@ -56,7 +56,6 @@ public class RoomService {
                 .build();
 
         Room createdRoom = roomRepository.save(room);
-
         return createdRoom;
     }
 

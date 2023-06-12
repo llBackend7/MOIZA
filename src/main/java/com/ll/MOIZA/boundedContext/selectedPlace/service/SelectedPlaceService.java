@@ -2,6 +2,7 @@ package com.ll.MOIZA.boundedContext.selectedPlace.service;
 
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import com.ll.MOIZA.boundedContext.selectedPlace.repository.SelectedPlaceRepository;
 import lombok.RequiredArgsConstructor;
