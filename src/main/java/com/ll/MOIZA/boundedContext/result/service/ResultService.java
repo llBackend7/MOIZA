@@ -21,22 +21,23 @@ public class ResultService {
     private final ResultRepository resultRepository;
 
     @Transactional
-    public DecidedResult createResult(Room room, TimeRangeWithMember timeRangeWithMember, String decidedPlace) {
+    public void createResult(Room room, TimeRangeWithMember timeRangeWithMember, String decidedPlace) {
         LocalDateTime decidedDateTime = timeRangeWithMember.getDate().atTime(timeRangeWithMember.getStart());
 
         DecidedResult result = DecidedResult.builder()
                 .decidedDayTime(decidedDateTime)
                 .decidedPlace(decidedPlace)
+                .participationMembers(timeRangeWithMember.getParticipationMembers())
+                .nonParticipationMembers(timeRangeWithMember.getNonParticipationMembers())
                 .room(room)
                 .build();
 
         resultRepository.save(result);
-        return result;
     }
 
     public DecidedResult getResult(Long roomId) {
         return resultRepository
                 .findByRoomId(roomId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "모임을 찾을 수 없습니다."));
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "모임의 결과를 찾을 수 없습니다."));
     }
 }

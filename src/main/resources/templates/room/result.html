@@ -38,6 +38,9 @@
                 <div class="my-2">
                     <div class="ml-4">참여 멤버</div>
                     <div class="border-l-4 border-neutral-300">
+                        <div th:if="${result.participationMembers.size() == 0 || result.participationMembers.isEmpty()}" class="font-gsans">
+                            참여가 가능한 멤버가 없습니다.
+                        </div>
                         <ul th:if="${result.participationMembers.size() > 0}" class="flex justify-center">
                             <li th:each="member : ${result.participationMembers}" class="flex flex-col items-center mr-2 py-2 font-gsans">
                                 <div>
@@ -52,8 +55,8 @@
                 <div class="my-2">
                     <div class="ml-4">참여 불가 멤버</div>
                     <div class="border-l-4 border-neutral-300 text-center">
-                        <div th:if="${result.nonParticipationMembers.size() == 0}">
-
+                        <div th:if="${result.nonParticipationMembers.size() == 0 || result.nonParticipationMembers.isEmpty()}" class="font-gsans">
+                            참여가 불가능한 멤버가 없습니다.
                         </div>
                         <ul th:if="${result.nonParticipationMembers.size() > 0}" class="flex justify-center">
                             <li th:each="member : ${result.nonParticipationMembers}" class="flex flex-col items-center mr-2 py-2 font-gsans">
