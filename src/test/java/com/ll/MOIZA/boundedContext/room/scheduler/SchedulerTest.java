@@ -2,9 +2,13 @@ package com.ll.MOIZA.boundedContext.room.scheduler;
 
 import com.ll.MOIZA.base.mail.MailService;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
+import com.ll.MOIZA.boundedContext.result.repository.ResultRepository;
+import com.ll.MOIZA.boundedContext.result.service.ResultService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
+import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
+import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -77,6 +81,9 @@ class SchedulerTest {
         RoomRepository roomRepository = Mockito.mock(RoomRepository.class);
         MailService mailService = Mockito.mock(MailService.class);
         SpringTemplateEngine templateEngine = Mockito.mock(SpringTemplateEngine.class);
+        SelectedTimeService selectedTimeService = Mockito.mock(SelectedTimeService.class);
+        SelectedPlaceService selectedPlaceService = Mockito.mock(SelectedPlaceService.class);
+        ResultRepository resultRepository = Mockito.mock(ResultRepository.class);
 
         Mockito.when(roomRepository.findByDeadLineBeforeAndMailSentFalse(Mockito.any(LocalDateTime.class)))
                 .thenReturn(roomToMailSend);
@@ -84,7 +91,7 @@ class SchedulerTest {
         Mockito.when(templateEngine.process(Mockito.anyString(), Mockito.any()))
                 .thenReturn("메일내용");
 
-        Scheduler scheduler = new Scheduler(roomRepository, mailService, templateEngine);
+        Scheduler scheduler = new Scheduler(roomRepository, mailService, templateEngine, selectedTimeService, selectedPlaceService, resultRepository);
 
         scheduler.checkConfirmedRoom();
 

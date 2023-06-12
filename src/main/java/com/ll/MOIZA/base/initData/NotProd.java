@@ -216,22 +216,28 @@ public class NotProd {
                     LocalTime.of(3, 0),
                     LocalDateTime.now().plusDays(3));
 
-            enterRoomService.createEnterRoom(room2, member1);
-            enterRoomService.createEnterRoom(room2, member3);
-            enterRoomService.createEnterRoom(room3, member3);
-
-            LocalDate date = LocalDate.of(2023, 6, 12);
-            LocalTime start = LocalTime.of(10, 0);
-            LocalTime end = LocalTime.of(12, 0);
-            List<Member> participationMembers = Arrays.asList(member1, member3);
-            List<Member> nonParticipationMembers = List.of(member2);
-            TimeRangeWithMember timeRangeWithMember = new TimeRangeWithMember(date, start, end, participationMembers, nonParticipationMembers);
-
-            resultService.createResult(room2, timeRangeWithMember,"강남역");
+            EnterRoom enterRoom4 = enterRoomService.createEnterRoom(room2, member1);
+            EnterRoom enterRoom5 = enterRoomService.createEnterRoom(room2, member3);
+            EnterRoom enterRoom6 = enterRoomService.createEnterRoom(room3, member3);
 
             selectedPlaceService.CreateSelectedPlace("서울역", enterRoom3);
             selectedPlaceService.CreateSelectedPlace("대구역", enterRoom3);
             selectedPlaceService.CreateSelectedPlace("익산역", enterRoom3);
+
+            selectedPlaceService.CreateSelectedPlace("강남역", enterRoom4);
+
+            selectedTimeService.CreateSelectedTime(
+                    LocalDate.now().plusDays(5),
+                    LocalTime.of(12, 0),
+                    LocalTime.of(18, 0),
+                    enterRoom4
+            );
+            selectedTimeService.CreateSelectedTime(
+                    LocalDate.now().plusDays(5),
+                    LocalTime.of(15, 0),
+                    LocalTime.of(19, 0),
+                    enterRoom5
+            );
         };
     }
 }

@@ -52,11 +52,11 @@ public class SelectedTimeService {
     private void validDate(Room room, LocalDate day) {
         if (room.getAvailableStartDay().isAfter(day)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "선택할 수 있는 날짜이 아닙니다. 선택한 날짜이 가능한 날짜보다 이릅니다.");
+                    "선택할 수 있는 날짜가 아닙니다. 선택한 날짜가 가능한 날짜보다 이릅니다.");
         }
         if (room.getAvailableEndDay().isBefore(day)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "선택할 수 있는 날짜이 아닙니다. 선택한 날짜이 가능한 날짜보다 늦습니다.");
+                    "선택할 수 있는 날짜가 아닙니다. 선택한 날짜가 가능한 날짜보다 늦습니다.");
         }
     }
 
@@ -175,7 +175,7 @@ public class SelectedTimeService {
                 .filter(selectedTime -> !selectedTime.getStartTime().isAfter(endTime))
                 .filter(selectedTime ->
                         !selectedTime.getStartTime().isAfter(startTime) &&
-                                !selectedTime.getEndTime().isBefore(endTime)
+                                !endTime.isAfter(selectedTime.getEndTime())
                 )
                 .map(SelectedTime::getEnterRoom)
                 .map(EnterRoom::getMember)

@@ -15,8 +15,7 @@
         </span>
         </div>
         <div class="navbar-end">
-            <!-- 조건문 수정해야함 -->
-            <a id="close-btn" href="javascript:" th:if="${room.getLeader() != actor}" onclick="$(this).next().submit();" class="flex items-center justify-center">마감하기</a>
+            <a id="close-btn" href="javascript:" th:if="${room.getLeader() == actor}" onclick="$(this).next().submit();" class="flex items-center justify-center">마감하기</a>
             <form hidden th:action="@{|/room/${room.id}/close|}" method="POST">
             </form>
         </div>

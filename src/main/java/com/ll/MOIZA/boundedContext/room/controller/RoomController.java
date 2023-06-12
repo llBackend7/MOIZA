@@ -167,18 +167,22 @@ public class RoomController {
     @GetMapping("/{roomId}/place")
     public String showRoomPlace(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
         Room room = roomService.getRoom(roomId);
+        Member actor = memberService.loginMember(user);
         Map<SelectedPlace, Long> selectedPlaceMap = selectedPlaceService.getSelectedPlaces(room);
 
         model.addAttribute("selectedPlaceMap", selectedPlaceMap);
         model.addAttribute("room", room);
+        model.addAttribute("actor", actor);
         return "status/place";
     }
 
     @PreAuthorize("isAuthenticated() && hasAuthority('ROOM#' + #roomId + '_MEMBER')")
     @GetMapping("/{roomId}/chat")
-    public String showRoomChat(@PathVariable Long roomId, Model model) {
+    public String showRoomChat(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
         Room room = roomService.getRoom(roomId);
+        Member actor = memberService.loginMember(user);
         model.addAttribute("room", room);
+        model.addAttribute("actor", actor);
         return "status/chat";
     }
 
@@ -186,7 +190,6 @@ public class RoomController {
     public String createPlace(@PathVariable Long roomId, PlaceCreateForm form, @AuthenticationPrincipal User user) {
         Member member = memberService.loginMember(user);
         Optional<EnterRoom> opEnterRoom = enterRoomService.findByMemberIdAndRoomId(member.getId(), roomId);
-
 
         selectedPlaceService.CreateSelectedPlace(form.getName(), opEnterRoom.get());
 

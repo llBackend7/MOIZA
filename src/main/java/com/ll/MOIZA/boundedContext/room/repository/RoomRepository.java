@@ -9,4 +9,5 @@ import java.util.List;
 
 public interface RoomRepository extends JpaRepository<Room, Long> {
     List<Room> findByDeadLineBeforeAndMailSentFalse(LocalDateTime currentTime);
+    List<Room> findByDeadLineBefore(LocalDateTime currentTime);
 }
