@@ -54,7 +54,8 @@
                 <span class="title">가능한 시간 선택</span>
 
                 <!-- 가능시간 목록 -->
-                <div class="shrink-0 flex flex-col !border !border-[#adcfee] divide-y divide-[#adcfee]" id="availableTimeList">
+                <div class="shrink-0 flex flex-col !border !border-[#adcfee] divide-y divide-[#adcfee]"
+                     id="availableTimeList">
 
                 </div>
                 <button class="italic !text-slate-400" onclick="addNewTime();">+시간추가</button>
@@ -96,6 +97,28 @@
             setTimeSelect();
         }
 
+        function checkRedundantTime(availableTimes) {
+            let dateTimeMap = new Map();
+            availableTimes.forEach(time => {
+                if (dateTimeMap.has(time.date)) {
+                    dateTimeMap.get(time.date).push({start:time.startTime, end: time.endTime});
+                } else {
+                    dateTimeMap.set(time.date, [{start:time.startTime, end: time.endTime}]);
+                }
+            });
+
+            for (let [date, schedule] of dateTimeMap.entries()) {
+                schedule.sort((a, b) => a.startTime - b.startTime);
+
+                for (let i = 0; i < schedule.length - 1; i++) {
+                    if (schedule[i].end > schedule[i + 1].start) {
+                        alert(`날짜 ${date}에 일정이 겹칩니다.`);
+                        return true;
+                    }
+                }
+            }
+        }
+
         function enter() {
             let availableTimes = [];
             $('div[name=availableTime]').each(function () {
@@ -109,6 +132,10 @@
                     endTime: endTime
                 });
             });
+
+            if (checkRedundantTime(availableTimes)) {
+                return;
+            }
             /*<![CDATA[*/
             const csrfToken = `[[${_csrf.token}]]`;
             const csrfHeader = `[[${_csrf.headerName}]]`;
@@ -117,11 +144,11 @@
             $.ajax({
                 url: window.location.href,
                 type: 'post',
-                beforeSend: function(xhr) {
+                beforeSend: function (xhr) {
                     xhr.setRequestHeader(csrfHeader, csrfToken);
                 },
                 contentType: 'application/json',
-                data: JSON.stringify( availableTimes),
+                data: JSON.stringify(availableTimes),
                 success: function (response) {
                     console.log(response);
                     window.location.href = response.redirectUrl;
