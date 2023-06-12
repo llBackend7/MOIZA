@@ -38,18 +38,12 @@
                 <div class="my-2">
                     <div class="ml-4">참여 멤버</div>
                     <div class="border-l-4 border-neutral-300">
-                        <ul class="flex justify-center">
-                            <li class="flex flex-col items-center mr-2 py-2 font-gsans">
+                        <ul th:if="${result.participationMembers.size() > 0}" class="flex justify-center">
+                            <li th:each="member : ${result.participationMembers}" class="flex flex-col items-center mr-2 py-2 font-gsans">
                                 <div>
-<<<<<<< HEAD
-                                    <img width="55" class="mask mask-circle">
+                                    <img th:src="${member.profile}" width="55" class="mask mask-circle">
                                 </div>
-                                <div></div>
-=======
-                                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTY8sBJjw1lkCkdx5UrFAIinx47f3gBtOwVRA&usqp=CAU" width="55" class="mask mask-circle">
-                                </div>
-                                <div>멤버1</div>
->>>>>>> a0a05009d5ede31652aaaed0718bc2a5c84b070c
+                                <div th:text="${member.name}"></div>
                             </li>
                         </ul>
                     </div>
@@ -58,24 +52,15 @@
                 <div class="my-2">
                     <div class="ml-4">참여 불가 멤버</div>
                     <div class="border-l-4 border-neutral-300 text-center">
-<<<<<<< HEAD
-                        <div>
+                        <div th:if="${result.nonParticipationMembers.size() == 0}">
 
                         </div>
-                        <ul class="flex justify-center">
-                            <li class="flex flex-col items-center mr-2 py-2 font-gsans">
+                        <ul th:if="${result.nonParticipationMembers.size() > 0}" class="flex justify-center">
+                            <li th:each="member : ${result.nonParticipationMembers}" class="flex flex-col items-center mr-2 py-2 font-gsans">
                                 <div>
-                                    <img width="55" class="mask mask-circle">
+                                    <img th:src="${member.profile}" width="55" class="mask mask-circle">
                                 </div>
-                                <div></div>
-=======
-                        <ul class="flex justify-center">
-                            <li class="flex flex-col items-center mr-2 py-2 font-gsans">
-                                <div>
-                                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTY8sBJjw1lkCkdx5UrFAIinx47f3gBtOwVRA&usqp=CAU" width="55" class="mask mask-circle">
-                                </div>
-                                <div>멤버1</div>
->>>>>>> a0a05009d5ede31652aaaed0718bc2a5c84b070c
+                                <div th:text="${member.name}"></div>
                             </li>
                         </ul>
                     </div>
@@ -84,12 +69,7 @@
                 <div class="my-2">
                     <div class="ml-4">약속 시간</div>
                     <div class="border-l-4 border-neutral-300 text-center text-xl font-gsans">
-<<<<<<< HEAD
                         <span th:text="${#temporals.format(result.decidedDayTime, 'yyyy년 MM월 dd일 a hh:mm')}"></span>
-=======
-                        <span th:text="${#temporals.format(result.room.availableStartDay, 'yyyy년 MM월 dd일')}"></span>
-                        <span th:text="${#temporals.format(result.room.availableStartTime, 'a hh:mm')}"></span>
->>>>>>> a0a05009d5ede31652aaaed0718bc2a5c84b070c
                     </div>
                 </div>
 
