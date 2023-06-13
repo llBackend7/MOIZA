@@ -12,12 +12,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.*;
 
 @Repository
+@Transactional
 @RequiredArgsConstructor
 public class CachedChatRepository {
     private final RedisTemplate<String, Chat> redisTemplate;

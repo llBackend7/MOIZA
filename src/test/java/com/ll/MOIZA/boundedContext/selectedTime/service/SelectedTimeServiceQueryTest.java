@@ -54,7 +54,7 @@ public class SelectedTimeServiceQueryTest {
     void 겹치는_시간_조회() {
         Member member1 = memberRepository.findByName("user1").get();
         Member member2 = memberRepository.findByName("user2").get();
-        Member member3 = memberRepository.findByName("이은혜").get();
+        Member member3 = memberRepository.findByName("으네").get();
         Room room = roomRepository.getReferenceById(1L);
 
         List<TimeRangeWithMember> overlappingRanges = selectedTimeService.findOverlappingTimeRanges(
@@ -63,7 +63,14 @@ public class SelectedTimeServiceQueryTest {
 
         for (TimeRangeWithMember t : overlappingRanges) {
             System.out.println(t.date + " | " + t.start + "~" + t.end);
+            System.out.print("참여자 : ");
             for (Member m : t.getParticipationMembers()) {
+                System.out.print(m.getName()+ " ");
+            }
+            System.out.println();
+
+            System.out.print("불참자 : ");
+            for (Member m : t.getNonParticipationMembers()) {
                 System.out.print(m.getName()+ " ");
             }
             System.out.println();
@@ -88,7 +95,7 @@ public class SelectedTimeServiceQueryTest {
     void 전체_겹치는_시간_조회() {
         Member member1 = memberRepository.findByName("user1").get();
         Member member2 = memberRepository.findByName("user2").get();
-        Member member3 = memberRepository.findByName("이은혜").get();
+        Member member3 = memberRepository.findByName("으네").get();
 
         Room room = roomRepository.getReferenceById(1L);
 
