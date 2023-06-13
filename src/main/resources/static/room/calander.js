@@ -18,12 +18,12 @@ function setDurationValue() {
     var minute = $(".minuteSelect").val();
 
     if (hour !== "00" && hour !== "01" && hour !== "02" && hour !== "03" && hour !== "04" && hour !== "05" && hour !== "06" && hour !== "07" && hour !== "08" && hour !== "09" && hour !== "10" && hour !== "11" && hour !== "12") {
-        alert("시간을 올바르게 선택해주세요.");
+        toastWarning("시간을 올바르게 선택해주세요.");
         return false;
     }
 
     if (minute !== "00" && minute !== "30") {
-        alert("분을 올바르게 선택해주세요.");
+        toastWarning("분을 올바르게 선택해주세요.");
         return false;
     }
 
@@ -78,7 +78,7 @@ $(document).ready(function () {
 
 function validateTimes(startDate, endDate, name, description, duration, startTime, endTime, deadLine) {
     if (!validateTime(startTime) || !validateTime(endTime)) {
-        alert("30분단위로 시각을 입력해주세요.");
+        toastWarning("30분단위로 시각을 입력해주세요.");
         return false;
     }
     startDate = new Date(startDate);
@@ -88,23 +88,23 @@ function validateTimes(startDate, endDate, name, description, duration, startTim
     deadLine = new Date(deadLine);
 
     if (duration === '00:00' || !duration) {
-        alert("모임 진행 시간을 올바르게 입력해 주세요.");
+        toastWarning("모임 진행 시간을 올바르게 입력해 주세요.");
         return false;
     }
     if (endDate < startDate) {
-        alert("시작날짜는 끝날짜보다 앞서야합니다.");
+        toastWarning("시작날짜는 끝날짜보다 앞서야합니다.");
         return false;
     }
     if (endTime <= startTime) {
-        alert("시작시간은 끝시간보다 앞서야 합니다.");
+        toastWarning("시작시간은 끝시간보다 앞서야 합니다.");
         return false;
     }
     if (new Date() > deadLine) {
-        alert("마감시간은 현재보다 나중이어야 합니다.");
+        toastWarning("마감시간은 현재보다 나중이어야 합니다.");
         return false;
     }
     if (startDate < deadLine) {
-        alert("마감시간은 가능한 날짜보다 이전이어야 합니다.");
+        toastWarning("마감시간은 가능한 날짜보다 이전이어야 합니다.");
         return false;
     }
     return true;
@@ -140,3 +140,40 @@ function increaseVoteCount(button) {
     voteCountElement.textContent = currentCount + 1;
 }
 
+toastr.options = {
+    closeButton: true,
+    debug: false,
+    newestOnTop: true,
+    progressBar: true,
+    positionClass: "toast-top-right",
+    preventDuplicates: false,
+    onclick: null,
+    showDuration: "300",
+    hideDuration: "1000",
+    timeOut: "5000",
+    extendedTimeOut: "1000",
+    showEasing: "swing",
+    hideEasing: "linear",
+    showMethod: "fadeIn",
+    hideMethod: "fadeOut"
+};
+
+function parseMsg(msg) {
+    const [pureMsg, ttl] = msg.split(";ttl=");
+
+    const currentJsUnixTimestamp = new Date().getTime();
+
+    if (ttl && parseInt(ttl) + 5000 < currentJsUnixTimestamp) {
+        return [pureMsg, false];
+    }
+
+    return [pureMsg, true];
+}
+
+function toastWarning(msg) {
+    const [pureMsg, needToShow] = parseMsg(msg);
+
+    if (needToShow) {
+        toastr["warning"](pureMsg, "경고");
+    }
+}
