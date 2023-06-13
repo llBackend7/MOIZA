@@ -2,6 +2,7 @@ package com.ll.MOIZA.boundedContext.room.controller;
 
 import com.ll.MOIZA.base.appConfig.AppConfig;
 import com.ll.MOIZA.base.mail.MailService;
+import com.ll.MOIZA.base.rq.Rq;
 import com.ll.MOIZA.base.security.CustomOAuth2User;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
@@ -60,7 +61,7 @@ public class RoomController {
     private final SelectedTimeService selectedTimeService;
     private final EnterRoomService enterRoomService;
     private final SelectedPlaceService selectedPlaceService;
-
+    private final Rq rq;
 
     @Data
     public static class RoomForm {
@@ -92,12 +93,11 @@ public class RoomController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/create")
-    @ResponseBody
-    public Map<String, Object> createRoom(@AuthenticationPrincipal User user,
+    public String createRoom(@AuthenticationPrincipal User user,
                                           @Valid RoomForm roomForm,
                                           BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return Map.of("error", bindingResult.getAllErrors());
+            bindingResult.getAllErrors();
         }
 
         Member member = memberService.loginMember(user);
@@ -110,10 +110,9 @@ public class RoomController {
                 roomForm.availableEndTime,
                 roomForm.duration,
                 roomForm.deadLine);
-        String accessToken = roomService.getAccessToken(room);
-        Long roomId = room.getId();
 
-        return Map.of("link", "http://localhost:8080/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken));
+        enterRoomService.createEnterRoom(room, member);
+        return "redirect:/invite?roomId=%d".formatted(room.getId());
     }
 
     @GetMapping("/{roomId}/changeTime")
@@ -165,24 +164,16 @@ public class RoomController {
         throw new AuthorizationServiceException("토큰값이 유효하지 않습니다.");
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{roomId}/invite")
     @ResponseBody
     public String invite(@AuthenticationPrincipal User user,
-                         @PathVariable Long roomId,
-                         @RequestParam Long memberId) {
-        Member actor = memberService.loginMember(user);
-        Member friend = memberService.getMember(memberId);
-        Room room = roomService.getRoom(roomId);
+                         @PathVariable Long roomId) {
+        if(rq.isLogout()) { return "/memberLogin"; }
 
+        Room room = roomService.getRoom(roomId);
         String accessToken = roomService.getAccessToken(room);
 
-        String mailContent = "<h1>%s님으로부터의 모임초대링크입니다.</h1>".formatted(actor.getName())
-                + "<a href='http://localhost:8080/room/enter?roomId=%d&accessToken=%s'>모임참여하기</a>".formatted(roomId, accessToken);
-
-        mailService.sendMailTo(friend, mailContent);
-
-        return "{'result':'초대링크를 발송했습니다.'}";
+        return "redirect:/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -243,7 +234,7 @@ public class RoomController {
             redirectAttributes.addAttribute("message", ex.getReason());
         }
 
-        return "redirect:/room/" + roomId + "/place";
+        return "redirect:/room/%d/place".formatted(roomId);
     }
 
     @PreAuthorize("isAuthenticated() && hasAuthority('ROOM#' + #roomId + '_MEMBER')")
@@ -282,7 +273,7 @@ public class RoomController {
         }
 
         resultService.createResult(room, timeRangeWithMember, place);
-        return "redirect:/room/" + roomId + "/result";
+        return "redirect:/room/%d/place".formatted(roomId);
     }
 
     @Data

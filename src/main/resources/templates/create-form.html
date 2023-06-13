@@ -1,6 +1,5 @@
 <div th:fragment="create-form" class="h-screen">
-    <div th:insert="~{link-popup :: popup}"></div>
-    <form th:action="@{/room/create}" method="post" th:object="${roomForm}">
+    <form id="response" th:action="@{/room/create}" method="post" th:object="${roomForm}">
         <div class="gap-2 flex flex-col m-0">
             <div class="shrink-0 flex gap-10 mt-5">
                 <span class="label self-center">모임이름</span>

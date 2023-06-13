@@ -24,6 +24,7 @@ public class SecurityConfig {
                         request.requestMatchers("/").permitAll()
                                 .requestMatchers("/login").permitAll()
                                 .requestMatchers("/memberLogin").permitAll()
+                                .requestMatchers("/invite").permitAll()
                                 .requestMatchers("/css/**").permitAll()
                                 .requestMatchers("/img/**").permitAll()
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
