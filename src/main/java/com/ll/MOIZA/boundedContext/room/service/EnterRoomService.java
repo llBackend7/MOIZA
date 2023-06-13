@@ -37,7 +37,7 @@ public class EnterRoomService {
             List<RoomController.SelectedDayWithTime> selectedDayWhitTimesList) {
 
         EnterRoom enterRoom = enterRoomRepository.findByRoomAndMember(room, member);
-        if (enterRoom != null) {
+        if (enterRoom == null) {
             enterRoom = createEnterRoom(room, member);
         }
 
