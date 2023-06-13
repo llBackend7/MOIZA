@@ -75,11 +75,21 @@
             </div>
         </div>
 
-        <form class="place-input" th:action th:method="post">
-            <input type="text" name="name" placeholder=" 원하는 장소 입력 후 장소 추가 버튼을 눌러주세요." />
+        <form class="place-input" th:action th:method="post" onsubmit="return validateInputForm()">
+            <input type="text" name="name" id="place-name" placeholder=" 원하는 장소 입력 후 장소 추가 버튼을 눌러주세요." />
             <button class="add-place">+ 장소 추가</button>
         </form>
     </div>
+    <script>
+        function validateInputForm() {
+            var input = document.getElementById("place-name").value;
+            if (input.trim() === "") {
+                alert("장소를 입력해주세요.");
+                return false;
+            }
+            return true;
+        }
+    </script>
 </main>
 
 </body>
