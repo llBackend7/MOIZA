@@ -245,8 +245,6 @@ public class RoomController {
 
         if (roomService.validateToken(room, accessToken)) {
             model.addAttribute("room", room);
-            model.addAttribute("availableDayList", roomService.getAvailableDayList(roomId));
-            model.addAttribute("availableTimeList", roomService.getAvailableTimeList(roomId));
 
             return "/room/enter";
         }
