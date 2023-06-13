@@ -33,8 +33,8 @@ public class Scheduler {
     private final SelectedPlaceService selectedPlaceService;
     private final ResultRepository resultRepository;
 
-    // 2분 간격으로 마감된 모임 탐색
-    @Scheduled(fixedRate = 120_000)
+    // 1분 간격으로 마감된 모임 탐색
+    @Scheduled(fixedRate = 60_000)
     public void checkConfirmedRoom() {
         List<Room> roomToConfirm = roomRepository.findByDeadLineBeforeAndMailSentFalse(LocalDateTime.now());
 

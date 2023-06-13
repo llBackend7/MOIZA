@@ -2,6 +2,7 @@ package com.ll.MOIZA.boundedContext.room.controller;
 
 import com.ll.MOIZA.base.appConfig.AppConfig;
 import com.ll.MOIZA.base.mail.MailService;
+import com.ll.MOIZA.base.security.CustomOAuth2User;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
@@ -134,7 +135,7 @@ public class RoomController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{roomId}/date")
     public String showRoomDate(@PathVariable Long roomId,
-                               @RequestParam(value="timeIndex", defaultValue="-1") int timeIndex ,
+                               @RequestParam(value = "timeIndex", defaultValue = "-1") int timeIndex,
                                @AuthenticationPrincipal User user, Model model) {
         Room room = roomService.getRoom(roomId);
         Member actor = memberService.loginMember(user);
@@ -149,7 +150,7 @@ public class RoomController {
         model.addAttribute("actor", actor);
         model.addAttribute("overlappingTimes", overlappingTimes);
 
-        if(timeIndex >= 0) {
+        if (timeIndex >= 0) {
             availableMembers = overlappingTimes.stream()
                     .map(TimeRangeWithMember::getParticipationMembers)
                     .toList();
@@ -242,7 +243,7 @@ public class RoomController {
     public String enterRoom(@RequestParam long roomId, @RequestParam String accessToken, Model model) {
         Room room = roomService.getRoom(roomId);
 
-        if (roomService.validateToken(room,accessToken)) {
+        if (roomService.validateToken(room, accessToken)) {
             model.addAttribute("room", room);
             model.addAttribute("availableDayList", roomService.getAvailableDayList(roomId));
             model.addAttribute("availableTimeList", roomService.getAvailableTimeList(roomId));
@@ -263,7 +264,7 @@ public class RoomController {
                                     Model model) {
         Room room = roomService.getRoom(roomId);
 
-        if (roomService.validateToken(room,accessToken)) {
+        if (roomService.validateToken(room, accessToken)) {
             Member member = memberService.loginMember(user);
             enterRoomService.enterRoomWithSelectedTime(room, member, selectedDayWhitTimeList);
 
@@ -281,8 +282,16 @@ public class RoomController {
         // 사용자 권한 추가
         List<GrantedAuthority> updatedAuthorities = new ArrayList<>(user.getAuthorities());
         updatedAuthorities.add(new SimpleGrantedAuthority("ROOM#%d_MEMBER".formatted(roomId)));
+        User updatedUser;
 
-        User updatedUser = new User(user.getUsername(), "", updatedAuthorities);
+        if (user instanceof CustomOAuth2User) {
+            updatedUser = new CustomOAuth2User(user.getUsername(),
+                    ((CustomOAuth2User) user).getId(),
+                    ((CustomOAuth2User) user).getProfile(),
+                    "", updatedAuthorities);
+        } else {
+            updatedUser = new User(user.getUsername(), "", updatedAuthorities);
+        }
 
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(updatedUser, "", updatedAuthorities));
