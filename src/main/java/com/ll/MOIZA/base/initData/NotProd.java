@@ -49,7 +49,7 @@ public class NotProd {
             mongoTemplate.dropCollection("chat");
             //redisTemplate.delete("ROOM#1_CHAT");
 
-            Member member1 = Member.builder().name("user1").email("user1@email.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
+            Member member1 = Member.builder().name("재원").email("moonjw119@naver.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
             Member member2 = Member.builder().name("user2").email("user2@email.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
             Member member3 = Member.builder().name("으네").email("lutea67@naver.com").profile("http://k.kakaocdn.net/dn/CcQvQ/btsjJSVUxLW/n0JWhg5VeAjvcTQEy12G00/img_640x640.jpg").build();
             Member member4 = Member.builder().name("정상화").email("mouse4786@gmail.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();

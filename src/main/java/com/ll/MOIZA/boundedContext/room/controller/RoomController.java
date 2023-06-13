@@ -37,6 +37,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -180,10 +182,15 @@ public class RoomController {
     }
 
     @PostMapping("/{roomId}/place")
-    public String createPlace(@PathVariable Long roomId, PlaceCreateForm form, @AuthenticationPrincipal User user) {
+    public String createPlace(@PathVariable Long roomId, PlaceCreateForm form, @AuthenticationPrincipal User user, RedirectAttributes redirectAttributes) {
         Member member = memberService.loginMember(user);
         Optional<EnterRoom> opEnterRoom = enterRoomService.findByMemberIdAndRoomId(member.getId(), roomId);
-        selectedPlaceService.CreateSelectedPlace(form.getName(), opEnterRoom.get());
+
+        try {
+            selectedPlaceService.CreateSelectedPlace(form.getName(), opEnterRoom.get());
+        } catch (ResponseStatusException ex) {
+            redirectAttributes.addAttribute("message", ex.getReason());
+        }
 
         return "redirect:/room/" + roomId + "/place";
     }
