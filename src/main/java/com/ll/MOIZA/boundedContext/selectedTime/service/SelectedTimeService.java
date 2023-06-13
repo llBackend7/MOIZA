@@ -133,7 +133,7 @@ public class SelectedTimeService {
 
             List<Member> nonParticipationMembers = getNonParticipationMembers(room, participationMembers);
 
-            if (participationMembers.size() > 1) {
+            if (participationMembers.size() >= 1) {
                 overlappingRanges.add(
                         new TimeRangeWithMember(date, basicStartTime, basicEndTime, participationMembers, nonParticipationMembers));
             }
