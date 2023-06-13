@@ -150,19 +150,6 @@ public class SelectedTimeService {
         return overlappingRanges;
     }
 
-    public Set<LocalDate> findOverlappingDates(List<EnterRoom> enterRooms) {
-        Set<LocalDate> overlappingDates = new LinkedHashSet<>();
-
-        for (EnterRoom enterRoom : enterRooms) {
-            List<SelectedTime> selectedTimes = selectedTimeRepository.findAllByEnterRoom(enterRoom);
-            for (SelectedTime selectedTime : selectedTimes) {
-                overlappingDates.add(selectedTime.getDate());
-            }
-        }
-
-        return overlappingDates;
-    }
-
     public List<Member> getContainedMember (List<SelectedTime> selectedTimeList,
             LocalTime meetingDuration, LocalTime startTime, LocalTime endTime) {
         return selectedTimeList.stream()
@@ -179,6 +166,7 @@ public class SelectedTimeService {
                 )
                 .map(SelectedTime::getEnterRoom)
                 .map(EnterRoom::getMember)
+                .distinct()
                 .sorted(Comparator.comparing(Member::getName))
                 .collect(Collectors.toCollection(LinkedList::new));
     }
