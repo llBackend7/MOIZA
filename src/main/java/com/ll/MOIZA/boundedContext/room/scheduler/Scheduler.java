@@ -12,6 +12,7 @@ import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +70,11 @@ public class Scheduler {
                     .room(room)
                     .build();
 
-            resultRepository.save(result);
+            try {
+                resultRepository.save(result);
+            } catch (DataIntegrityViolationException duplicationEx) {
+                System.out.println("중복된 결과 저장에 대한 예외 발생 처리");
+            }
 
             try {
                 room.getEnterRoom().forEach(enterRoom -> {
