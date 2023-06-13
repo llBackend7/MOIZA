@@ -61,7 +61,8 @@
                 <div class="shrink-0 border border-blue-400 rounded-lg divide-y divide-[#adcfee]"
                      id="availableTimeList"></div>
                 <div class="text-end mr-4">
-                    <button class="text-slate-400" onclick="addNewTime();">+시간추가</button>
+                    <button class="text-slate-400 mr-3" onclick="addNewTime();">+ 추가</button>
+                    <button class="text-slate-400" onclick="removeNewTime();">- 삭제</button>
                 </div>
             </div>
 
@@ -92,11 +93,15 @@
                     </div>
                 </div>
             </div>
-        `);
-            setTimeSelect();
-        }
+            `);
+                setTimeSelect();
+            }
 
-        function checkRedundantTime(availableTimes) {
+            function removeNewTime() {
+                $('#availableTimeList').children().last().remove();
+            }
+
+            function checkRedundantTime(availableTimes) {
             let dateTimeMap = new Map();
             availableTimes.forEach(time => {
                 if (dateTimeMap.has(time.date)) {

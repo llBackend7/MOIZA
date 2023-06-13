@@ -32,6 +32,10 @@ body::-webkit-scrollbar {
     flex-direction: column;
 }
 
+.bg-blue-50::-webkit-scrollbar {
+    display: none;
+}
+
 .font-gsans {
     font-family: "GmarketSansMedium";
 }
