@@ -249,6 +249,7 @@ public class RoomController {
     @PostMapping("/{roomId}/close")
     public String closeRoom(@PathVariable Long roomId) {
         Room room = roomService.getRoom(roomId);
+        roomService.closeRoom(roomId);
 
         List<TimeRangeWithMember> overlappingTimes = selectedTimeService.findOverlappingTimeRanges(room);
         TimeRangeWithMember timeRangeWithMember = overlappingTimes.size() > 0 ? overlappingTimes.get(0) : null;

@@ -25,6 +25,7 @@ public class Room extends BaseEntity {
     private LocalDate availableEndDay;
     private LocalTime availableStartTime;
     private LocalTime availableEndTime;
+    @Setter
     private LocalDateTime deadLine;
     private LocalTime meetingDuration;
     private String accessCode;

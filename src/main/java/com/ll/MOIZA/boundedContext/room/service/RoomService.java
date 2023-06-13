@@ -132,4 +132,10 @@ public class RoomService {
 
         return availableTimeList;
     }
+
+    public void closeRoom(Long roomId) {
+        Room room = getRoom(roomId);
+        room.setDeadLine(LocalDateTime.now());
+        roomRepository.save(room);
+    }
 }
