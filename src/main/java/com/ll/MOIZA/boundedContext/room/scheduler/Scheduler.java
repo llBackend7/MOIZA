@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -74,7 +75,7 @@ public class Scheduler {
                 resultRepository.save(result);
             } catch (DataIntegrityViolationException duplicationEx) {
                 System.out.println("중복된 결과 저장에 대한 예외 발생 처리");
-            }
+            } catch (UnexpectedRollbackException ignored) {}
 
             try {
                 room.getEnterRoom().forEach(enterRoom -> {
