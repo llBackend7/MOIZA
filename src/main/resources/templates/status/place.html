@@ -89,10 +89,8 @@
         function validateInputForm() {
             var input = document.getElementById("place-name").value;
             if (input.trim() === "") {
-                alert("장소를 입력해주세요.");
-                return false;
+                toastWarning("장소를 입력해주세요.");
             }
-            return true;
         }
 
         toastr.options = {

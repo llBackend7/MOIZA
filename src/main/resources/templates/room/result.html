@@ -176,7 +176,7 @@
                                         const pageLink = window.location.href;
                                         navigator.clipboard.writeText(pageLink)
                                             .then(() => {
-                                                alert("페이지 링크가 복사되었습니다.");
+                                                toastWarning("페이지 링크가 복사되었습니다.");
                                             })
                                             .catch((error) => {
                                                 console.error("페이지 링크 복사 실패:", error);
@@ -192,6 +192,45 @@
             </div>
         </div>
     </div>
+    <SCRIPT>
+      toastr.options = {
+        closeButton: true,
+        debug: false,
+        newestOnTop: true,
+        progressBar: true,
+        positionClass: "toast-top-right",
+        preventDuplicates: false,
+        onclick: null,
+        showDuration: "300",
+        hideDuration: "1000",
+        timeOut: "5000",
+        extendedTimeOut: "1000",
+        showEasing: "swing",
+        hideEasing: "linear",
+        showMethod: "fadeIn",
+        hideMethod: "fadeOut"
+      };
+
+      function parseMsg(msg) {
+        const [pureMsg, ttl] = msg.split(";ttl=");
+
+        const currentJsUnixTimestamp = new Date().getTime();
+
+        if (ttl && parseInt(ttl) + 5000 < currentJsUnixTimestamp) {
+          return [pureMsg, false];
+        }
+
+        return [pureMsg, true];
+      }
+
+      function toastWarning(msg) {
+        const [pureMsg, needToShow] = parseMsg(msg);
+
+        if (needToShow) {
+          toastr["warning"](pureMsg, "경고");
+        }
+      }
+    </script>
 </main>
 <footer layout:fragment="footer" class="hidden"></footer>
 </body>
