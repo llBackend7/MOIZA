@@ -6,11 +6,6 @@ spring:
   profiles:
     active: dev
     include: secret
-  datasource:
-    driver-class-name: org.mariadb.jdbc.Driver
-    url: jdbc:mariadb://127.0.0.1:3306/moiza__dev?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul
-    username: lldj        # ?? DB ??
-    password: ${MYSQL_PW} # ?? DB ??
   security:
     oauth2:
       client:
@@ -35,10 +30,6 @@ spring:
   data:
     redis:
       url: redis://default:redispw@localhost:55000
-  sendgrid:
-    api-key: ${SENDGRID_MOIZA}
 custom:
-  jwt:
-    secretKey: thissecretkeyisfordevandtestdontusethissecretkeyinrealproduction
   site:
     baseUrl:
