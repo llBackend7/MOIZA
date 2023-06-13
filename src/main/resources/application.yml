@@ -14,7 +14,7 @@ spring:
             scope: profile_nickname, account_email, profile_image
             client-name: Kakao
             authorization-grant-type: authorization_code
-            redirect-uri: http://localhost:8080/login/oauth2/code/kakao
+            redirect-uri: ${custom.site.baseUrl}/login/oauth2/code/kakao
             client-authentication-method: POST
         provider:
           kakao:
@@ -22,6 +22,3 @@ spring:
             token-uri: https://kauth.kakao.com/oauth/token
             user-info-uri: https://kapi.kakao.com/v2/user/me
             user-name-attribute: id
-custom:
-  site:
-    baseUrl:
