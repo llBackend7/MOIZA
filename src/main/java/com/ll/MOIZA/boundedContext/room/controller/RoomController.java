@@ -16,9 +16,11 @@ import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -112,6 +114,16 @@ public class RoomController {
         Long roomId = room.getId();
 
         return Map.of("link", "http://localhost:8080/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken));
+    }
+
+    @GetMapping("/{roomId}/changeTime")
+    public void changeTime(@PathVariable long roomId,
+            Model model, HttpServletResponse httpServletResponse) throws IOException {
+
+        Room room = roomService.getRoom(roomId);
+        String accessToken = roomService.getAccessToken(room);
+
+        httpServletResponse.sendRedirect("http://localhost:8080/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken));
     }
 
     @PreAuthorize("isAuthenticated()")

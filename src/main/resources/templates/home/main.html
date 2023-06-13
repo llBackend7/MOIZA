@@ -70,8 +70,7 @@
 
                             <div class="flex justify-end p-2">
                                 <div class="text-sm font-gsans hover:text-slate-300 active:text-slate-400">
-                                    <!-- accessToken 추가해야함 -->
-                                    <a th:href="@{'room/enter?roomId='+${room.id}}">가능시간 수정</a>
+                                    <a th:href="@{'room/'+${room.id}+'/changeTime'}">가능시간 수정</a>
                                 </div>
                             </div>
                         </div>

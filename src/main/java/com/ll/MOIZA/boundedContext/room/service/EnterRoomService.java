@@ -35,7 +35,11 @@ public class EnterRoomService {
     @Transactional
     public void enterRoomWithSelectedTime(Room room, Member member,
             List<RoomController.SelectedDayWithTime> selectedDayWhitTimesList) {
-        EnterRoom enterRoom = createEnterRoom(room, member);
+
+        EnterRoom enterRoom = enterRoomRepository.findByRoomAndMember(room, member);
+        if (enterRoom != null) {
+            enterRoom = createEnterRoom(room, member);
+        }
 
         for (RoomController.SelectedDayWithTime selectedDayWhitTime : selectedDayWhitTimesList) {
             selectedTimeService.CreateSelectedTime(
