@@ -52,28 +52,26 @@
                             <div th:if="${room.getLeader() == member}"  class="flex justify-between">
                                 <span>내가 만든 모임</span>
                                 <a href="javascript:" onclick="if(confirm('모임을 삭제하시겠습니까?')) $(this).next().submit();">X</a>
-                                <form hidden th:action="@{|/${room.id}|}" method="POST">
-                                    <input type="hidden" name="_method" value="delete">
-                                </form>
+                                <form hidden th:action="@{|/room/enter/roomId=${room.id}|}"></form>
                             </div>
                         </div>
 
 
                         <div>
                             <div class="h-20 flex flex-col justify-center items-center mt-3">
-                                <div th:onclick="|${room.deadLine.isAfter(#temporals.createNow())} ? location.href='room/'+${room.id}+'/date' : null|"
+                                <div th:onclick="|location.href='room/'+${room.id}+'/date'|"
                                      th:text="${room.name}" class="text-xl hover:text-slate-300 active:text-slate-400 hover-pointer"></div>
                                 <div th:if="${room.deadLine.isAfter(#temporals.createNow())}" class="text-sm text-center font-gsans">
-                                    <span>마감 기한: ~</span>
-                                    <span th:text="${#temporals.format(room.deadLine, 'yyyy.MM.dd HH:mm:ss')}">2023/06/02 24:00:00</span>
-                                    <span> 까지</span>
+                                    <span>마감 기한 : ~</span>
+                                    <span th:text="${#temporals.format(room.deadLine, 'yyyy.MM.dd HH:mm')}">2023/06/02 24:00:00</span>
+                                    <span>까지</span>
                                 </div>
                             </div>
 
                             <div class="flex justify-end p-2">
                                 <div class="text-sm font-gsans hover:text-slate-300 active:text-slate-400">
                                     <!-- accessToken 추가해야함 -->
-                                    <a th:href="@{'room/enter?roomId='+${room.id}+'&accessToken='}">가능시간 수정</a>
+                                    <a th:href="@{'room/enter?roomId='+${room.id}}">가능시간 수정</a>
                                 </div>
                             </div>
                         </div>

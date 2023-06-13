@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -24,9 +25,15 @@ public class ResultService {
 
     @Transactional
     public void createResult(Room room, TimeRangeWithMember timeRangeWithMember, String decidedPlace) {
-        LocalDateTime decidedDateTime = timeRangeWithMember.getDate().atTime(timeRangeWithMember.getStart());
-        List<Member> participationMembers = timeRangeWithMember.getParticipationMembers();
-        List<Member> nonParticipationMembers = timeRangeWithMember.getNonParticipationMembers();
+        LocalDateTime decidedDateTime = null;
+        List<Member> participationMembers = null;
+        List<Member> nonParticipationMembers = null;
+
+        if (timeRangeWithMember != null) {
+            decidedDateTime = (timeRangeWithMember.getDate() != null) ? timeRangeWithMember.getDate().atTime(timeRangeWithMember.getStart()) : null;
+            participationMembers = (timeRangeWithMember.getParticipationMembers() != null) ? timeRangeWithMember.getParticipationMembers() : null;
+            nonParticipationMembers = (timeRangeWithMember.getNonParticipationMembers() != null) ? timeRangeWithMember.getNonParticipationMembers() : null;
+        }
 
         DecidedResult result = DecidedResult.builder()
                 .decidedDayTime(decidedDateTime)

@@ -37,7 +37,7 @@
 
                 <div class="my-2">
                     <div class="ml-4">참여 멤버</div>
-                    <div class="border-l-4 border-neutral-300">
+                    <div class="border-l-4 border-neutral-300 text-center">
                         <div th:if="${result.participationMembers.size() == 0 || result.participationMembers.isEmpty()}" class="font-gsans">
                             참여가 가능한 멤버가 없습니다.
                         </div>
@@ -71,16 +71,22 @@
 
                 <div class="my-2">
                     <div class="ml-4">약속 시간</div>
-                    <div class="border-l-4 border-neutral-300 text-center text-xl font-gsans">
-                        <span th:text="${#temporals.format(result.decidedDayTime, 'yyyy년 MM월 dd일 a hh:mm')}"></span>
+                    <div class="border-l-4 border-neutral-300 text-center font-gsans">
+                        <div th:if="${result.decidedPlace.isEmpty()}">
+                            정해진 약속 시간이 없습니다.
+                        </div>
+                        <span th:text="${#temporals.format(result.decidedDayTime, 'yyyy년 MM월 dd일 a hh:mm')}" class="text-xl"></span>
                     </div>
                 </div>
 
                 <div class="my-2">
                     <div class="ml-4">약속 장소</div>
-                    <div class="border-l-4 border-neutral-300 text-center text-xl font-gsans">
-                        <div th:text="${result.decidedPlace}"></div>
-                        <div>
+                    <div class="border-l-4 border-neutral-300 text-center font-gsans">
+                        <div th:if="${result.decidedPlace.isEmpty()}">
+                            정해진 약속 장소가 없습니다.
+                        </div>
+                        <div th:text="${result.decidedPlace}" class="text-xl"></div>
+                        <div th:if="${!result.decidedPlace.isEmpty()}">
                             <div class="m-3" id="map" style="width:100%;height:350px;"></div>
 
                             <script type="text/javascript" th:src="@{'//dapi.kakao.com/v2/maps/sdk.js?appkey='+${appKey}+'&libraries=services'}"></script>

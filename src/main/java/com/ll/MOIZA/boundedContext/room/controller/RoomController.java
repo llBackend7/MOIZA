@@ -113,6 +113,45 @@ public class RoomController {
     }
 
     @PreAuthorize("isAuthenticated()")
+    @GetMapping("/enter")
+    public String enterRoom(@RequestParam long roomId, @RequestParam String accessToken, Model model) {
+        Room room = roomService.getRoom(roomId);
+
+        if (roomService.validateToken(room, accessToken)) {
+            model.addAttribute("room", room);
+            model.addAttribute("availableDayList", roomService.getAvailableDayList(roomId));
+            model.addAttribute("availableTimeList", roomService.getAvailableTimeList(roomId));
+            return "/room/enter";
+        }
+
+        throw new AuthorizationServiceException("토큰값이 유효하지 않습니다.");
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/enter")
+    @ResponseBody
+    public ResponseEntity enterRoom(@AuthenticationPrincipal User user,
+                                    @RequestParam long roomId,
+                                    @RequestParam String accessToken,
+                                    @RequestBody List<SelectedDayWithTime> selectedDayWhitTimeList,
+                                    Model model) {
+        Room room = roomService.getRoom(roomId);
+
+        if (roomService.validateToken(room, accessToken)) {
+            Member member = memberService.loginMember(user);
+            enterRoomService.enterRoomWithSelectedTime(room, member, selectedDayWhitTimeList);
+
+            addUserAuthority(user, roomId);
+
+            Map<String, String> response = new HashMap<>();
+            response.put("redirectUrl", String.format("/room/%d/date", roomId));
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        }
+
+        throw new AuthorizationServiceException("토큰값이 유효하지 않습니다.");
+    }
+
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{roomId}/invite")
     @ResponseBody
     public String invite(@AuthenticationPrincipal User user,
@@ -212,7 +251,7 @@ public class RoomController {
         Room room = roomService.getRoom(roomId);
 
         List<TimeRangeWithMember> overlappingTimes = selectedTimeService.findOverlappingTimeRanges(room);
-        TimeRangeWithMember timeRangeWithMember = overlappingTimes.get(0);
+        TimeRangeWithMember timeRangeWithMember = overlappingTimes.size() > 0 ? overlappingTimes.get(0) : null;
 
         Map<SelectedPlace, Long> selectedPlaces = selectedPlaceService.getSelectedPlaces(room);
         String place = "";
@@ -236,45 +275,6 @@ public class RoomController {
         LocalTime startTime;
         @NotNull
         LocalTime endTime;
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/enter")
-    public String enterRoom(@RequestParam long roomId, @RequestParam String accessToken, Model model) {
-        Room room = roomService.getRoom(roomId);
-
-        if (roomService.validateToken(room, accessToken)) {
-            model.addAttribute("room", room);
-            model.addAttribute("availableDayList", roomService.getAvailableDayList(roomId));
-            model.addAttribute("availableTimeList", roomService.getAvailableTimeList(roomId));
-            return "/room/enter";
-        }
-
-        throw new AuthorizationServiceException("토큰값이 유효하지 않습니다.");
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("/enter")
-    @ResponseBody
-    public ResponseEntity enterRoom(@AuthenticationPrincipal User user,
-                                    @RequestParam long roomId,
-                                    @RequestParam String accessToken,
-                                    @RequestBody List<SelectedDayWithTime> selectedDayWhitTimeList,
-                                    Model model) {
-        Room room = roomService.getRoom(roomId);
-
-        if (roomService.validateToken(room, accessToken)) {
-            Member member = memberService.loginMember(user);
-            enterRoomService.enterRoomWithSelectedTime(room, member, selectedDayWhitTimeList);
-
-            addUserAuthority(user, roomId);
-
-            Map<String, String> response = new HashMap<>();
-            response.put("redirectUrl", String.format("/room/%d/date", roomId));
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        }
-
-        throw new AuthorizationServiceException("토큰값이 유효하지 않습니다.");
     }
 
     private void addUserAuthority(User user, long roomId) {
