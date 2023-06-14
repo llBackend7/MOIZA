@@ -279,7 +279,7 @@ public class RoomController {
         }
 
         resultService.createResult(room, timeRangeWithMember, place);
-        return "redirect:/room/%d/place".formatted(roomId);
+        return "redirect:/room/%d/result".formatted(roomId);
     }
 
     @Data
