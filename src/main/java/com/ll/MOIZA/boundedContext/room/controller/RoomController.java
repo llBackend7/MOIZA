@@ -1,8 +1,6 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
 import com.ll.MOIZA.base.appConfig.AppConfig;
-import com.ll.MOIZA.base.mail.MailService;
-import com.ll.MOIZA.base.rq.Rq;
 import com.ll.MOIZA.base.security.CustomOAuth2User;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
@@ -17,15 +15,14 @@ import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
-import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import java.io.IOException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AuthorizationServiceException;
@@ -59,7 +56,9 @@ public class RoomController {
     private final SelectedTimeService selectedTimeService;
     private final EnterRoomService enterRoomService;
     private final SelectedPlaceService selectedPlaceService;
-    private final Rq rq;
+
+    @Value("${custom.site.baseUrl}")
+    private String baseUrl;
 
     @Data
     public static class RoomForm {
@@ -93,7 +92,8 @@ public class RoomController {
     @PostMapping("/create")
     public String createRoom(@AuthenticationPrincipal User user,
                                           @Valid RoomForm roomForm,
-                                          BindingResult bindingResult) {
+                                          BindingResult bindingResult,
+                             Model model) {
         if (bindingResult.hasErrors()) {
             bindingResult.getAllErrors();
         }
@@ -110,7 +110,25 @@ public class RoomController {
                 roomForm.deadLine);
 
         enterRoomService.createEnterRoom(room, member);
-        return "redirect:/invite?roomId=%d".formatted(room.getId());
+
+        String accessToken = roomService.getAccessToken(room);
+        String redirectUrl = "%s/room/enter?roomId=%d&accessToken=%s".formatted(baseUrl, room.getId(), accessToken);
+
+        model.addAttribute("redirectUrl", redirectUrl);
+        return "home/invite";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{roomId}/invite")
+    public String invite(@AuthenticationPrincipal User user,
+                               @PathVariable Long roomId,
+                               Model model) {
+        Room room = roomService.getRoom(roomId);
+        String accessToken = roomService.getAccessToken(room);
+        String redirectUrl = "%s/room/enter?roomId=%d&accessToken=%s".formatted(baseUrl, room.getId(), accessToken);
+
+        model.addAttribute("redirectUrl", redirectUrl);
+        return "home/invite";
     }
 
     @GetMapping("/{roomId}/changeTime")
@@ -119,7 +137,7 @@ public class RoomController {
         Room room = roomService.getRoom(roomId);
         String accessToken = roomService.getAccessToken(room);
 
-        String redirectUrl = "/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken);
+        String redirectUrl = "%s/room/enter?roomId=%d&accessToken=%s".formatted(baseUrl, roomId, accessToken);
         return new ModelAndView("redirect:" + redirectUrl);
     }
 
@@ -162,17 +180,6 @@ public class RoomController {
         }
 
         throw new AuthorizationServiceException("토큰값이 유효하지 않습니다.");
-    }
-
-    @PreAuthorize("isAuthenticated()")
-    @GetMapping("/{roomId}/invite")
-    @ResponseBody
-    public ModelAndView invite(@AuthenticationPrincipal User user,
-                               @PathVariable Long roomId) {
-        Room room = roomService.getRoom(roomId);
-        String accessToken = roomService.getAccessToken(room);
-        String redirectUrl = "/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken);
-        return new ModelAndView("redirect:" + redirectUrl);
     }
 
     @PreAuthorize("isAuthenticated()")

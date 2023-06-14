@@ -81,36 +81,6 @@ public class MockedRoomControllerTest {
     @MockBean
     SelectedPlaceService selectedPlaceService;
 
-    /*
-    실제 메일 날라옴
-    테스트는 성공
-     */
-    @Test
-    @WithMockUser
-    void 초대링크_발송_테스트() throws Exception {
-        Member actor = Member.builder()
-                .name("actor")
-                .email("me@meme.com")
-                .build();
-        when(memberService.loginMember(any())).thenReturn(actor);
-
-        Member friend = Member.builder()
-                .name("friend")
-                .email("freind@test.com")
-                .build();
-        when(memberService.getMember(anyLong())).thenReturn(friend);
-
-        Room room = Room.builder()
-                .accessCode("액세스코드")
-                .build();
-        when(roomService.getRoom(anyLong())).thenReturn(room);
-
-        mockMvc.perform(get("/room/{roomId}/invite", 1L).param("memberId", "1"))
-                .andExpect(status().isOk());
-
-        verify(mailService, times(1)).sendMailTo(any(Member.class), any(String.class));
-    }
-
     @Test
     @WithMockUser
     public void testDateTimeExceptionHandler() throws Exception {

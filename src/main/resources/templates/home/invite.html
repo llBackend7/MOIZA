@@ -15,6 +15,12 @@
     <div class="navbar-end">
     </div>
   </div>
+  <script>
+    /*<![CDATA[*/
+    let pageLink;
+    /*]]>*/
+  </script>
+  <script th:utext="|pageLink = '@{${redirectUrl}}';|"></script>
 </header>
 
 <main layout:fragment="main" class="flex-grow flex justify-center">
@@ -47,13 +53,7 @@
       hideMethod: "fadeOut"
     };
 
-    $(document).ready(function() {
-      // 페이지 로딩이 완료된 후 실행할 함수
-      copyPageLink()
-    });
-
     function copyPageLink() {
-      let pageLink = [[${baseUrl}]] + "/room/" + [[${roomId}]] +"/invite";
       navigator.clipboard.writeText(pageLink)
               .then(() => {
                 toastWarning("링크가 복사되었습니다.");
@@ -62,6 +62,11 @@
                 console.error("링크 복사 실패:", error);
               });
     }
+
+    $(document).ready(function() {
+      // 페이지 로딩이 완료된 후 실행할 함수
+      copyPageLink()
+    });
 
     function parseMsg(msg) {
       const [pureMsg, ttl] = msg.split(";ttl=");
