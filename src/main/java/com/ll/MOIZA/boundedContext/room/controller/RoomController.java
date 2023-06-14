@@ -114,13 +114,13 @@ public class RoomController {
     }
 
     @GetMapping("/{roomId}/changeTime")
-    public void changeTime(@PathVariable long roomId,
-            Model model, HttpServletResponse httpServletResponse) throws IOException {
+    public ModelAndView changeTime(@PathVariable long roomId){
 
         Room room = roomService.getRoom(roomId);
         String accessToken = roomService.getAccessToken(room);
 
-        httpServletResponse.sendRedirect("http://localhost:8080/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken));
+        String redirectUrl = "/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken);
+        return new ModelAndView("redirect:" + redirectUrl);
     }
 
     @PreAuthorize("isAuthenticated()")
