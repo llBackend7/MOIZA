@@ -41,14 +41,13 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -167,12 +166,13 @@ public class RoomController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{roomId}/invite")
     @ResponseBody
-    public String invite(@AuthenticationPrincipal User user,
-                         @PathVariable Long roomId) {
+    public ModelAndView invite(@AuthenticationPrincipal User user,
+                               @PathVariable Long roomId) {
         Room room = roomService.getRoom(roomId);
         String accessToken = roomService.getAccessToken(room);
         enterRoomService.createEnterRoom(room, rq.getMember());
-        return "redirect:/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken);
+        String redirectUrl = "/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken);
+        return new ModelAndView("redirect:" + redirectUrl);
     }
 
     @PreAuthorize("isAuthenticated()")
