@@ -28,15 +28,17 @@
         <div class="text">
             <div class="title">모임이름</div>
             <div class="font-gsans w-1/2 flex justify-center text-2xl" th:text="${room.name}"></div>
-            <div class="m-2 text-lg " style="color: #006bce;">
-                <a th:href="@{|/room/${room.id}/changeTime|}">가능시간 수정</a>
-            </div>
         </div>
 
         <div class="date-rank overflow-auto">
 
-            <div class="text-center m-2 text-xl">
-                날짜 현황
+            <div class="flex justify-center items-center m-2">
+                <div class="text-center text-xl mr-2">
+                    날짜 현황
+                </div>
+                <a th:href="@{|/room/${room.id}/changeTime|}" class="hover-pointer">
+                    <i class="far fa-light fa-pen-to-square"></i>
+                </a>
             </div>
 
             <div th:if="${#lists.isEmpty(overlappingTimes)}" class="w-full flex flex-col items-center justify-center mt-4 text-xl font-gsans">
