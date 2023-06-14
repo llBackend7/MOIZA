@@ -58,14 +58,6 @@ public class HomeController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/invite")
-    public String invite(@RequestParam Long roomId, Model model){
-        model.addAttribute("roomId",roomId);
-        model.addAttribute("baseUrl", AppConfig.getBaseUrl());
-        return "home/invite";
-    }
-
-    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{groupId}")
     public String deleteGroup(@PathVariable Long groupId, Model model){
         memberService.deleteGroup(groupId);
