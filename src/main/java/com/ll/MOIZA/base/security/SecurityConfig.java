@@ -38,10 +38,6 @@ public class SecurityConfig {
                         oauth2Login -> oauth2Login
                                 .loginPage("/login")
                                 .successHandler(authenticationSuccessHandler)
-                                .userInfoEndpoint(
-                                        userInfoEndpoint -> userInfoEndpoint
-                                                .userService(oAuth2UserService)
-                                )
                 )
                 .logout(
                         logout -> logout
