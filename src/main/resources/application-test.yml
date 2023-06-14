@@ -11,3 +11,6 @@ spring:
 logging:
   level:
     org.mongodb.driver: DEBUG
+custom:
+  site:
+    baseUrl: http://localhost:8080
