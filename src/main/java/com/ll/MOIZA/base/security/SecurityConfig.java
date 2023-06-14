@@ -1,7 +1,6 @@
 package com.ll.MOIZA.base.security;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,9 +9,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -20,7 +17,7 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
-    private final AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final CustomAuthSuccessHandler successHandler;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -30,13 +27,14 @@ public class SecurityConfig {
                                 .requestMatchers("/invite").permitAll()
                                 .requestMatchers("/css/**").permitAll()
                                 .requestMatchers("/img/**").permitAll()
+                                .requestMatchers("/error").permitAll()
                                 .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                                 .requestMatchers("/**").authenticated()
                 )
                 .oauth2Login(
                         oauth2Login -> oauth2Login
                                 .loginPage("/login")
-                                .successHandler(authenticationSuccessHandler)
+                                .successHandler(successHandler)
                 )
                 .logout(
                         logout -> logout
