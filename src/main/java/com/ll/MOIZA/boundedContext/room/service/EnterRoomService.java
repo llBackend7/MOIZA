@@ -25,7 +25,11 @@ public class EnterRoomService {
     public EnterRoom createEnterRoom(Room room,
             Member member
     ) {
-        EnterRoom enterRoom = EnterRoom.builder()
+        EnterRoom enterRoom = enterRoomRepository.findByRoomAndMember(room, member);
+        if (enterRoom != null) {
+            return enterRoom;
+        }
+        enterRoom = EnterRoom.builder()
                 .room(room)
                 .member(member)
                 .build();
@@ -36,10 +40,7 @@ public class EnterRoomService {
     public void enterRoomWithSelectedTime(Room room, Member member,
             List<RoomController.SelectedDayWithTime> selectedDayWhitTimesList) {
 
-        EnterRoom enterRoom = enterRoomRepository.findByRoomAndMember(room, member);
-        if (enterRoom == null) {
-            enterRoom = createEnterRoom(room, member);
-        }
+        EnterRoom enterRoom = createEnterRoom(room, member);
 
         for (RoomController.SelectedDayWithTime selectedDayWhitTime : selectedDayWhitTimesList) {
             selectedTimeService.CreateSelectedTime(

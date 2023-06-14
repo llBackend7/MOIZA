@@ -114,21 +114,23 @@ public class RoomController {
     }
 
     @GetMapping("/{roomId}/changeTime")
-    public void changeTime(@PathVariable long roomId,
-            Model model, HttpServletResponse httpServletResponse) throws IOException {
+    public ModelAndView changeTime(@PathVariable long roomId){
 
         Room room = roomService.getRoom(roomId);
         String accessToken = roomService.getAccessToken(room);
 
-        httpServletResponse.sendRedirect("http://localhost:8080/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken));
+        String redirectUrl = "/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken);
+        return new ModelAndView("redirect:" + redirectUrl);
     }
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/enter")
-    public String enterRoom(@RequestParam long roomId, @RequestParam String accessToken, Model model) {
+    public String enterRoom(@AuthenticationPrincipal User user, @RequestParam long roomId, @RequestParam String accessToken, Model model) {
         Room room = roomService.getRoom(roomId);
 
         if (roomService.validateToken(room, accessToken)) {
+            Member member = memberService.loginMember(user);
+            enterRoomService.createEnterRoom(room, member);
             model.addAttribute("room", room);
             model.addAttribute("availableDayList", roomService.getAvailableDayList(roomId));
             model.addAttribute("availableTimeList", roomService.getAvailableTimeList(roomId));
@@ -169,7 +171,6 @@ public class RoomController {
                                @PathVariable Long roomId) {
         Room room = roomService.getRoom(roomId);
         String accessToken = roomService.getAccessToken(room);
-        enterRoomService.createEnterRoom(room, rq.getMember());
         String redirectUrl = "/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken);
         return new ModelAndView("redirect:" + redirectUrl);
     }
