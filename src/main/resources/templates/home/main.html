@@ -71,7 +71,7 @@
 
                             <div class="flex justify-end p-2">
                                 <div class="text-sm font-gsans">
-                                    <a th:href="@{'/invite?roomId='+${room.id}}" class="mr-2 hover:text-slate-300 active:text-slate-400">초대하기</a>
+                                    <a th:href="@{|/room/${room.id}/invite|}" class="mr-2 hover:text-slate-300 active:text-slate-400">초대하기</a>
                                     <a th:href="@{'room/'+${room.id}+'/changeTime'}" class="hover:text-slate-300 active:text-slate-400">가능시간 수정</a>
                                 </div>
                             </div>

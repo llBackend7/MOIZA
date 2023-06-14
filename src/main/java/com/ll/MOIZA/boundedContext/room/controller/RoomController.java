@@ -118,6 +118,19 @@ public class RoomController {
         return "home/invite";
     }
 
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{roomId}/invite")
+    public String invite(@AuthenticationPrincipal User user,
+                               @PathVariable Long roomId,
+                               Model model) {
+        Room room = roomService.getRoom(roomId);
+        String accessToken = roomService.getAccessToken(room);
+        String redirectUrl = "%s/room/enter?roomId=%d&accessToken=%s".formatted(baseUrl, room.getId(), accessToken);
+
+        model.addAttribute("redirectUrl", redirectUrl);
+        return "home/invite";
+    }
+
     @GetMapping("/{roomId}/changeTime")
     public ModelAndView changeTime(@PathVariable long roomId){
 
