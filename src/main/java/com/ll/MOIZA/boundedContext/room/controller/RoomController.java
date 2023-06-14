@@ -55,7 +55,6 @@ import java.util.*;
 public class RoomController {
     private final RoomService roomService;
     private final MemberService memberService;
-    private final MailService mailService;
     private final ResultService resultService;
     private final SelectedTimeService selectedTimeService;
     private final EnterRoomService enterRoomService;
@@ -87,7 +86,7 @@ public class RoomController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/create")
     public String createRoom(RoomForm roomForm) {
-        return "/room/create";
+        return "room/create";
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -133,7 +132,7 @@ public class RoomController {
             model.addAttribute("room", room);
             model.addAttribute("availableDayList", roomService.getAvailableDayList(roomId));
             model.addAttribute("availableTimeList", roomService.getAvailableTimeList(roomId));
-            return "/room/enter";
+            return "room/enter";
         }
 
         throw new AuthorizationServiceException("토큰값이 유효하지 않습니다.");
@@ -252,7 +251,7 @@ public class RoomController {
         DecidedResult result = resultService.getResult(roomId);
         model.addAttribute("result", result);
         model.addAttribute("appKey", AppConfig.getAppKey());
-        return "/room/result";
+        return "room/result";
     }
 
     @PostMapping("/{roomId}/close")
