@@ -28,6 +28,9 @@
         <div class="text">
             <div class="title">모임이름</div>
             <div class="font-gsans w-1/2 flex justify-center text-2xl" th:text="${room.name}"></div>
+            <div class="m-2 text-lg " style="color: #006bce;">
+                <a th:href="@{|/room/${room.id}/changeTime|}">가능시간 수정</a>
+            </div>
         </div>
 
         <div class="date-rank overflow-auto">
