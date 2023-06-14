@@ -1,18 +1,18 @@
-// $(function() {
-//     $('#dialog').dialog({
-//         autoOpen: false, // 초기에 자동으로 열리지 않도록 설정
-//         modal: true, // 모달 다이얼로그로 설정
-//         resizable: true, // 크기 조정 허용
-//         open: function(event, ui) {
-//             // 다이얼로그 열릴 때 중앙 정렬
-//             $(this).dialog('widget').position({
-//                 my: 'center',
-//                 at: 'center',
-//                 of: window
-//             });
-//         }
-//     });
-// });
+$(function() {
+    $('#dialog').dialog({
+        autoOpen: false, // 초기에 자동으로 열리지 않도록 설정
+        modal: true, // 모달 다이얼로그로 설정
+        resizable: true, // 크기 조정 허용
+        open: function(event, ui) {
+            // 다이얼로그 열릴 때 중앙 정렬
+            $(this).dialog('widget').position({
+                my: 'center',
+                at: 'center',
+                of: window
+            });
+        }
+    });
+});
 function setDurationValue() {
     var hour = $(".hourSelect").val();
     var minute = $(".minuteSelect").val();
@@ -40,40 +40,40 @@ $(document).ready(function () {
     });
 });
 
-// $(document).ready(function () {
-//     $('form').on('submit', function (e) {
-//         e.preventDefault(); // 폼 제출의 기본 동작을 방지합니다.
-//         if (setDurationValue()) {
-//             return false;
-//         }
-//
-//         let startDate = $('#startDate').val();
-//         let endDate = $('#endDate').val();
-//         let name = $('#name').val();
-//         let description = $('#description').val();
-//         let duration = $('#duration').val();
-//         let startTime = $('#availableStartTime').val();
-//         let endTime = $('#availableEndTime').val();
-//         let deadLine = $('#deadLine').val();
-//
-//         if (validateTimes(startDate, endDate, name, description, duration, startTime, endTime, deadLine)) {
-//             $.ajax({
-//                 type: $(this).attr('method'),
-//                 url: $(this).attr('action'),
-//                 data: $(this).serialize(),
-//                 success: function () {
-//                     $('form input, select, textarea').prop('disabled', true);
-//                     $('form button[type="submit"]').prop('disabled', true);
-//                     $('#response').attr('href',resp.link);
-//                     $('#dialog').dialog('open');
-//                 },
-//                 error: function (jqXHR, textStatus, errorThrown) {
-//                     console.error(textStatus, errorThrown);
-//                 }
-//             });
-//         }
-//     });
-// });
+$(document).ready(function () {
+    $('form').on('submit', function (e) {
+        e.preventDefault(); // 폼 제출의 기본 동작을 방지합니다.
+        if (setDurationValue()) {
+            return false;
+        }
+
+        let startDate = $('#startDate').val();
+        let endDate = $('#endDate').val();
+        let name = $('#name').val();
+        let description = $('#description').val();
+        let duration = $('#duration').val();
+        let startTime = $('#availableStartTime').val();
+        let endTime = $('#availableEndTime').val();
+        let deadLine = $('#deadLine').val();
+
+        if (validateTimes(startDate, endDate, name, description, duration, startTime, endTime, deadLine)) {
+            $.ajax({
+                type: $(this).attr('method'),
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                success: function () {
+                    $('form input, select, textarea').prop('disabled', true);
+                    $('form button[type="submit"]').prop('disabled', true);
+                    $('#response').attr('href',resp.link);
+                    $('#dialog').dialog('open');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    console.error(textStatus, errorThrown);
+                }
+            });
+        }
+    });
+});
 
 function validateTimes(startDate, endDate, name, description, duration, startTime, endTime, deadLine) {
     if (!validateTime(startTime) || !validateTime(endTime)) {
@@ -86,8 +86,16 @@ function validateTimes(startDate, endDate, name, description, duration, startTim
     endTime = new Date(`1970-01-01T${endTime}:00`);
     deadLine = new Date(deadLine);
 
+    const [durationHours, durationMinutes] = duration.split(':');
+    const durationInMinutes = parseInt(durationHours) * 60 + parseInt(durationMinutes);
+    const differenceInMinutes = (endTime - startTime) / (1000 * 60); // 시간 차이를 분 단위로 계산
+
     if (duration === '00:00' || !duration) {
         toastWarning("모임 진행 시간을 올바르게 입력해 주세요.");
+        return false;
+    }
+    if (differenceInMinutes < durationInMinutes) {
+        toastWarning("시작시간과 끝시간의 간격이 모임 진행 시간보다 커야 합니다.");
         return false;
     }
     if (endDate < startDate) {
