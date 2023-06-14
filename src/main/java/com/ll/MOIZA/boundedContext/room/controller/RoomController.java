@@ -164,15 +164,14 @@ public class RoomController {
         throw new AuthorizationServiceException("토큰값이 유효하지 않습니다.");
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{roomId}/invite")
     @ResponseBody
     public String invite(@AuthenticationPrincipal User user,
                          @PathVariable Long roomId) {
-        if(rq.isLogout()) { return "/memberLogin"; }
-
         Room room = roomService.getRoom(roomId);
         String accessToken = roomService.getAccessToken(room);
-
+        enterRoomService.createEnterRoom(room, rq.getMember());
         return "redirect:/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken);
     }
 

@@ -36,14 +36,6 @@ public class HomeController {
             return "redirect:/groups";
     }
 
-    @GetMapping("/memberLogin")
-    public String subLogin(){
-        if(rq.isLogout())
-            return "home/memberLogin";
-        else
-            return "redirect:/groups";
-    }
-
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/groups")
     public String home(Model model){
