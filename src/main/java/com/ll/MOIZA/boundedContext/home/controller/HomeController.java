@@ -1,11 +1,13 @@
 package com.ll.MOIZA.boundedContext.home.controller;
 
+import com.ll.MOIZA.base.appConfig.AppConfig;
 import com.ll.MOIZA.base.rq.Rq;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -59,12 +61,13 @@ public class HomeController {
     @GetMapping("/invite")
     public String invite(@RequestParam Long roomId, Model model){
         model.addAttribute("roomId",roomId);
+        model.addAttribute("baseUrl", AppConfig.getBaseUrl());
         return "home/invite";
     }
 
     @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{groupId}")
-    public String deleteGroup(@PathVariable Long groupId){
+    public String deleteGroup(@PathVariable Long groupId, Model model){
         memberService.deleteGroup(groupId);
         return "redirect:/groups";
     }

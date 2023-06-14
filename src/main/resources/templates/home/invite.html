@@ -21,13 +21,14 @@
   <div class="max-w-2xl w-[60%] h-[35rem] mt-20 flex justify-center mainsub-img">
     <div class="flex flex-col items-center justify-center">
       <div class="text-white text-4xl mb-3 text-shadow">MOIZA</div>
-      <div class="font-gsans text-center text-white text-xl" id="room-info" th:attr="data-id=${roomId}">
+      <div class="font-gsans text-center text-white text-xl">
         <div>모임원들에게 링크를 공유하고 초대해보세요!</div>
         <button class="btn btn-warning btn-wide mt-3" onclick="copyPageLink()">링크 다시 복사하기</button>
       </div>
     </div>
   </div>
-  <script>
+
+  <script th:inline="javascript">
     toastr.options = {
       closeButton: true,
       debug: false,
@@ -52,7 +53,7 @@
     });
 
     function copyPageLink() {
-      let pageLink = "http://localhost:8080/room/"+ $('#room-info').data("id") +"/invite";
+      let pageLink = [[${baseUrl}]] + "/room/" + [[${roomId}]] +"/invite";
       navigator.clipboard.writeText(pageLink)
               .then(() => {
                 toastWarning("링크가 복사되었습니다.");

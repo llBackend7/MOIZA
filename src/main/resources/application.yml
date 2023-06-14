@@ -24,3 +24,6 @@ spring:
             user-name-attribute: id
   thymeleaf:
     prefix: classpath:/templates/
+custom:
+  site:
+    baseUrl:
