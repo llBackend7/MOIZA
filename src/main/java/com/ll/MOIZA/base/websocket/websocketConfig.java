@@ -32,6 +32,8 @@ public class websocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         // TODO origin 경로 수정필요
         registry.addEndpoint("/ws")
+                .setAllowedOrigins("http://localhost:8080")
+                .setAllowedOrigins("https://moiza.online")
                 .setHandshakeHandler(new DefaultHandshakeHandler() {
                     @Override
                     protected Principal determineUser(ServerHttpRequest request, WebSocketHandler wsHandler, Map<String, Object> attributes) {
