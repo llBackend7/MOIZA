@@ -71,8 +71,8 @@
                 <div class="mb-2">참여 멤버</div>
                 <ul class="flex justify-center">
                     <li th:each="member : ${selectedAvailableMembers}" class="mr-2">
-                        <img th:src="${member.profile}" width="50" class="mask mask-circle">
-                        <div th:text="${member.name}"></div>
+                        <img th:src="${member.profile}" width="50" class="mask mask-circle" style="z-index: 0">
+                        <div th:text="${member.name}" class="text-center"></div>
                     </li>
                 </ul>
             </div>
@@ -81,8 +81,8 @@
                 <div class="mb-2">참여 불가능 멤버</div>
                 <ul class="flex justify-center">
                     <li th:each="member : ${selectedUnavailableMembers}" class="mr-2">
-                        <img th:src="${member.profile}" width="50" class="mask mask-circle">
-                        <div th:text="${member.name}"></div>
+                        <img th:src="${member.profile}" width="50" class="mask mask-circle" style="z-index: 0">
+                        <div th:text="${member.name}" class="text-center"></div>
                     </li>
                 </ul>
             </div>
