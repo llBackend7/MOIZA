@@ -23,19 +23,18 @@
     <div class="max-w-2xl w-full flex justify-center">
         <div class="w-full flex flex-col items-center">
 
-            <div class="w-3/4 h-22 flex items-center profile border border-2 border-slate-300 rounded-lg m-5 p-3 pl-14">
-
-                <div>
+            <div class="w-3/4 h-22 flex items-center profile border border-2 border-slate-300 rounded-lg m-5 p-3">
+                <div class="w-1/5 flex justify-end">
                     <img th:src="${@rq.member.profile}" width="65" class="mr-2 mask mask-circle">
                 </div>
 
-                <div>
-                    <div class="text-xl font-gsans font-bold" th:text="${@rq.member.name}"></div>
-                    <div class="text-slate-300 text-sm font-gsans" th:text="${@rq.member.email}"></div>
+                <div class="w-2/5 ml-3">
+                    <div class="text-xl sm:text-xl/4 md:text-xl/2 font-gsans font-bold" th:text="${@rq.member.name}"></div>
+                    <div class="text-slate-300 text-sm sm:text-sm/4 md:text-sm/2 font-gsans" th:text="${@rq.member.email}"></div>
                 </div>
 
-                <div>
-                    <a href="/room/create" class="btn ml-10">+ 모임 생성</a>
+                <div class="w-2/5 flex justify-end mr-2">
+                    <a href="/room/create" class="btn btn-xs sm:btn-sm md:btn-md">+ 모임 생성</a>
                 </div>
 
             </div>
@@ -48,7 +47,7 @@
                 <li th:each="room : ${rooms}" class="groups w-3/5 h-48 rounded-2xl mt-5 flex flex-col justify-center shadow-md text-white" style="background-color: #006BCE;">
 
                     <div th:if="${room.deadLine.isAfter(#temporals.createNow())}" class="h-full p-7 rounded-2xl">
-                        <div class="h-5 px-4 text-sm font-gsans">
+                        <div class="h-1/5 mx-4 text-sm font-gsans">
                             <div th:if="${room.getLeader() == member}"  class="flex justify-between">
                                 <span>내가 만든 모임</span>
                                 <a href="javascript:" onclick="if(confirm('모임을 삭제하시겠습니까?')) $(this).next().submit();">X</a>
@@ -57,10 +56,10 @@
                         </div>
 
 
-                        <div>
-                            <div class="h-20 flex flex-col justify-center items-center mt-3">
+                        <div class="h-4/5">
+                            <div class="h-4/5 flex flex-col justify-center items-center">
                                 <div th:onclick="|location.href='room/'+${room.id}+'/date'|"
-                                     th:text="${room.name}" class="text-xl hover:text-slate-300 active:text-slate-400 hover-pointer"></div>
+                                     th:text="${room.name}" class="text-xl text-center hover:text-slate-300 active:text-slate-400 hover-pointer"></div>
                                 <div th:if="${room.deadLine.isAfter(#temporals.createNow())}" class="text-sm text-center font-gsans">
                                     <span>마감 기한 : ~</span>
                                     <span th:text="${#temporals.format(room.deadLine, 'yyyy.MM.dd HH:mm')}">2023/06/02 24:00:00</span>
@@ -78,7 +77,7 @@
                     </div>
 
                     <div th:if="${room.deadLine.isBefore(#temporals.createNow())}" class="h-full p-7">
-                        <div class="h-5 px-4 text-sm font-gsans">
+                        <div class="h-1/5 mx-4 text-sm font-gsans">
                             <div th:if="${room.getLeader() == member}"  class="flex justify-between">
                                 <span>내가 만든 모임</span>
                                 <a href="javascript:" onclick="if(confirm('모임을 삭제하시겠습니까?')) $(this).next().submit();">X</a>
@@ -89,9 +88,9 @@
                         </div>
 
 
-                        <div>
-                            <div class="h-20 flex flex-col justify-center items-center mt-3">
-                                <div th:text="${room.name}" class="text-xl"></div>
+                        <div class="h-4/5">
+                            <div class="h-4/5 flex flex-col justify-center items-center">
+                                <div th:text="${room.name}" class="text-xl text-center"></div>
                             </div>
 
                             <div class="flex justify-end p-2">

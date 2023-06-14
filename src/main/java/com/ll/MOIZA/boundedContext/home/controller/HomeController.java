@@ -4,6 +4,7 @@ import com.ll.MOIZA.base.rq.Rq;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -29,11 +30,13 @@ public class HomeController {
     }
 
     @GetMapping("/login")
-    public String login(){
-        if(rq.isLogout())
-            return "home/login";
-        else
-            return "redirect:/groups";
+    public String login(HttpServletRequest request) {
+        String uri = request.getHeader("Referer");
+        if (uri != null && !uri.contains("/login")) {
+            request.getSession().setAttribute("prevPage", uri);
+        }
+
+        return "home/login";
     }
 
     @PreAuthorize("isAuthenticated()")

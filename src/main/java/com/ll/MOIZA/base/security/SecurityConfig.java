@@ -1,6 +1,7 @@
 package com.ll.MOIZA.base.security;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,7 +10,9 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
@@ -17,13 +20,14 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @RequiredArgsConstructor
 @EnableMethodSecurity
 public class SecurityConfig {
+    private final OAuth2UserService oAuth2UserService;
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(request ->
                         request.requestMatchers("/").permitAll()
                                 .requestMatchers("/login").permitAll()
-                                .requestMatchers("/memberLogin").permitAll()
                                 .requestMatchers("/invite").permitAll()
                                 .requestMatchers("/css/**").permitAll()
                                 .requestMatchers("/img/**").permitAll()
@@ -31,8 +35,13 @@ public class SecurityConfig {
                                 .requestMatchers("/**").authenticated()
                 )
                 .oauth2Login(
-                        oauth2Login -> oauth2Login.loginPage("/login")
-                                .defaultSuccessUrl("/groups", true)
+                        oauth2Login -> oauth2Login
+                                .loginPage("/login")
+                                .successHandler(authenticationSuccessHandler)
+                                .userInfoEndpoint(
+                                        userInfoEndpoint -> userInfoEndpoint
+                                                .userService(oAuth2UserService)
+                                )
                 )
                 .logout(
                         logout -> logout
