@@ -150,8 +150,6 @@ public class RoomController {
             Member member = memberService.loginMember(user);
             enterRoomService.createEnterRoom(room, member);
             model.addAttribute("room", room);
-            model.addAttribute("availableDayList", roomService.getAvailableDayList(roomId));
-            model.addAttribute("availableTimeList", roomService.getAvailableTimeList(roomId));
             return "room/enter";
         }
 

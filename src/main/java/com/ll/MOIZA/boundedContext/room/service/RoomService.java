@@ -101,38 +101,6 @@ public class RoomService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "모임을 찾을 수 없습니다."));
     }
 
-    public List<LocalDate> getAvailableDayList(Long roomId) {
-        Room room = getRoom(roomId);
-
-        LocalDate availableStartDay = room.getAvailableStartDay();
-        LocalDate availableEndDay = room.getAvailableEndDay();
-
-        List<LocalDate> availableDayList = new ArrayList<>();
-
-        while (!availableStartDay.isAfter(availableEndDay)) {
-            availableDayList.add(availableStartDay);
-            availableStartDay = availableStartDay.plusDays(1);
-        }
-
-        return availableDayList;
-    }
-
-    public List<LocalTime> getAvailableTimeList(Long roomId) {
-        Room room = getRoom(roomId);
-
-        LocalTime availableStartTime = room.getAvailableStartTime();
-        LocalTime availableEndTime = room.getAvailableEndTime();
-
-        List<LocalTime> availableTimeList = new ArrayList<>();
-
-        while (!availableStartTime.isAfter(availableEndTime)) {
-            availableTimeList.add(availableStartTime);
-            availableStartTime = availableStartTime.plusMinutes(30);
-        }
-
-        return availableTimeList;
-    }
-
     public void closeRoom(Long roomId) {
         Room room = getRoom(roomId);
         room.setDeadLine(LocalDateTime.now());
