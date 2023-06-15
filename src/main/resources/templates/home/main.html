@@ -88,9 +88,8 @@
                                 </form>
                             </div>
                             <div th:if="${room.getLeader() != member}" class="flex justify-end">
-                                <a href="javascript:" onclick="if(confirm('모임을 삭제하시겠습니까?')) $(this).next().submit();">X</a>
-                                <form hidden th:action="@{|/${room.id}|}" method="POST">
-                                    <input type="hidden" name="_method" value="delete">
+                                <a href="javascript:" onclick="if(confirm('모임을 떠나시겠습니까?')) $(this).next().submit();">X</a>
+                                <form hidden th:action="@{|/leave?roomId=${room.id}|}" method="POST">
                                 </form>
                             </div>
                         </div>

@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 @Service
-@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class EnterRoomService {
 
@@ -36,6 +35,7 @@ public class EnterRoomService {
 
         return enterRoomRepository.save(enterRoom);
     }
+
     @Transactional
     public void enterRoomWithSelectedTime(Room room, Member member,
             List<RoomController.SelectedDayWithTime> selectedDayWhitTimesList) {
@@ -53,5 +53,11 @@ public class EnterRoomService {
     }
     public Optional<EnterRoom> findByMemberIdAndRoomId(Long memberId, Long roomId) {
         return enterRoomRepository.findByMemberIdAndRoomId(memberId, roomId);
+    }
+
+    @Transactional
+    public void leaveEnterRoom(Room room, Member actor) {
+        EnterRoom enterRoom = enterRoomRepository.findByRoomAndMember(room, actor);
+        enterRoomRepository.delete(enterRoom);
     }
 }
