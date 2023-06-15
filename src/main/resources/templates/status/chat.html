@@ -72,7 +72,7 @@
     <script>
         $(document).ready(async () => {
             connect();
-            $('form').on('submit', e => e.preventDefault());
+            $('#send').on('submit', e => e.preventDefault());
             $('#send').click(() => send());
             await getChats();
             goToRecent();
