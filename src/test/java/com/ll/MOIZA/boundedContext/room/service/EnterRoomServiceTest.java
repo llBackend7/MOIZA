@@ -40,7 +40,7 @@ public class EnterRoomServiceTest {
     MemberRepository memberRepository;
 
     @Test
-    void 빙_입장() {
+    void 방_입장() {
 
         Member member = memberRepository.findByName("user1").get();
         Room room = roomService.createRoom(

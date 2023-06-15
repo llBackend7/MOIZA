@@ -93,7 +93,7 @@ class SchedulerTest {
 
         Scheduler scheduler = new Scheduler(roomRepository, mailService, templateEngine, selectedTimeService, selectedPlaceService, resultRepository);
 
-        scheduler.checkConfirmedRoom();
+        scheduler.checkConfirmedRoomAndSendMail();
 
         // 테스트데이터셋의 마감된 방의 모든 인원수(중복포함)의 합만큼 메일이 보내져야함
         Mockito.verify(mailService, Mockito.times(8)).sendMailTo(Mockito.any(Member.class), Mockito.anyString());
