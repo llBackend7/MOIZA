@@ -89,6 +89,10 @@ function validateTimes(startDate, endDate, name, description, duration, startTim
     const [durationHours, durationMinutes] = duration.split(':');
     const durationInMinutes = parseInt(durationHours) * 60 + parseInt(durationMinutes);
     const differenceInMinutes = (endTime - startTime) / (1000 * 60); // 시간 차이를 분 단위로 계산
+    const startDateTime = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate(), startTime.getHours(), startTime.getMinutes());
+
+    console.log(startDateTime)
+    console.log(startDateTime < deadLine)
 
     if (duration === '00:00' || !duration) {
         toastWarning("모임 진행 시간을 올바르게 입력해 주세요.");
@@ -110,7 +114,7 @@ function validateTimes(startDate, endDate, name, description, duration, startTim
         toastWarning("마감시간은 현재보다 나중이어야 합니다.");
         return false;
     }
-    if (startDate < deadLine) {
+    if (startDateTime < deadLine) {
         toastWarning("마감시간은 가능한 날짜보다 이전이어야 합니다.");
         return false;
     }
