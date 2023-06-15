@@ -15,8 +15,8 @@
         </span>
         </div>
         <div class="navbar-end">
-            <a id="close-btn" href="javascript:" th:if="${room.getLeader() == actor}" onclick="$(this).next().submit();" class="flex items-center justify-center">마감하기</a>
-            <form hidden th:action="@{|/room/${room.id}/close|}" method="POST">
+            <form th:action="@{|/room/${room.id}/close|}" method="POST">
+                <button id="close-btn" type="submit" th:if="${room.leader.id == actor.id}" class="flex items-center justify-center">마감하기</button>
             </form>
         </div>
     </div>
@@ -59,7 +59,7 @@
                 </div>
             </div>
             <div class="chat-input px-2.5 bg-[#006BCE]">
-                <form class="w-full flex justify-space gap-3 p-1.5">
+                <form id="chatForm" class="w-full flex justify-space gap-3 p-1.5">
                     <input type="text" class="input input-sm  input-bordered p-1 font-gsans flex-grow"
                            id="content"
                            placeholder=" 내용 입력 후 Enter"/>
@@ -72,10 +72,10 @@
     <script>
         $(document).ready(async () => {
             connect();
-            $('#send').on('submit', e => e.preventDefault());
+            $('#chatForm').on('submit', e => e.preventDefault());
+            $('#send').click(() => send());
             await getChats();
             goToRecent();
-            $('#send').click(() => send());
         })
 
         function connect() {
