@@ -1,0 +1,33 @@
+<html layout:decorate="~{layout/layout.html}" xmlns:layout="http://www.w3.org/1999/xhtml">
+
+<body>
+
+<header layout:fragment="header" class="sticky top-0">
+  <div class="navbar max-w-2xl mx-auto bg-base-100">
+    <div class="navbar-start text-2xl font-gsans m-5">
+      <a href="/" class="flex">
+        <img width="35" src="https://img.icons8.com/external-flat-lima-studio/64/external-block-toys-flat-lima-studio-2.png" alt="external-block-toys-flat-lima-studio-2"/>
+        <div class="ml-2 mt-1">MOIZA</div>
+      </a>
+    </div>
+    <div class="navbar-center">
+    </div>
+    <div class="navbar-end">
+    </div>
+  </div>
+</header>
+
+<main layout:fragment="main" class="flex-grow flex justify-center">
+  <div class="max-w-2xl w-[60%] h-[35rem] mt-20 flex justify-center mainsub-img">
+    <div class="flex flex-col items-center justify-center">
+      <div class="text-white text-4xl mb-3 text-shadow">MOIZA</div>
+      <div class="font-gsans text-center text-white text-xl">
+        <div>예상치 못한 장애가 일어났어요! 서버 정상화까지 잠시 기다려주세요</div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer layout:fragment="footer" class="hidden"></footer>
+</body>
+</html>
