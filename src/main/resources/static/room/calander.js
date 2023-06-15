@@ -62,10 +62,7 @@ $(document).ready(function () {
                 url: $(this).attr('action'),
                 data: $(this).serialize(),
                 success: function () {
-                    $('form input, select, textarea').prop('disabled', true);
-                    $('form button[type="submit"]').prop('disabled', true);
-                    $('#response').attr('href',resp.link);
-                    $('#dialog').dialog('open');
+                    $('form').off('submit').submit();
                 },
                 error: function (jqXHR, textStatus, errorThrown) {
                     console.error(textStatus, errorThrown);
