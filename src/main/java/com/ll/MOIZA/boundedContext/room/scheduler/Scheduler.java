@@ -97,7 +97,6 @@ public class Scheduler {
             Optional<DecidedResult> existResult = resultRepository.findByRoomId(room.getId());
 
             if(existResult.isPresent()) {
-                System.out.println("해당 모임에 대한 결과가 저장되어 있습니다.");
                 return;
             }
 
@@ -109,10 +108,7 @@ public class Scheduler {
                 });
                 room.setMailSent(true);
                 roomRepository.save(room);
-            } catch (Exception ex){
-                System.out.println("sendGrid 예외 처리: Maximum credits exceeded");
-            }
-
+            } catch (Exception ex){}
         });
     }
 
