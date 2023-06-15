@@ -115,6 +115,8 @@ public class RoomController {
         String redirectUrl = "%s/room/enter?roomId=%d&accessToken=%s".formatted(baseUrl, room.getId(), accessToken);
 
         model.addAttribute("redirectUrl", redirectUrl);
+        addUserAuthority(user, room.getId());
+
         return "home/invite";
     }
 
