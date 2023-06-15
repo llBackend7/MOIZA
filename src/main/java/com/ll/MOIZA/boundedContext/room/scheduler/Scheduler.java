@@ -37,13 +37,13 @@ public class Scheduler {
     private final SelectedPlaceService selectedPlaceService;
     private final ResultRepository resultRepository;
 
-    // 1분 간격으로 마감된 모임 탐색
-    @Scheduled(fixedRate = 60_000)
-    public void checkConfirmedRoom() {
-        List<Room> roomToConfirm = roomRepository.findByDeadLineBeforeAndMailSentFalse(LocalDateTime.now());
+    @Scheduled(fixedRate = 50_000)
+    public void checkConfirmedRoomAndCreateResult() {
+        List<Room> roomToConfirm = roomRepository.findByDeadLineBefore(LocalDateTime.now());
 
         roomToConfirm.forEach(room -> {
             Optional<DecidedResult> existResult = resultRepository.findByRoomId(room.getId());
+
             if(existResult.isPresent()) {
                 System.out.println("해당 모임에 대한 결과가 저장되어 있습니다.");
                 return;
@@ -83,9 +83,21 @@ public class Scheduler {
                 resultRepository.save(result);
             } catch (DataIntegrityViolationException duplicationEx) {
                 System.out.println("중복된 결과 저장에 대한 예외 발생 처리");
-                return;
             } catch (UnexpectedRollbackException rollbackEx) {
                 System.out.println("롤백 예외 처리");
+            }
+        });
+    }
+
+    @Scheduled(fixedRate = 180_000)
+    public void checkConfirmedRoomAndSendMail() {
+        List<Room> roomToConfirm = roomRepository.findByDeadLineBeforeAndMailSentFalse(LocalDateTime.now());
+
+        roomToConfirm.forEach(room -> {
+            Optional<DecidedResult> existResult = resultRepository.findByRoomId(room.getId());
+
+            if(existResult.isPresent()) {
+                System.out.println("해당 모임에 대한 결과가 저장되어 있습니다.");
                 return;
             }
 
@@ -100,6 +112,7 @@ public class Scheduler {
             } catch (Exception ex){
                 System.out.println("sendGrid 예외 처리: Maximum credits exceeded");
             }
+
         });
     }
 
