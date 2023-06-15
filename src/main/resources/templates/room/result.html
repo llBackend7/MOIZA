@@ -72,7 +72,7 @@
                 <div class="my-2">
                     <div class="ml-4">약속 시간</div>
                     <div class="border-l-4 border-neutral-300 text-center font-gsans">
-                        <div th:if="${result.decidedPlace.isEmpty()}">
+                        <div th:if="${result.decidedDayTime == null}">
                             정해진 약속 시간이 없습니다.
                         </div>
                         <span th:text="${#temporals.format(result.decidedDayTime, 'yyyy년 MM월 dd일 a hh:mm')}" class="text-xl"></span>
