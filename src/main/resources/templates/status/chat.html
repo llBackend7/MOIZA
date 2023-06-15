@@ -73,9 +73,9 @@
         $(document).ready(async () => {
             connect();
             $('#send').on('submit', e => e.preventDefault());
-            $('#send').click(() => send());
             await getChats();
             goToRecent();
+            $('#send').click(() => send());
         })
 
         function connect() {
