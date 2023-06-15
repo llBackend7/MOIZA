@@ -32,23 +32,23 @@
                 <div class="h-40 flex flex-col items-center justify-center p-5 border border-none rounded-lg bg-white">
                     <div>
                         가능한 날짜는
-                        <span class="p-1 text-xl border border-none rounded-lg bg-slate-200" th:text="${room.availableStartDay}"></span>
+                        <span id="roomStartDate" class="p-1 text-xl border border-none rounded-lg bg-slate-200" th:text="${room.availableStartDay}"></span>
                         부터
-                        <span class="p-1 text-xl border border-none rounded-lg bg-slate-200" th:text="${room.availableEndDay}"></span>
+                        <span id="roomEndDate" class="p-1 text-xl border border-none rounded-lg bg-slate-200" th:text="${room.availableEndDay}"></span>
                         까지
                     </div>
 
                     <div class="mt-2">
                         가능한 시간은
-                        <span class="p-1 text-xl border border-none rounded-lg bg-slate-200" th:text="${room.availableStartTime}"></span>
+                        <span id="roomStartTime" class="p-1 text-xl border border-none rounded-lg bg-slate-200" th:text="${room.availableStartTime}"></span>
                         부터
-                        <span class="p-1 text-xl border border-none rounded-lg bg-slate-200" th:text="${room.availableEndTime}"></span>
+                        <span id="roomEndTime" class="p-1 text-xl border border-none rounded-lg bg-slate-200" th:text="${room.availableEndTime}"></span>
                         사이에 가능합니다.
                     </div>
 
                     <div class="mt-2">
                         약속 시간은
-                        <span th:text="${room.meetingDuration.getMinute() == 0 ? #temporals.format(room.meetingDuration, 'h시간') : #temporals.format(room.meetingDuration, 'h시간 mm분')}" class="p-1 text-xl border border-none rounded-lg bg-slate-200"></span>
+                        <span id="roomMeetingDuration" th:text="${room.meetingDuration.getMinute() == 0 ? #temporals.format(room.meetingDuration, 'h시간') : #temporals.format(room.meetingDuration, 'h시간 mm분')}" class="p-1 text-xl border border-none rounded-lg bg-slate-200"></span>
                         입니다. 시간 범위에 맞게 지정해주세요.
                     </div>
                 </div>
@@ -127,6 +127,48 @@
             }
         }
 
+        function validateDate(date) {
+            if ($('#roomStartDate').html() > date) {
+                toastWarning(`선택할 수 있는 날짜가 아닙니다. 선택한 날짜가 가능한 날짜보다 이릅니다.`);
+                return false;
+            }
+            if ($('#roomEndDate').html() < date) {
+                toastWarning(`선택할 수 있는 날짜가 아닙니다. 선택한 날짜가 가능한 날짜보다 늦습니다.`);
+                return false;
+            }
+            return true;
+        }
+
+        function validateParticipantTime(start, end) {
+            let endTime = new Date('1970-01-01T' + end);
+            let startTime = new Date('1970-01-01T' + start);
+            let roomStartTime = new Date('1970-01-01T' + $('#roomEndTime').html());
+            let roomEndTime = new Date('1970-01-01T' + $('#roomStartTime').html());
+            let meetingDurationInMinutes = parseInt($('#roomMeetingDuration').html(), 10);
+
+            if (startTime > endTime) {
+                toastWarning(`시작하는 시간은 끝나는 시간보다 빠를 수 없습니다.`);
+                return false;
+            }
+            if (roomStartTime > startTime) {
+                toastWarning(`선택할 수 있는 시간이 아닙니다. 선택한 시간이 가능한 시간보다 이릅니다.`);
+                return false;
+            }
+            if (roomEndTime < endTime) {
+                toastWarning(`선택할 수 있는 시간이 아닙니다. 선택한 시간이 가능한 시간보다 늦습니다.`);
+                return false;
+            }
+            // startTime과 endTime 사이의 시간 차이를 분으로 계산합니다
+            let diffInMinutes = (endTime - startTime) / 1000 / 60;
+
+            if (diffInMinutes < meetingDurationInMinutes) {
+                toastWarning('선택할 수 있는 시간이 아닙니다. 미팅 진행 시간보다 짧은 시간입니다.');
+                return false;
+            }
+
+            return true;
+        }
+
         function enter() {
             let availableTimes = [];
             $('div[name=availableTime]').each(function () {
@@ -144,6 +186,19 @@
             if (checkRedundantTime(availableTimes)) {
                 return;
             }
+
+            for (let availableTime of availableTimes) {
+                if(!validateDate(availableTime.date)){
+                    return;
+                }
+            }
+
+            for (let availableTime of availableTimes) {
+                if(!validateParticipantTime(availableTime.startTime, availableTime.endTime)){
+                    return;
+                }
+            }
+
             /*<![CDATA[*/
             const csrfToken = `[[${_csrf.token}]]`;
             const csrfHeader = `[[${_csrf.headerName}]]`;
@@ -163,7 +218,7 @@
                 },
                 error: function (error) {
                     console.log(error);
-                    toastWarning(error.responseJSON.message);
+                    toastWarning("서버에의 요청에 문제가 생겼습니다");
                 }
             });
         }
