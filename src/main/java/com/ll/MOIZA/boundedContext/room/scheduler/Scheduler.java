@@ -37,7 +37,7 @@ public class Scheduler {
     private final SelectedPlaceService selectedPlaceService;
     private final ResultRepository resultRepository;
 
-    @Scheduled(fixedRate = 50_000)
+    @Scheduled(fixedRate = 5_000)
     public void checkConfirmedRoomAndCreateResult() {
         List<Room> roomToConfirm = roomRepository.findByDeadLineBefore(LocalDateTime.now());
 
