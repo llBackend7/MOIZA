@@ -75,7 +75,7 @@
             <div th:if="${selectedAvailableMembers != null}">
                 <div class="mb-2">참여 멤버</div>
                 <ul class="flex justify-center">
-                    <li th:each="member : ${selectedAvailableMembers}" class="mr-2">
+                    <li th:each="member : ${selectedAvailableMembers}" class="mr-2 flex flex-col items-center justify-center">
                         <img th:src="${member.profile}" width="50" class="mask mask-circle" style="z-index: 0">
                         <div th:text="${member.name}" class="text-center"></div>
                     </li>
@@ -85,8 +85,8 @@
             <div th:if="${selectedUnavailableMembers != null}">
                 <div class="mb-2">참여 불가능 멤버</div>
                 <ul class="flex justify-center">
-                    <li th:each="member : ${selectedUnavailableMembers}" class="mr-2">
-                        <img th:src="${member.profile}" width="50" class="mask mask-circle" style="z-index: 0">
+                    <li th:each="member : ${selectedUnavailableMembers}" class="mr-2 flex flex-col items-center justify-center">
+                        <div><img th:src="${member.profile}" width="50" class="mask mask-circle" style="z-index: 0"></div>
                         <div th:text="${member.name}" class="text-center"></div>
                     </li>
                 </ul>
