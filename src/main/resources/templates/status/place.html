@@ -81,8 +81,10 @@
         </div>
 
         <form class="place-input" th:action th:method="post" onsubmit="return validateInputForm()">
-            <input type="text" name="name" id="place-name" placeholder=" 원하는 장소 입력 후 장소 추가 버튼을 눌러주세요." />
-            <button class="add-place">+ 장소 추가</button>
+            <div class="flex flex-nowrap">
+                <input type="text" name="name" id="place-name" placeholder=" 원하는 장소 입력 후 장소 추가 버튼을 눌러주세요."/>
+                <button class="add-place">추가</button>
+            </div>
         </form>
     </div>
     <script>

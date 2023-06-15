@@ -30,7 +30,7 @@
             <div class="font-gsans w-1/2 flex justify-center text-2xl" th:text="${room.name}"></div>
         </div>
 
-        <div class="date-rank overflow-auto">
+        <div class="date-rank">
 
             <div class="flex justify-center items-center m-2">
                 <div class="text-center text-xl mr-2">
@@ -49,14 +49,18 @@
                 <ul th:if="${!#lists.isEmpty(overlappingTimes)}" class="flex flex-col items-center">
                     <li th:each="time, index : ${overlappingTimes}" class="my-2">
                         <a href="javascript:" onclick="$(this).next().submit();">
-                            <div class="rank font-gsans hover:bg-slate-100 active:bg-slate-200">
-                                <span th:if="${index.index == 0}" class="rank-number text-bold text-xl" style="border: 6px solid #006bce; border-radius: 50%;">1위</span>
-                                <span th:if="${index.index > 0}" th:text="${index.index + 1 + '위'}" class="rank-number text-bold text-lg" style="color: #006bce;"></span>
-                                <span class="rank-content">
-                                <div th:text="${#temporals.format(time.date, 'yyyy년 M월 d일 EEEE')}"></div>
-                                <div th:text="${time.start + ' ~ ' +time.end}" class="ml-5"></div>
-                            </span>
-                                <span><div th:text="${time.participationMembers.size()} + '명 / ' + ${time.participationMembers.size()+time.nonParticipationMembers.size()} + '명'" class="people-number text-sm"></div></span>
+                            <div class="rank flex font-gsans hover:bg-slate-100 active:bg-slate-200">
+                                <div class="p-3 shrink">
+                                    <span th:if="${index.index == 0}" class="rank-number text-bold text-xl" style="border: 6px solid #006bce; border-radius: 50%;">1위</span>
+                                    <span th:if="${index.index > 0}" th:text="${index.index + 1 + '위'}" class="rank-number text-bold text-lg" style="color: #006bce;"></span>
+                                </div>
+                                <div class="flex flex-wrap">
+                                    <div class="rank-content flex flex-grow flex-wrap gap-1">
+                                        <div class="flex-grow" th:text="${#temporals.format(time.date, 'yyyy년 M월 d일 EEEE')}"></div>
+                                        <div th:text="${time.start + ' ~ ' +time.end}"></div>
+                                    </div>
+                                </div>
+                                <div class="people-number text-center text-sm shrink" th:text="${time.participationMembers.size()} + '/' + ${time.participationMembers.size()+time.nonParticipationMembers.size()}"></div>
                             </div>
                         </a>
                         <form hidden th:action="@{|/room/${room.id}/date|}">

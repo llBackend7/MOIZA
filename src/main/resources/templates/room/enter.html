@@ -29,26 +29,25 @@
             </div>
 
             <div class="w-full mt-4">
-                <div class="h-40 flex flex-col items-center justify-center p-5 border border-none rounded-lg bg-white">
+                <div class="h-48 flex flex-col items-center justify-around p-2 border border-none rounded-lg bg-white">
                     <div>
-                        가능한 날짜는
-                        <span id="roomStartDate" class="p-1 text-xl border border-none rounded-lg bg-slate-200" th:text="${room.availableStartDay}"></span>
-                        부터
-                        <span id="roomEndDate" class="p-1 text-xl border border-none rounded-lg bg-slate-200" th:text="${room.availableEndDay}"></span>
-                        까지
+                        <span id="roomStartDate" class="p-1 border border-none rounded-lg bg-slate-200" th:text="${room.availableStartDay}"></span>
+                        <span>부터</span>
+                        <span id="roomEndDate" class="p-1 border border-none rounded-lg bg-slate-200" th:text="${room.availableEndDay}"></span>
+                        <span>사이의 날짜를 골라주세요.</span>
                     </div>
 
                     <div class="mt-2">
                         가능한 시간은
-                        <span id="roomStartTime" class="p-1 text-xl border border-none rounded-lg bg-slate-200" th:text="${room.availableStartTime}"></span>
+                        <span id="roomStartTime" class="p-1 border border-none rounded-lg bg-slate-200" th:text="${room.availableStartTime}"></span>
                         부터
-                        <span id="roomEndTime" class="p-1 text-xl border border-none rounded-lg bg-slate-200" th:text="${room.availableEndTime}"></span>
+                        <span id="roomEndTime" class="p-1 border border-none rounded-lg bg-slate-200" th:text="${room.availableEndTime}"></span>
                         사이에 가능합니다.
                     </div>
 
                     <div class="mt-2">
                         약속 시간은
-                        <span id="roomMeetingDuration" th:text="${room.meetingDuration.getMinute() == 0 ? #temporals.format(room.meetingDuration, 'h시간') : #temporals.format(room.meetingDuration, 'h시간 mm분')}" class="p-1 text-xl border border-none rounded-lg bg-slate-200"></span>
+                        <span id="roomMeetingDuration" th:text="${room.meetingDuration.getMinute() == 0 ? #temporals.format(room.meetingDuration, 'h시간') : #temporals.format(room.meetingDuration, 'h시간 mm분')}" class="p-1 border border-none rounded-lg bg-slate-200"></span>
                         입니다. 시간 범위에 맞게 지정해주세요.
                     </div>
                 </div>
@@ -76,20 +75,20 @@
         function addNewTime() {
             $('#availableTimeList').append(`
             <div name="availableTime" class="flex gap-1 p-2">
-                <div class="w-1/2 flex justify-center gap-2">
-                    <span class="self-center text-center w-1/4 border border-none rounded-lg bg-slate-200 p-1" style="font-family: GmarketSansMedium !important;">날짜</span>
-                    <input required name="date" type="date" class="input input-bordered flex items-center self-center w-4/6">
+                <div class="w-1/2 flex flex-col justify-start gap-2">
+                    <span class="self-center text-center w-full border border-none rounded-lg bg-slate-200 p-1" style="font-family: GmarketSansMedium !important;">날짜</span>
+                    <input required name="date" type="date" class="input input-bordered flex items-center self-center w-full">
                 </div>
 
                 <div class="w-1/2 flex flex-col justify-center items-stretch gap-1">
-                    <div class="w-2/2 flex justify-end mb-2 gap-1">
-                        <span class="self-center border border-none rounded-lg bg-slate-200 p-1" style="font-family: GmarketSansMedium !important;">시작 시간</span>
-                        <select required class="select select-bordered select-sm time-30m-intervals text-center font-gsans w-4/6" name="startTime"></select>
+                    <div class="w-2/2 flex flex-wrap justify-end mb-2 gap-1">
+                        <span class="self-center w-full border border-none rounded-lg bg-slate-200 p-1" style="font-family: GmarketSansMedium !important;">시작 시간</span>
+                        <select required class="select w-full select-bordered select-sm time-30m-intervals text-center font-gsans" name="startTime"></select>
                     </div>
 
-                    <div class="w-2/2 flex justify-end gap-1">
-                      <span class="self-center border border-none rounded-lg bg-slate-200 p-1" style="font-family: GmarketSansMedium !important; ">끝나는 시간</span>
-                      <select required class="select select-bordered select-sm time-30m-intervals text-center font-gsans w-4/6" name="endTime"></select>
+                    <div class="w-2/2 flex flex-wrap justify-end gap-1">
+                      <span class="self-center w-full border border-none rounded-lg bg-slate-200 p-1" style="font-family: GmarketSansMedium !important; ">끝나는 시간</span>
+                      <select required class="select w-full select-bordered select-sm time-30m-intervals text-center font-gsans" name="endTime"></select>
                     </div>
                 </div>
             </div>
