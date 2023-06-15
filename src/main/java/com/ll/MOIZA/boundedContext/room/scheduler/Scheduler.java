@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -75,7 +76,11 @@ public class Scheduler {
                 resultRepository.save(result);
             } catch (DataIntegrityViolationException duplicationEx) {
                 System.out.println("중복된 결과 저장에 대한 예외 발생 처리");
-            } catch (UnexpectedRollbackException ignored) {}
+                return;
+            } catch (UnexpectedRollbackException rollbackEx) {
+                System.out.println("롤백 예외 처리");
+                return;
+            }
 
             try {
                 room.getEnterRoom().forEach(enterRoom -> {
@@ -85,7 +90,9 @@ public class Scheduler {
                 });
                 room.setMailSent(true);
                 roomRepository.save(room);
-            } catch (Exception ignored){}
+            } catch (Exception ex){
+                System.out.println("sendGrid 예외 처리: Maximum credits exceeded");
+            }
         });
     }
 

@@ -95,7 +95,8 @@ public class SelectedTimeService {
             startDay = startDay.plusDays(1);
         }
 
-        Collections.sort(timeRangeWithMembers);
+        if(!timeRangeWithMembers.isEmpty())
+            Collections.sort(timeRangeWithMembers);
 
         if (timeRangeWithMembers.size() > 10) {
             return new ArrayList<>(timeRangeWithMembers.subList(0, 10));

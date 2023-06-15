@@ -80,8 +80,14 @@
 
                     <div th:if="${room.deadLine.isBefore(#temporals.createNow())}" class="h-full p-7">
                         <div class="h-1/5 mx-4 text-sm font-gsans">
-                            <div th:if="${room.getLeader() == member}"  class="flex justify-between">
+                            <div th:if="${room.getLeader() == member}" class="flex justify-between">
                                 <span>내가 만든 모임</span>
+                                <a href="javascript:" onclick="if(confirm('모임을 삭제하시겠습니까?')) $(this).next().submit();">X</a>
+                                <form hidden th:action="@{|/${room.id}|}" method="POST">
+                                    <input type="hidden" name="_method" value="delete">
+                                </form>
+                            </div>
+                            <div th:if="${room.getLeader() != member}" class="flex justify-end">
                                 <a href="javascript:" onclick="if(confirm('모임을 삭제하시겠습니까?')) $(this).next().submit();">X</a>
                                 <form hidden th:action="@{|/${room.id}|}" method="POST">
                                     <input type="hidden" name="_method" value="delete">
