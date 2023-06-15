@@ -72,7 +72,7 @@ class SelectedTimeServiceTest {
     }
 
     @ParameterizedTest(name = "{index} - 기준 1~5시 시간:{0} 끝:{1}")
-    @CsvSource({"1, 5", "1, 3", "3, 5"})
+    @CsvSource({"1, 5", "1, 4", "2, 5"})
     void 시간_선택(int st, int et) {
 
         SelectedTime selectedTime = selectedTimeService.CreateSelectedTime(

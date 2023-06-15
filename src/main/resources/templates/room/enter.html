@@ -215,6 +215,17 @@
                 toastr["warning"](pureMsg, "경고");
             }
         }
+
+        $(document).ready(function () {
+            const urlParams = new URLSearchParams(window.location.search);
+            const message = urlParams.get('message');
+
+            console.log(message);
+
+            if (message != null) {
+                toastWarning(message);
+            }
+        })
     </script>
 </main>
 <footer layout:fragment="footer" class="hidden"></footer>

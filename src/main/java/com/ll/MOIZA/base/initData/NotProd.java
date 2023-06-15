@@ -152,7 +152,7 @@ public class NotProd {
             selectedTimeService.CreateSelectedTime(
                     LocalDate.now().plusDays(6),
                     LocalTime.of(15, 0),
-                    LocalTime.of(17, 0),
+                    LocalTime.of(18, 0),
                     enterRoom2
             );
 
@@ -166,7 +166,7 @@ public class NotProd {
             selectedTimeService.CreateSelectedTime(
                     LocalDate.now().plusDays(5),
                     LocalTime.of(15, 0),
-                    LocalTime.of(17, 0),
+                    LocalTime.of(18, 0),
                     enterRoom2
             );
 
