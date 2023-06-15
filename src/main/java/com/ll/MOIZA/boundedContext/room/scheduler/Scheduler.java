@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
@@ -42,6 +43,12 @@ public class Scheduler {
         List<Room> roomToConfirm = roomRepository.findByDeadLineBeforeAndMailSentFalse(LocalDateTime.now());
 
         roomToConfirm.forEach(room -> {
+            Optional<DecidedResult> existResult = resultRepository.findByRoomId(room.getId());
+            if(existResult.isPresent()) {
+                System.out.println("해당 모임에 대한 결과가 저장되어 있습니다.");
+                return;
+            }
+
             List<TimeRangeWithMember> overlappingTimes = selectedTimeService.findOverlappingTimeRanges(room);
             LocalDateTime decidedDateTime = null;
             TimeRangeWithMember timeRangeWithMember = null;
