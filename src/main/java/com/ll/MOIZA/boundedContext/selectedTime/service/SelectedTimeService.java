@@ -73,6 +73,11 @@ public class SelectedTimeService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "선택할 수 있는 시간이 아닙니다. 선택한 시간이 가능한 시간보다 늦습니다.");
         }
+        if (endTime.minusHours(startTime.getHour()).minusMinutes(startTime.getMinute())
+                .isBefore(room.getMeetingDuration())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "선택할 수 있는 시간이 아닙니다. 미팅 진행 시간보다 짧은 시간입니다.");
+        }
     }
 
     public List<SelectedTime> findSelectedTimeByRoomAndDate(Room room, LocalDate date) {
