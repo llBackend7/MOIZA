@@ -42,7 +42,6 @@ $(document).ready(function () {
 
 $(document).ready(function () {
     $('form').on('submit', function (e) {
-        e.preventDefault(); // 폼 제출의 기본 동작을 방지합니다.
         if (setDurationValue()) {
             return false;
         }
@@ -56,19 +55,7 @@ $(document).ready(function () {
         let endTime = $('#availableEndTime').val();
         let deadLine = $('#deadLine').val();
 
-        if (validateTimes(startDate, endDate, name, description, duration, startTime, endTime, deadLine)) {
-            $.ajax({
-                type: $(this).attr('method'),
-                url: $(this).attr('action'),
-                data: $(this).serialize(),
-                success: function () {
-                    $('form').off('submit').submit();
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    console.error(textStatus, errorThrown);
-                }
-            });
-        }
+        return validateTimes(startDate, endDate, name, description, duration, startTime, endTime, deadLine);
     });
 });
 
