@@ -2,6 +2,7 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.1.0'
 	id 'io.spring.dependency-management' version '1.1.0'
+	id 'jacoco'
 }
 
 group = 'com.ll'
@@ -16,6 +17,45 @@ configurations {
 
 repositories {
 	mavenCentral()
+}
+
+jacoco {
+	toolVersion = "0.8.8"
+}
+
+jacocoTestReport {
+	reports {
+		xml.enabled false
+		csv.enabled false
+		html.destination file("${buildDir}/jacocoHtml")
+		finalizedBy 'jacocoTestCoverageVerification'
+	}
+}
+
+jacocoTestCoverageVerification {
+	violationRules {
+		rule {
+			enabled = true
+			element = 'CLASS'
+			limit {
+				counter = 'LINE'
+				value = 'COVEREDRATIO'
+				minimum = 0.75
+			}
+			includes = [
+					'*.RoomController',
+					'*.HomeController',
+					'*.ChatController',
+					'*.SelectedTimeService',
+					'*.MemberService',
+					'*.RoomService',
+					'*.ResultService',
+					'*.ChatService',
+					'*.ChatService',
+					'*.SelectedPlaceService'
+			]
+		}
+	}
 }
 
 dependencies {
@@ -58,4 +98,5 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy 'jacocoTestReport'
 }
