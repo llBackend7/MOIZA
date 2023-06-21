@@ -25,5 +25,7 @@ spring:
   thymeleaf:
     prefix: classpath:/templates/
 custom:
+  mail:
+    sender: mouse4786@gmail.com
   site:
     baseUrl:

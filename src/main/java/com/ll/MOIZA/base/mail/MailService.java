@@ -8,6 +8,7 @@ import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,6 +18,9 @@ import java.io.IOException;
 public class MailService {
 
     private final SendGrid sg;
+
+    @Value("${custom.mail.sender}")
+    private String mailSender;
 
     public void sendMailTo(Member to, String content) {
         Mail mail = buildMail(to.getEmail(), content);
@@ -34,7 +38,7 @@ public class MailService {
     }
 
     private Mail buildMail(String userEmail, String mailContents) {
-        Email from = new Email("mouse4786@gmail.com");
+        Email from = new Email(mailSender);
         String subject = "[MOIZA] 모이자에서 발송한 메일입니다.";
         Email to = new Email(userEmail);
         Content content = new Content("text/html", mailContents);

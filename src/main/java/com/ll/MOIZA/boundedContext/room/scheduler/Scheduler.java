@@ -117,7 +117,7 @@ public class Scheduler {
         context.setVariable("roomName", roomName);
         context.setVariable("id", id);
 
-        String content = templateEngine.process("/mail/mail-template", context);
+        String content = templateEngine.process("mail/mail-template", context);
         return content;
     }
 }
