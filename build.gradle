@@ -30,6 +30,19 @@ jacocoTestReport {
 		html.destination file("${buildDir}/jacocoHtml")
 		finalizedBy 'jacocoTestCoverageVerification'
 	}
+
+	afterEvaluate {
+		classDirectories.setFrom(files(classDirectories.files.collect {
+			fileTree(dir: it,
+					exclude: [
+							'**/entity/**',
+							'**/repository/**',
+							'**/form/**',
+							'**/document/**',
+							'**/base/**'
+					])
+		}))
+	}
 }
 
 jacocoTestCoverageVerification {
