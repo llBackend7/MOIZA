@@ -11,6 +11,7 @@ import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -136,6 +137,20 @@ public class MockedRoomControllerTest {
         boolean hasAuthority = Boolean.parseBoolean(mvcResult.getResponse().getContentAsString());
 
         assertThat(hasAuthority).isTrue();
+    }
+
+    @Test
+    @WithMockUser
+    @DisplayName("방 초대 테스트")
+    void inviteTest() throws Exception {
+        Room dummyRoom = new Room();
+
+        when(roomService.getRoom(anyLong())).thenReturn(dummyRoom);
+        when(roomService.getAccessToken(any(Room.class))).thenReturn("ACCESS_TOKEN");
+
+        mockMvc.perform(get("/room/1/invite"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("home/invite"));
     }
 
     /**
