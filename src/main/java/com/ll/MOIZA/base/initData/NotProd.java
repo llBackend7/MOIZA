@@ -28,6 +28,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 
@@ -44,13 +45,16 @@ public class NotProd {
             ResultService resultService,
 
             MongoTemplate mongoTemplate,
-            //RedisTemplate<String, Chat> redisTemplate,
+            RedisTemplate<String, Chat> redisTemplate,
             ChatService chatService
 
     ) {
         return args -> {
             mongoTemplate.dropCollection("chat");
-            //redisTemplate.delete("ROOM#1_CHAT");
+            try{
+                redisTemplate.delete("ROOM#1_CHAT");
+            }catch (RedisConnectionFailureException e){}
+
 
             Member member1 = Member.builder().name("user1").email("user1@email.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
             Member member2 = Member.builder().name("user2").email("user2@email.com").profile("http://k.kakaocdn.net/dn/dpk9l1/btqmGhA2lKL/Oz0wDuJn1YV2DIn92f6DVK/img_640x640.jpg").build();
@@ -96,18 +100,22 @@ public class NotProd {
                         .build();
                 mongoTemplate.save(chat);
             }
-//            ZSetOperations<String, Chat> ops = redisTemplate.opsForZSet();
-//            for (int i = 0; i < 100; i++) {
-//                Chat chat = Chat.builder()
-//                        .roomId("1")
-//                        .writer("user1")
-//                        .memberId("1")
-//                        .content("테스트 채팅 레디스db#%d".formatted(i))
-//                        .createDate(LocalDateTime.now())
-//                        .modifyDate(LocalDateTime.now())
-//                        .build();
-//                ops.add("ROOM#1_CHAT", chat, -chat.getCreateDate().toInstant(ZoneOffset.UTC).toEpochMilli());
-//            }
+
+            try{
+                ZSetOperations<String, Chat> ops = redisTemplate.opsForZSet();
+                for (int i = 0; i < 100; i++) {
+                    Chat chat = Chat.builder()
+                            .roomId("1")
+                            .writer("user1")
+                            .memberId("1")
+                            .content("테스트 채팅 레디스db#%d".formatted(i))
+                            .createDate(LocalDateTime.now())
+                            .modifyDate(LocalDateTime.now())
+                            .build();
+                    ops.add("ROOM#1_CHAT", chat, -chat.getCreateDate().toInstant(ZoneOffset.UTC).toEpochMilli());
+                }
+            }catch (RedisConnectionFailureException e){}
+
 
             selectedTimeService.CreateSelectedTime(
                     LocalDate.now().plusDays(6),

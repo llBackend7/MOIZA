@@ -1,16 +1,20 @@
 package com.ll.MOIZA.boundedContext.chat.service;
 
 import com.ll.MOIZA.boundedContext.chat.document.Chat;
+import com.ll.MOIZA.boundedContext.chat.repository.CachedChatRepository;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Slice;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.redis.RedisConnectionFailureException;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +36,16 @@ class ChatServiceTest {
     @Autowired
     MongoTemplate mongoTemplate;
 
+    @Autowired
+    CachedChatRepository cachedChatRepository;
+
+    @BeforeEach
     @AfterEach
     void 클리어() {
         mongoTemplate.dropCollection("chat");
+        try {
+            cachedChatRepository.clear("1");
+        }catch (RedisConnectionFailureException e){}
     }
 
     @Test

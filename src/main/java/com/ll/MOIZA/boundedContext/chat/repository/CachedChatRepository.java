@@ -8,6 +8,7 @@ import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Repository;
@@ -41,14 +42,19 @@ public class CachedChatRepository {
 
         String key = getKey(chat.getRoomId());
 
-        operations.add(key, chat, -chat.getCreateDate().toInstant(ZoneOffset.UTC).toEpochMilli());
+        try {
+            operations.add(key, chat, -chat.getCreateDate().toInstant(ZoneOffset.UTC).toEpochMilli());
 
-        //TODO MAX_CHATS 넘으면 벌크삽입
-        if (operations.size(key) >= MAX_CACHE) {
-            Set<Chat> half = operations.range(key, MAX_CACHE / 2, -1);
-            operations.removeRange(key, MAX_CACHE / 2, -1);
-            chatRepository.saveAll(half);
+            //MAX_CHATS 넘으면 벌크삽입
+            if (operations.size(key) >= MAX_CACHE) {
+                Set<Chat> half = operations.range(key, MAX_CACHE / 2, -1);
+                operations.removeRange(key, MAX_CACHE / 2, -1);
+                chatRepository.saveAll(half);
+            }
+        }catch (RedisConnectionFailureException e){
+            chatRepository.save(chat);
         }
+
         return chat;
     }
 
@@ -63,17 +69,16 @@ public class CachedChatRepository {
             if (currentCursorId != null) {
                 deserializedCursor = objectMapper.readValue(currentCursorId, Chat.class);
             }
-        } catch (JsonProcessingException e) {
+            // 커서의 위치를 찾기 위해 커서 이전까지의 개수를 구함
+            Long offset = getOffset(key, deserializedCursor);
+
+            chats = fetchFromCache(key, offset);
+        } catch (JsonProcessingException | RedisConnectionFailureException e) {
             // 이 경우 cursor는 redis의 value가 아니라 몽고db의 다큐멘트 id임.
             FetchedResult fetchedResult = fetchFromDb(PAGE_SIZE, roomId, currentCursorId);
 
             return Cursor.of(fetchedResult.fetchedChat, fetchedResult.hasNext, fetchedResult.nextCursorId);
         }
-
-        // 커서의 위치를 찾기 위해 커서 이전까지의 개수를 구함
-        Long offset = getOffset(key, deserializedCursor);
-
-        chats = fetchFromCache(key, offset);
 
         // 몽고db에서 데이터를 더 긁어와야하는지 판단
         if (chats.size() > PAGE_SIZE) {
@@ -103,7 +108,7 @@ public class CachedChatRepository {
         List<Chat> chatsFromDb;
         FetchedResult fetchedResult = new FetchedResult();
 
-        if (size == PAGE_SIZE) {
+        if (size == PAGE_SIZE && cursorId != null) {
             chatsFromDb = chatRepository.findByRoomIdWithCursor(roomId, new ObjectId(cursorId), pageable);
         }else{
             chatsFromDb = chatRepository.findByRoomId(roomId, pageable);
