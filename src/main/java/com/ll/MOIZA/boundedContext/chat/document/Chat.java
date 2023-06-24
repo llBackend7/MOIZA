@@ -1,5 +1,6 @@
 package com.ll.MOIZA.boundedContext.chat.document;
 
+import com.ll.MOIZA.base.entity.Identifiable;
 import jakarta.persistence.EntityListeners;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -17,7 +18,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @EntityListeners(AuditingEntityListener.class)
-public class Chat implements Comparable<Chat>{
+public class Chat implements Comparable<Chat>, Identifiable<String> {
     @Id
     private String id;
 

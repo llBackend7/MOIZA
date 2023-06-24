@@ -47,7 +47,7 @@ public class ChatController {
 
     @PreAuthorize("isAuthenticated() && hasAuthority('ROOM#' + #roomId + '_MEMBER')")
     @GetMapping("/chats")
-    public Cursor<Chat> loadChats(@RequestParam(required = false) String nextCursor, @RequestParam Long roomId) {
+    public Cursor<Chat, String> loadChats(@RequestParam(required = false) String nextCursor, @RequestParam Long roomId) {
         Room room = roomService.getRoom(roomId);
         return chatService.getChats(room, nextCursor);
     }

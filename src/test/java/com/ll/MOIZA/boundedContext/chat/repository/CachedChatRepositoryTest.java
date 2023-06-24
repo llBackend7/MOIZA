@@ -10,10 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.IntStream;
 
@@ -66,13 +63,13 @@ class CachedChatRepositoryTest {
             cachedChatRepository.save(testChat);
         }
 
-        Cursor<Chat> first = cachedChatRepository.findByRoom("TEST", null);
-        Cursor<Chat> second = cachedChatRepository.findByRoom("TEST", first.getNextCursor());
+        Cursor<Chat, String> first = cachedChatRepository.findByRoom("TEST", null);
+        Cursor<Chat, String> second = cachedChatRepository.findByRoom("TEST", first.getNextCursorId());
         Chat testChat1 = Chat.builder().roomId("TEST").content("새로운채팅1").build();
         cachedChatRepository.save(testChat1);
         Chat testChat2 = Chat.builder().roomId("TEST").content("새로운채팅2").build();
         cachedChatRepository.save(testChat2);
-        Cursor<Chat> third = cachedChatRepository.findByRoom("TEST", second.getNextCursor());
+        Cursor<Chat, String> third = cachedChatRepository.findByRoom("TEST", second.getNextCursorId());
 
         assertThat(first).hasSize(20);
         assertThat(first.hasNext()).isTrue();
@@ -110,10 +107,10 @@ class CachedChatRepositoryTest {
             cachedChatRepository.save(testChat);
         }
                                                                                                      // redis        mongo
-        Cursor<Chat> first = cachedChatRepository.findByRoom("TEST", null);            // 34 ~ 15
-        Cursor<Chat> second = cachedChatRepository.findByRoom("TEST", first.getNextCursor()); // 14 ~ 0       29~25
-        Cursor<Chat> third = cachedChatRepository.findByRoom("TEST", second.getNextCursor()); //              24~5
-        Cursor<Chat> fourth = cachedChatRepository.findByRoom("TEST", third.getNextCursor()); //              4 ~ 0   noNext
+        Cursor<Chat, String> first = cachedChatRepository.findByRoom("TEST", null);            // 34 ~ 15
+        Cursor<Chat, String> second = cachedChatRepository.findByRoom("TEST", first.getNextCursorId()); // 14 ~ 0       29~25
+        Cursor<Chat, String> third = cachedChatRepository.findByRoom("TEST", second.getNextCursorId()); //              24~5
+        Cursor<Chat, String> fourth = cachedChatRepository.findByRoom("TEST", third.getNextCursorId()); //              4 ~ 0   noNext
 
         assertMemberIdStream(first, 15 ,35);
         int[] memberIds = second.stream().mapToInt(this::memberIdOfChat).toArray();
@@ -124,7 +121,7 @@ class CachedChatRepositoryTest {
         assertThat(fourth.hasNext()).isFalse();
     }
 
-    private void assertMemberIdStream(Cursor<Chat> first, int small, int big) {
+    private void assertMemberIdStream(Cursor<Chat, String> first, int small, int big) {
         assertThat(first.stream().mapToInt(this::memberIdOfChat).toArray()).isEqualTo(descendingStream(small, big).toArray());
     }
 

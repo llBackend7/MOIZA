@@ -29,7 +29,7 @@ public class ChatService {
     }
 
 
-    public Cursor<Chat> getChats(Room room, String cursor) {
+    public Cursor<Chat, String> getChats(Room room, String cursor) {
         return chatRepository.findByRoom(room.getId().toString(), cursor);
     }
 

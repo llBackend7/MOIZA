@@ -23,7 +23,7 @@ import static jakarta.persistence.GenerationType.IDENTITY;
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
 @ToString
-public abstract class BaseEntity {
+public abstract class BaseEntity implements Identifiable<Long> {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;

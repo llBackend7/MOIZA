@@ -4,8 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ll.MOIZA.boundedContext.chat.document.Chat;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
+import lombok.*;
 import org.bson.types.ObjectId;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -54,76 +53,88 @@ public class CachedChatRepository {
     }
 
     @SneakyThrows
-    public Cursor<Chat> findByRoom(String roomId, String cursor) {
+    public Cursor<Chat, String> findByRoom(String roomId, String currentCursorId) {
         String key = getKey(roomId);
 
         List<Chat> chats;
-        boolean hasNext;
-        String nextCursor;
 
+        Chat deserializedCursor = null;
         try {
-            Chat deserializedCursor = null;
-
-            if (cursor != null) {
-                deserializedCursor = objectMapper.readValue(cursor, Chat.class);
-            }
-
-            // 커서의 위치를 찾기 위해 커서 이전까지의 개수를 구함
-            Long offset = getOffset(key, deserializedCursor);
-
-            Set<Chat> chatSet = Optional.ofNullable(operations.range(key, offset, offset + PAGE_SIZE))
-                    .orElse(new LinkedHashSet<>());
-
-            hasNext = chatSet.size() > PAGE_SIZE;
-            chats = new ArrayList<>(chatSet);
-            int contetSize = chats.size() - 1;
-            Chat nextCursorChat;
-            if (contetSize >= 0) {
-                nextCursorChat = chats.get(contetSize);
-            } else {
-                nextCursorChat = new Chat();
-            }
-            nextCursor = objectMapper.writeValueAsString(nextCursorChat);
-
-            if (hasNext) {
-                chats = chats.subList(0, PAGE_SIZE);
-            } else {
-                // db에서 데이터 긁어와서 붙이기
-                int deficiency = PAGE_SIZE - chats.size();
-
-                Pageable pageable = PageRequest.of(0, deficiency + 1);
-
-                List<Chat> appendChats;
-                appendChats = chatRepository.findByRoomId(roomId, pageable);
-
-                if (appendChats.size() == deficiency + 1) {
-                    hasNext = true;
-                    nextCursor = appendChats.get(deficiency).getId();
-                    appendChats = appendChats.subList(0, deficiency);
-                } else {
-                    hasNext = false;
-                    nextCursor = null;
-                }
-
-                chats.addAll(appendChats);
+            if (currentCursorId != null) {
+                deserializedCursor = objectMapper.readValue(currentCursorId, Chat.class);
             }
         } catch (JsonProcessingException e) {
             // 이 경우 cursor는 redis의 value가 아니라 몽고db의 다큐멘트 id임.
-            Pageable pageable = PageRequest.of(0, PAGE_SIZE + 1);
-            chats = chatRepository.findByRoomIdWithCursor(roomId, new ObjectId(cursor), pageable);
+            FetchedResult fetchedResult = fetchFromDb(PAGE_SIZE, roomId, currentCursorId);
 
-            if (chats.size() == PAGE_SIZE + 1) {
-                hasNext = true;
-                nextCursor = chats.get(PAGE_SIZE).getId();
-                chats = chats.subList(0, PAGE_SIZE);
-            } else {
-                hasNext = false;
-                nextCursor = null;
-            }
+            return Cursor.of(fetchedResult.fetchedChat, fetchedResult.hasNext, fetchedResult.nextCursorId);
         }
 
+        // 커서의 위치를 찾기 위해 커서 이전까지의 개수를 구함
+        Long offset = getOffset(key, deserializedCursor);
 
-        return new Cursor<>(chats, PageRequest.of(0, PAGE_SIZE), hasNext, nextCursor);
+        chats = fetchFromCache(key, offset);
+
+        // 몽고db에서 데이터를 더 긁어와야하는지 판단
+        if (chats.size() > PAGE_SIZE) {
+            Chat nextCursorChat = getNextCursorChat(chats);
+            String nextCursorId = objectMapper.writeValueAsString(nextCursorChat);
+            chats = chats.subList(0, PAGE_SIZE);
+
+            return new Cursor<>(chats, PageRequest.of(0, PAGE_SIZE), true, nextCursorId);
+        }
+
+        // db에서 데이터 긁어와서 붙이기
+        int deficiency = PAGE_SIZE - chats.size();
+        FetchedResult fetchedResult = fetchFromDb(deficiency, roomId, currentCursorId);
+
+        chats.addAll(fetchedResult.fetchedChat);
+        return Cursor.of(chats, fetchedResult.hasNext, fetchedResult.nextCursorId);
+    }
+
+    private static class FetchedResult{
+        boolean hasNext;
+        String nextCursorId;
+        List<Chat> fetchedChat = new ArrayList<>();
+    }
+
+    private FetchedResult fetchFromDb(int size, String roomId,  String cursorId){
+        Pageable pageable = PageRequest.of(0, size + 1);
+        List<Chat> chatsFromDb;
+        FetchedResult fetchedResult = new FetchedResult();
+
+        if (size == PAGE_SIZE) {
+            chatsFromDb = chatRepository.findByRoomIdWithCursor(roomId, new ObjectId(cursorId), pageable);
+        }else{
+            chatsFromDb = chatRepository.findByRoomId(roomId, pageable);
+        }
+        fetchedResult.fetchedChat = chatsFromDb;
+
+
+        if (chatsFromDb.size() == size + 1) {
+            fetchedResult.hasNext = true;
+            fetchedResult.nextCursorId = chatsFromDb.get(size).getId();
+            fetchedResult.fetchedChat = chatsFromDb.subList(0, size);
+        }
+
+        return fetchedResult;
+    }
+
+    private ArrayList<Chat> fetchFromCache(String key, Long offset) {
+        return new ArrayList<>(Optional.ofNullable(operations.range(key, offset, offset + PAGE_SIZE))
+                .orElse(new LinkedHashSet<>()));
+    }
+
+    private Chat getNextCursorChat(List<Chat> chats) {
+        Chat nextCursorChat;
+        int lastIndex = chats.size() - 1;
+
+        if (lastIndex >= 0) {
+            nextCursorChat = chats.get(lastIndex);
+        } else {
+            nextCursorChat = new Chat();
+        }
+        return nextCursorChat;
     }
 
     private Long getOffset(String key, Chat deserializedCursor) {
