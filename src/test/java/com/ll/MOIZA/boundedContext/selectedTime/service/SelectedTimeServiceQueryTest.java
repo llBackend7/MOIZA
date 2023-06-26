@@ -3,51 +3,46 @@ package com.ll.MOIZA.boundedContext.selectedTime.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.ll.MOIZA.base.initData.NotProd;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
-import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
+import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
-import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
-import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
-import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
-import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
+import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.context.annotation.Import;
 
 @SpringBootTest
-@Transactional
 @ActiveProfiles("test")
+@Transactional
+@Import(NotProd.class)
 public class SelectedTimeServiceQueryTest {
 
     @Autowired
+    MemberService memberService;
+    @Autowired
+    RoomService roomService;
+    @Autowired
     SelectedTimeService selectedTimeService;
 
-    @Autowired
-    SelectedTimeRepository selectedTimeRepository;
+    static Room room;
 
-    @Autowired
-    EnterRoomService enterRoomService;
+    @BeforeEach
+    void init() {
+        room = roomService.getRoom(1L);
+    }
 
-    @Autowired
-    EnterRoomRepository enterRoomRepository;
-
-
-    @Autowired
-    MemberRepository memberRepository;
-
-    @Autowired
-    RoomRepository roomRepository;
-
-    @Test
     @DisplayName("조회_선택_날짜")
-    void select_seleted_time_by_day() {
-        Room room = roomRepository.getReferenceById(1L);
+    @Test
+    void select_selected_time_by_day() {
         assertThat(selectedTimeService.findSelectedTimeByRoomAndDate(
                 room, LocalDate.now().plusDays(6)).size()).isEqualTo(6);
     }
@@ -55,10 +50,9 @@ public class SelectedTimeServiceQueryTest {
     @Test
     @DisplayName("겹치는_시간_조회")
     void findOverlappingTimeRanges_test() {
-        Member member1 = memberRepository.findByName("user1").get();
-        Member member2 = memberRepository.findByName("user2").get();
-        Member member3 = memberRepository.findByName("으네").get();
-        Room room = roomRepository.getReferenceById(1L);
+        Member member1 = memberService.findByName("user1");
+        Member member2 = memberService.findByName("user2");
+        Member member3 = memberService.findByName("으네");
 
         List<TimeRangeWithMember> overlappingRanges = selectedTimeService.findOverlappingTimeRanges(
                 room, LocalDate.now().plusDays(6)
@@ -97,11 +91,9 @@ public class SelectedTimeServiceQueryTest {
     @Test
     @DisplayName("전체_겹치는_시간_조회")
     void all_findOverlappingTimeRanges_test() {
-        Member member1 = memberRepository.findByName("user1").get();
-        Member member2 = memberRepository.findByName("user2").get();
-        Member member3 = memberRepository.findByName("으네").get();
-
-        Room room = roomRepository.getReferenceById(1L);
+        Member member1 = memberService.findByName("user1");
+        Member member2 = memberService.findByName("user2");
+        Member member3 = memberService.findByName("으네");
 
         List<TimeRangeWithMember> overlappingRanges = selectedTimeService.findOverlappingTimeRanges(
                 room);
