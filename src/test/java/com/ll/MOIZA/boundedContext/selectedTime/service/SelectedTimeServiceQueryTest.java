@@ -13,6 +13,7 @@ import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepositor
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -44,14 +45,16 @@ public class SelectedTimeServiceQueryTest {
     RoomRepository roomRepository;
 
     @Test
-    void 조회_선택_날짜() {
+    @DisplayName("조회_선택_날짜")
+    void select_seleted_time_by_day() {
         Room room = roomRepository.getReferenceById(1L);
-        System.out.println(selectedTimeService.findSelectedTimeByRoomAndDate(
-                room, LocalDate.now().plusDays(6)).size());
+        assertThat(selectedTimeService.findSelectedTimeByRoomAndDate(
+                room, LocalDate.now().plusDays(6)).size()).isEqualTo(6);
     }
 
     @Test
-    void 겹치는_시간_조회() {
+    @DisplayName("겹치는_시간_조회")
+    void findOverlappingTimeRanges_test() {
         Member member1 = memberRepository.findByName("user1").get();
         Member member2 = memberRepository.findByName("user2").get();
         Member member3 = memberRepository.findByName("으네").get();
@@ -92,7 +95,8 @@ public class SelectedTimeServiceQueryTest {
     }
 
     @Test
-    void 전체_겹치는_시간_조회() {
+    @DisplayName("전체_겹치는_시간_조회")
+    void all_findOverlappingTimeRanges_test() {
         Member member1 = memberRepository.findByName("user1").get();
         Member member2 = memberRepository.findByName("user2").get();
         Member member3 = memberRepository.findByName("으네").get();
