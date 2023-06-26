@@ -73,7 +73,7 @@ public class HomeController {
 
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/leave")
-    public String deleteGroup(@RequestParam Long roomId, @AuthenticationPrincipal User user){
+    public String leaveGroup(@RequestParam Long roomId, @AuthenticationPrincipal User user){
         Room room = roomService.getRoom(roomId);
         Member member = memberService.findByName(user.getUsername());
         enterRoomService.leaveEnterRoom(room, member);

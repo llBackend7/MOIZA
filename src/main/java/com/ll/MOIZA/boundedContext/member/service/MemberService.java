@@ -51,7 +51,7 @@ public class MemberService {
             return join(nickname, profile, email);
     }
 
-    private Member join(String nickname, String profile, String email) {
+    public Member join(String nickname, String profile, String email) {
         Member member = Member.builder()
                 .name(nickname)
                 .email(email)
