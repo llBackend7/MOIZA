@@ -13,7 +13,6 @@ import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -26,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.util.LinkedMultiValueMap;
@@ -41,9 +41,8 @@ import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
 
-
-import static org.hamcrest.Matchers.is;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -52,7 +51,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(controllers = {RoomController.class, GlobalExceptionHandler.class})
 @AutoConfigureDataMongo
-@Import(MockedRoomControllerTest.TestController.class)
+@Import({MockedRoomControllerTest.TestController.class})
 @MockBean({JpaMetamodelMappingContext.class, SpringDataMongoDB.class})
 public class MockedRoomControllerTest {
     @Autowired
@@ -151,6 +150,21 @@ public class MockedRoomControllerTest {
         mockMvc.perform(get("/room/1/invite"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("home/invite"));
+    }
+
+    @Test
+    @WithMockUser(authorities = "ROOM#1_MEMBER")
+    @DisplayName("채팅방 페이지 보여주기")
+    void showRoomChat() throws Exception {
+        Room dummyRoom = Room.builder().id(1l).leader(new Member()).build();
+        Member dummyActor = new Member();
+
+        when(roomService.getRoom(anyLong())).thenReturn(dummyRoom);
+        when(memberService.loginMember(any(User.class))).thenReturn(dummyActor);
+
+        mockMvc.perform(get("/room/1/chat"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("status/chat"));
     }
 
     /**
