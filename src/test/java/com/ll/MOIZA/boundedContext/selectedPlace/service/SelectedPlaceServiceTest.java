@@ -10,6 +10,8 @@ import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import com.ll.MOIZA.boundedContext.selectedPlace.repository.SelectedPlaceRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,9 +21,11 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import org.springframework.web.server.ResponseStatusException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @Transactional
@@ -48,10 +52,13 @@ class SelectedPlaceServiceTest {
     @Autowired
     MemberRepository memberRepository;
 
-    @Test
-    void 장소_선택() {
-        Member member = memberRepository.findByName("user1").get();
-        Room room = roomService.createRoom(
+    static Member member;
+    static Room room;
+    static EnterRoom enterRoom;
+    @BeforeEach
+    void before_test() {
+        member = memberRepository.findByName("user1").get();
+        room = roomService.createRoom(
                 member,
                 "테스트룸",
                 "테스트룸임",
@@ -62,13 +69,21 @@ class SelectedPlaceServiceTest {
                 LocalTime.of(3, 0),
                 LocalDateTime.now().plusDays(2));
 
-        EnterRoom enterRoom = enterRoomService.createEnterRoom(room, member);
+        enterRoom = enterRoomService.createEnterRoom(room, member);
+    }
+
+    @Test
+    @DisplayName("장소_선택")
+    void select_place_test() {
 
         SelectedPlace selectedPlace = selectedPlaceService.CreateSelectedPlace("테스트 장소", enterRoom);
 
         assertAll(
                 () -> assertThat(selectedPlace.getName()).isEqualTo("테스트 장소"),
-                () -> assertThat(selectedPlace.getEnterRoom().getId()).isEqualTo(enterRoom.getId())
+                () -> assertThat(selectedPlace.getEnterRoom().getId()).isEqualTo(enterRoom.getId()),
+                () -> assertThrows(ResponseStatusException.class, () -> {
+                    selectedPlaceService.CreateSelectedPlace("테스트 장소", enterRoom);
+                })
         );
     }
 }
