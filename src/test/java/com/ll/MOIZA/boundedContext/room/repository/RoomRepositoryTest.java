@@ -1,6 +1,7 @@
 package com.ll.MOIZA.boundedContext.room.repository;
 
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

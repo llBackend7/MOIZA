@@ -4,6 +4,7 @@ import com.ll.MOIZA.boundedContext.member.entity.Member;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -11,6 +12,7 @@ import java.util.List;
 
 @Getter
 @Setter
+@SuperBuilder
 @AllArgsConstructor
 public class TimeRangeWithMember implements Comparable<TimeRangeWithMember> {
 

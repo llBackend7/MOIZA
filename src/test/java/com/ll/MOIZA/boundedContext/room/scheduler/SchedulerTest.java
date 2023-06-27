@@ -2,25 +2,43 @@ package com.ll.MOIZA.boundedContext.room.scheduler;
 
 import com.ll.MOIZA.base.mail.MailService;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
+import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
 import com.ll.MOIZA.boundedContext.result.repository.ResultRepository;
 import com.ll.MOIZA.boundedContext.result.service.ResultService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
+import com.ll.MOIZA.boundedContext.room.scheduler.Scheduler;
+import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
+import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.UnexpectedRollbackException;
+import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.lang.reflect.Field;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
+import java.time.LocalTime;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.mockito.Mockito.*;
 
+@SpringBootTest
+@Transactional
+@ActiveProfiles("test")
 class SchedulerTest {
     List<Room> roomToMailSend;
 
@@ -77,7 +95,7 @@ class SchedulerTest {
     }
 
     @Test
-    void testCheckConfirmedRoom() {
+    void testCheckConfirmedRoomAndSendMail() {
         RoomRepository roomRepository = Mockito.mock(RoomRepository.class);
         MailService mailService = Mockito.mock(MailService.class);
         SpringTemplateEngine templateEngine = Mockito.mock(SpringTemplateEngine.class);
@@ -85,10 +103,10 @@ class SchedulerTest {
         SelectedPlaceService selectedPlaceService = Mockito.mock(SelectedPlaceService.class);
         ResultRepository resultRepository = Mockito.mock(ResultRepository.class);
 
-        Mockito.when(roomRepository.findByDeadLineBeforeAndMailSentFalse(Mockito.any(LocalDateTime.class)))
+        when(roomRepository.findByDeadLineBeforeAndMailSentFalse(Mockito.any(LocalDateTime.class)))
                 .thenReturn(roomToMailSend);
 
-        Mockito.when(templateEngine.process(Mockito.anyString(), Mockito.any()))
+        when(templateEngine.process(Mockito.anyString(), Mockito.any()))
                 .thenReturn("메일내용");
 
         Scheduler scheduler = new Scheduler(roomRepository, mailService, templateEngine, selectedTimeService, selectedPlaceService, resultRepository);
@@ -96,11 +114,56 @@ class SchedulerTest {
         scheduler.checkConfirmedRoomAndSendMail();
 
         // 테스트데이터셋의 마감된 방의 모든 인원수(중복포함)의 합만큼 메일이 보내져야함
-        Mockito.verify(mailService, Mockito.times(8)).sendMailTo(Mockito.any(Member.class), Mockito.anyString());
+        verify(mailService, times(8)).sendMailTo(Mockito.any(Member.class), Mockito.anyString());
 
         // 마감된 방 수만큼 repository가 save호출
-        Mockito.verify(roomRepository, Mockito.times(roomToMailSend.size())).save(Mockito.any(Room.class));
+        verify(roomRepository, times(roomToMailSend.size())).save(Mockito.any(Room.class));
 
         assertThat(roomToMailSend.stream().map(Room::isMailSent)).allMatch(mailSent -> mailSent);
+    }
+
+    @Test
+    void testCheckConfirmedRoomAndCreateResult() {
+        // Mock dependencies
+        RoomRepository roomRepository = Mockito.mock(RoomRepository.class);
+        ResultRepository resultRepository = Mockito.mock(ResultRepository.class);
+        SelectedTimeService selectedTimeService = Mockito.mock(SelectedTimeService.class);
+        SelectedPlaceService selectedPlaceService = Mockito.mock(SelectedPlaceService.class);
+        MailService mailService = Mockito.mock(MailService.class);
+        SpringTemplateEngine templateEngine = Mockito.mock(SpringTemplateEngine.class);
+
+        // Create sample data
+        Room room = Room.builder().id(1L).build();
+
+        TimeRangeWithMember timeRange = TimeRangeWithMember.builder()
+                .date(LocalDate.now())
+                .start(LocalTime.now())
+                .participationMembers(Collections.singletonList(new Member()))
+                .nonParticipationMembers(Collections.emptyList())
+                .build();
+
+        List<TimeRangeWithMember> overlappingTimes = Collections.singletonList(timeRange);
+
+        Map<SelectedPlace, Long> selectedPlaces = Collections.singletonMap(new SelectedPlace(), 1L);
+
+        // Configure mock behavior
+        when(roomRepository.findByDeadLineBefore(Mockito.any(LocalDateTime.class)))
+                .thenReturn(Collections.singletonList(room));
+
+        when(resultRepository.findByRoomId(anyLong()))
+                .thenReturn(Optional.empty());
+
+        when(selectedTimeService.findOverlappingTimeRanges(Mockito.any(Room.class)))
+                .thenReturn(overlappingTimes);
+
+        when(selectedPlaceService.getSelectedPlaces(Mockito.any(Room.class)))
+                .thenReturn(selectedPlaces);
+
+        // Call the method under test
+        Scheduler scheduler = new Scheduler(roomRepository, mailService, templateEngine, selectedTimeService, selectedPlaceService, resultRepository);
+        scheduler.checkConfirmedRoomAndCreateResult();
+
+        // Verify the behavior
+        verify(resultRepository, times(1)).save(Mockito.any(DecidedResult.class));
     }
 }

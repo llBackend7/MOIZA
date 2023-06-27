@@ -7,6 +7,8 @@ import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
 import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
+import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
+import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

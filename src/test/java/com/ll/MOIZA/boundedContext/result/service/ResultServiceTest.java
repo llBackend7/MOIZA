@@ -1,4 +1,4 @@
-package com.ll.MOIZA.boundedContext.member.service.service;
+package com.ll.MOIZA.boundedContext.result.service;
 
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -23,6 +24,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -82,8 +84,11 @@ class ResultServiceTest {
     }
 
     @Test
-    @DisplayName("결과 데이터 불러오기 테스트")
+    @DisplayName("결과 데이터 불러오기 테스트 - 존재하지 않는 결과 불러올 시 오류 발생")
     void getResultTest() {
         assertThat(resultService.getResult(2L).getId()).isEqualTo(resultRepository.findByRoomId(2L).get().getId());
+        assertThrows(ResponseStatusException.class, () -> {
+            resultService.getResult(100L);
+        });
     }
 }

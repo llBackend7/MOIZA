@@ -8,8 +8,10 @@ import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -24,11 +26,12 @@ public class EnterRoomService {
     public EnterRoom createEnterRoom(Room room,
             Member member
     ) {
-        EnterRoom enterRoom = enterRoomRepository.findByRoomAndMember(room, member);
-        if (enterRoom != null) {
-            return enterRoom;
+        Optional<EnterRoom> opEnterRoom = enterRoomRepository.findByRoomAndMember(room, member);
+        if (opEnterRoom.isPresent()) {
+            return opEnterRoom.get();
         }
-        enterRoom = EnterRoom.builder()
+
+        EnterRoom enterRoom = EnterRoom.builder()
                 .room(room)
                 .member(member)
                 .build();
@@ -57,7 +60,10 @@ public class EnterRoomService {
 
     @Transactional
     public void leaveEnterRoom(Room room, Member actor) {
-        EnterRoom enterRoom = enterRoomRepository.findByRoomAndMember(room, actor);
-        enterRoomRepository.delete(enterRoom);
+        Optional<EnterRoom> opEnterRoom = enterRoomRepository.findByRoomAndMember(room, actor);
+        if(opEnterRoom.isPresent())
+            enterRoomRepository.delete(opEnterRoom.get());
+        else
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
     }
 }

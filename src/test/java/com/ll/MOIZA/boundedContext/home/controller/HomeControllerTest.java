@@ -2,6 +2,8 @@ package com.ll.MOIZA.boundedContext.home.controller;
 
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
+import com.ll.MOIZA.boundedContext.result.repository.ResultRepository;
+import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import org.junit.jupiter.api.DisplayName;
@@ -16,8 +18,10 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -35,10 +39,14 @@ class HomeControllerTest {
     private MockMvc mvc;
     @Autowired
     private MemberService memberService;
+    @Autowired
+    private RoomService roomService;
+    @Autowired
+    private EnterRoomService enterRoomService;
 
     @Test
     @DisplayName("메인페이지: 로그아웃 상태일 시 로그인 페이지 반환")
-    void showMain_logout() throws Exception {
+    void showMainTest_logout() throws Exception {
         mvc.perform(get("/"))
                 .andExpect(handler().methodName("showMain"))
                 .andExpect(status().isOk())
@@ -48,7 +56,7 @@ class HomeControllerTest {
     @Test
     @DisplayName("메인페이지: 로그인 상태일 시 그룹페이지로 리다이렉트")
     @WithUserDetails("user1")
-    void showMain_login() throws Exception {
+    void showMainTest_login() throws Exception {
         mvc.perform(get("/"))
                 .andExpect(handler().methodName("showMain"))
                 .andExpect(status().is3xxRedirection())
@@ -70,7 +78,7 @@ class HomeControllerTest {
     @Test
     @DisplayName("메인 뷰와 방 목록 표시")
     @WithUserDetails("user1")
-    void showHome() throws Exception {
+    void showHomeTest() throws Exception {
         Member member = memberService.findByName("user1");
         assertThat(member.getEnterRooms().size()).isEqualTo(2);
 
@@ -83,32 +91,37 @@ class HomeControllerTest {
     @Test
     @DisplayName("모임 삭제")
     @WithUserDetails("user1")
-    void deleteGroup() throws Exception {
+    void deleteGroupTest() throws Exception {
+        long roomId = 1L;
+
         ResultActions resultActions = mvc
                 .perform(
-                    delete("/"+String.valueOf(1L))
+                    delete("/"+roomId)
                             .with(csrf())
                 )
                 .andDo(print());
 
         resultActions
-                .andExpect(handler().methodName("deleteGroup"))
-                        .andExpect(status().is3xxRedirection())
-                        .andExpect(redirectedUrl("/groups"));
+            .andExpect(handler().methodName("deleteGroup"))
+            .andExpect(status().is3xxRedirection())
+            .andExpect(redirectedUrl("/groups"));
 
-        Member member = memberService.findByName("user1");
-        assertThat(member.getEnterRooms().size()).isEqualTo(1);
+        assertThrows(ResponseStatusException.class, () -> {
+            roomService.getRoom(roomId);
+        });
     }
 
     @Test
     @DisplayName("모임 나가기")
     @WithUserDetails("user1")
-    void leaveGroup() throws Exception {
+    void leaveGroupTest() throws Exception {
+        long roomId = 2L;
+
         ResultActions resultActions = mvc
                 .perform(
                         post("/leave")
                             .with(csrf())
-                            .param("roomId", "2")
+                            .param("roomId", String.valueOf(roomId))
                 )
                 .andDo(print());
 
@@ -117,7 +130,8 @@ class HomeControllerTest {
             .andExpect(status().is3xxRedirection())
             .andExpect(redirectedUrl("/groups"));
 
-        Member member = memberService.findByName("user1");
-        assertThat(member.getEnterRooms().size()).isEqualTo(1);
+        assertThrows(ResponseStatusException.class, () -> {
+            enterRoomService.leaveEnterRoom(roomService.getRoom(roomId), memberService.findByName("user1"));
+        });
     }
 }

@@ -3,7 +3,10 @@ package com.ll.MOIZA.boundedContext.room.service;
 import com.ll.MOIZA.base.jwt.JwtProvider;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
+import com.ll.MOIZA.boundedContext.result.repository.ResultRepository;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.service.RoomService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,9 +14,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
+import java.time.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -220,5 +221,11 @@ class RoomServiceTest {
         assertThat(jwtProvider.getClaims(accessToken).get("accessCode")).isEqualTo(room.getAccessCode());
     }
 
-
+    @Test
+    @DisplayName("모임 마감 테스트")
+    void closeRoomTest() {
+        roomService.closeRoom(1L);
+        Room room = roomService.getRoom(1L);
+        assertThat(room.getDeadLine().getDayOfMonth()).isEqualTo(LocalDateTime.now().getDayOfMonth());
+    }
 }

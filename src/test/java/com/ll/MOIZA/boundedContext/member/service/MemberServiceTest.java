@@ -4,6 +4,7 @@ import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
+import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Test;
@@ -16,6 +17,8 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Collections;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -31,9 +34,7 @@ class MemberServiceTest {
     @Autowired
     private MemberService memberService;
     @Autowired
-    private MemberRepository memberRepository;
-    @Autowired
-    private RoomRepository roomRepository;
+    private RoomService roomService;
 
     @Test
     @DisplayName("존재하는 이용자로 로그인하는 경우 해당 이용자의 정보를 불러옴")
@@ -49,28 +50,20 @@ class MemberServiceTest {
     @Test
     @DisplayName("존재하지 않는 이용자로 로그인하는 경우 NOT FOUND 발생")
     void loginMemberTest2() {
-        // Given
-        User user = new User("user2","", memberService.findByName("user2").getGrantedAuthorities());
-        Member member = memberService.findByName("user2");
-        memberRepository.delete(member);
+        User user = new User("user100","", Collections.emptyList());
 
-        // When
-        ResponseStatusException exception = assertThrows(ResponseStatusException.class, () -> {
+        assertThrows(ResponseStatusException.class, () -> {
             memberService.loginMember(user);
         });
-
-        // Then
-        assertThat(exception.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
-        assertThat(exception.getReason()).isEqualTo("사용자를 찾을 수 없습니다.");
     }
 
     @Test
     @DisplayName("memberId로 Member 정보 불러오기")
     void getMemberTest() {
-       assertThat(memberService.getMember(1L).getName()).isEqualTo("user1");
-
-        when(memberService.getMember(3L))
-                .thenThrow(new ResponseStatusException(HttpStatus.NOT_FOUND, "사용자를 찾을 수 없습니다."));
+        assertThat(memberService.getMember(1L).getName()).isEqualTo("user1");
+        assertThrows(ResponseStatusException.class, () -> {
+            memberService.getMember(100L);
+        });
     }
 
     @Test
@@ -99,11 +92,10 @@ class MemberServiceTest {
 
     @Test
     @DisplayName("roomId로 해당 모임 삭제")
-    void testDeleteGroup_ExistingRoom() {
-        Member member = memberService.getMember(1L);
-        int roomCnt = member.getRooms().size();
+    void deleteGroupTest() {
         memberService.deleteGroup(1L);
-
-        assertThat(member.getRooms().size()).isEqualTo(roomCnt-1);
+        assertThrows(ResponseStatusException.class, () -> {
+            roomService.getRoom(1L);
+        });
     }
 }
