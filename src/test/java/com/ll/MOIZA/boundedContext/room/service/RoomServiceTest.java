@@ -219,4 +219,6 @@ class RoomServiceTest {
         String accessToken = roomService.getAccessToken(room);
         assertThat(jwtProvider.getClaims(accessToken).get("accessCode")).isEqualTo(room.getAccessCode());
     }
+
+
 }
