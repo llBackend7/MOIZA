@@ -3,6 +3,7 @@ package com.ll.MOIZA.boundedContext.selectedTime.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
+import com.ll.MOIZA.MoizaApplication;
 import com.ll.MOIZA.base.initData.NotProd;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
@@ -16,11 +17,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.context.annotation.Import;
 
-@SpringBootTest
+@SpringBootTest(classes = MoizaApplication.class)
 @ActiveProfiles("test")
 @Transactional
 @Import(NotProd.class)
@@ -34,10 +35,17 @@ public class SelectedTimeServiceQueryTest {
     SelectedTimeService selectedTimeService;
 
     static Room room;
+    static Member member1;
+    static Member member2;
+    static Member member3;
 
     @BeforeEach
     void init() {
+        member1 = memberService.findByName("user1");
         room = roomService.getRoom(1L);
+
+        member2 = memberService.findByName("user2");
+        member3 = memberService.findByName("으네");
     }
 
     @DisplayName("조회_선택_날짜")
@@ -50,9 +58,6 @@ public class SelectedTimeServiceQueryTest {
     @Test
     @DisplayName("겹치는_시간_조회")
     void findOverlappingTimeRanges_test() {
-        Member member1 = memberService.findByName("user1");
-        Member member2 = memberService.findByName("user2");
-        Member member3 = memberService.findByName("으네");
 
         List<TimeRangeWithMember> overlappingRanges = selectedTimeService.findOverlappingTimeRanges(
                 room, LocalDate.now().plusDays(6)
@@ -91,9 +96,6 @@ public class SelectedTimeServiceQueryTest {
     @Test
     @DisplayName("전체_겹치는_시간_조회")
     void all_findOverlappingTimeRanges_test() {
-        Member member1 = memberService.findByName("user1");
-        Member member2 = memberService.findByName("user2");
-        Member member3 = memberService.findByName("으네");
 
         List<TimeRangeWithMember> overlappingRanges = selectedTimeService.findOverlappingTimeRanges(
                 room);
