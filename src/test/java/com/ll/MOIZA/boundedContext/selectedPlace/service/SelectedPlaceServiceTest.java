@@ -10,6 +10,8 @@ import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import com.ll.MOIZA.boundedContext.selectedPlace.repository.SelectedPlaceRepository;
+import java.util.Map.Entry;
+import javax.swing.text.html.parser.Entity;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -93,9 +95,7 @@ class SelectedPlaceServiceTest {
     @Test
     @DisplayName("장소_선택")
     void select_place() {
-        selectedPlaceService.CreateSelectedPlace("서울역", enterRoom);
-        selectedPlaceService.CreateSelectedPlace("용산역", enterRoom);
-        selectedPlaceService.CreateSelectedPlace("대구역", enterRoom);
+        room = roomService.getRoom(2L);
 
         Map<SelectedPlace, Long> selectedPlaces = selectedPlaceService.getSelectedPlaces(room);
 
