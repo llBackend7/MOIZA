@@ -10,6 +10,7 @@ import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import com.ll.MOIZA.boundedContext.selectedPlace.repository.SelectedPlaceRepository;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Map;
+
 import org.springframework.web.server.ResponseStatusException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -85,5 +88,17 @@ class SelectedPlaceServiceTest {
                     selectedPlaceService.CreateSelectedPlace("테스트 장소", enterRoom);
                 })
         );
+    }
+
+    @Test
+    @DisplayName("장소_선택")
+    void select_place() {
+        selectedPlaceService.CreateSelectedPlace("서울역", enterRoom);
+        selectedPlaceService.CreateSelectedPlace("용산역", enterRoom);
+        selectedPlaceService.CreateSelectedPlace("대구역", enterRoom);
+
+        Map<SelectedPlace, Long> selectedPlaces = selectedPlaceService.getSelectedPlaces(room);
+
+        Assertions.assertThat(selectedPlaces.size()).isEqualTo(1);
     }
 }
