@@ -1,5 +1,6 @@
 package com.ll.MOIZA.boundedContext.room.service;
 
+import com.ll.MOIZA.base.initData.NotProd;
 import com.ll.MOIZA.base.jwt.JwtProvider;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
@@ -10,6 +11,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -22,6 +24,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 @SpringBootTest
 @Transactional
 @ActiveProfiles("test")
+@Import(NotProd.class)
 class RoomServiceTest {
     @Autowired
     RoomService roomService;

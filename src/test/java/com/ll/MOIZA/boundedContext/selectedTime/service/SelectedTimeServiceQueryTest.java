@@ -17,14 +17,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @SpringBootTest(classes = MoizaApplication.class)
 @ActiveProfiles("test")
 @Transactional
-@Import(NotProd.class)
 public class SelectedTimeServiceQueryTest {
 
     @Autowired
