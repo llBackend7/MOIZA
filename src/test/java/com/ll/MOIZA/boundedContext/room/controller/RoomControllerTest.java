@@ -213,8 +213,13 @@ class RoomControllerTest {
 
         ResultActions resultActions = mvc
                 .perform(get("/room/%d/changeTime".formatted(roomId))
-                        .with(csrf())
+                        .with(csrf()));
 
+        resultActions
+                .andExpect(status().is3xxRedirection());
+    }
+
+    @Test
     @DisplayName("장소 투표 페이지의 POST")
     @WithUserDetails("user1")
     void showRoomPlacePostTest() throws Exception {
@@ -228,7 +233,6 @@ class RoomControllerTest {
                 .andDo(print());
 
         resultActions
-                .andExpect(status().is3xxRedirection());
                 .andExpect(handler().methodName("createPlace"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/room/" + roomId + "/place"));
