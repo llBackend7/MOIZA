@@ -3,7 +3,10 @@ package com.ll.MOIZA.boundedContext.room.controller;
 import com.ll.MOIZA.boundedContext.room.controller.RoomController;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
+import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
+import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import org.junit.jupiter.api.*;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,6 +25,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -210,10 +214,23 @@ class RoomControllerTest {
         ResultActions resultActions = mvc
                 .perform(get("/room/%d/changeTime".formatted(roomId))
                         .with(csrf())
+
+    @DisplayName("장소 투표 페이지의 POST")
+    @WithUserDetails("user1")
+    void showRoomPlacePostTest() throws Exception {
+        Long roomId = 1L;
+
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/room/"+roomId+"/place")
+                                .with(csrf())
                 )
                 .andDo(print());
 
         resultActions
                 .andExpect(status().is3xxRedirection());
+                .andExpect(handler().methodName("createPlace"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/room/" + roomId + "/place"));
     }
 }
