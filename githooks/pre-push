@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# main push 금지
+### main push 검증
 
 # Get the current branch being pushed
 current_branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD)
@@ -11,27 +11,14 @@ if [ "$current_branch" = "main" ]; then
     exit 1
 fi
 
-# code Coverage
-# 각 os용 Windows, macOs
-os=$(uname -s)
-
-# Set project_path dynamically based on the operating system
-if [[ "$os" == "Darwin" ]]; then
-    # macOS
-    project_path=$(pwd)
-else
-    # Windows
-    project_path=$(cmd.exe /c "cd" & echo %cd%)
-fi
+### code Coverage 검증
 
 # Generate Jacoco Report
 cd "$project_path"
 ./gradlew clean test jacocoTestCoverageVerification
 build_status=$?
 
+#커버리지 통과 실패
 if [ $build_status -eq 1 ]; then
-  echo "커버리지 통과 실패. 코드 커버리지를 확인해주세요."
   exit 1
-else
-  echo "커버리지 통과."
 fi
