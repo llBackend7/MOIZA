@@ -93,9 +93,7 @@ class SelectedPlaceServiceTest {
     @Test
     @DisplayName("장소_선택")
     void select_place() {
-        selectedPlaceService.CreateSelectedPlace("서울역", enterRoom);
-        selectedPlaceService.CreateSelectedPlace("용산역", enterRoom);
-        selectedPlaceService.CreateSelectedPlace("대구역", enterRoom);
+        room = roomService.getRoom(2L);
 
         Map<SelectedPlace, Long> selectedPlaces = selectedPlaceService.getSelectedPlaces(room);
 
