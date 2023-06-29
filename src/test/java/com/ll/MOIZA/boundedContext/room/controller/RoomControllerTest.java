@@ -139,4 +139,22 @@ class RoomControllerTest {
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/room/" + roomId + "/result"));
     }
+
+    @Test
+    @DisplayName("장소 투표 페이지의 View Attributes 확인")
+    @WithUserDetails("user1")
+    void showRoomPlaceTest() throws Exception {
+        Long roomId = 1L;
+
+        ResultActions resultActions = mvc
+                .perform(get("/room/"+roomId+"/place").with(csrf()).param("timeIndex","0"))
+                .andDo(print());
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(view().name("status/place"))
+                .andExpect(model().attributeExists("selectedPlaceMap"))
+                .andExpect(model().attributeExists("room"))
+                .andExpect(model().attributeExists("actor"));
+    }
 }
