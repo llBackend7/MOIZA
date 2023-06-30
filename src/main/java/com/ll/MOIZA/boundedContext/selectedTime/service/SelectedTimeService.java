@@ -6,6 +6,7 @@ import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -14,11 +15,13 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
+
 import java.util.*;
 
 @Service
@@ -100,7 +103,7 @@ public class SelectedTimeService {
             startDay = startDay.plusDays(1);
         }
 
-        if(!timeRangeWithMembers.isEmpty())
+        if (!timeRangeWithMembers.isEmpty())
             Collections.sort(timeRangeWithMembers);
 
         if (timeRangeWithMembers.size() > 10) {
@@ -110,7 +113,7 @@ public class SelectedTimeService {
         return timeRangeWithMembers;
     }
 
-    public List<TimeRangeWithMember>findOverlappingTimeRanges(
+    public List<TimeRangeWithMember> findOverlappingTimeRanges(
             Room room, LocalDate date) {
 
         List<SelectedTime> selectedTimeList = selectedTimeRepository.searchSelectedTimeByRoom(room,
@@ -156,25 +159,35 @@ public class SelectedTimeService {
         return overlappingRanges;
     }
 
-    public List<Member> getContainedMember (List<SelectedTime> selectedTimeList,
-            LocalTime meetingDuration, LocalTime startTime, LocalTime endTime) {
+    public List<Member> getContainedMember(List<SelectedTime> selectedTimeList,
+                                           LocalTime meetingDuration,
+                                           LocalTime startTime,
+                                           LocalTime endTime) {
         return selectedTimeList.stream()
+                .filter(selectedTime -> {
+                    LocalTime selectedDuration = selectedTime.getDuration();
+                    return isAfterOrEqual(selectedDuration, meetingDuration);
+                })
+                .filter(selectedTime -> isBeforeOrEqual(selectedTime.getStartTime(), endTime))
                 .filter(selectedTime ->
-                        !selectedTime.getEndTime()
-                                .minusHours(selectedTime.getStartTime().getHour())
-                                .minusMinutes(selectedTime.getStartTime().getMinute())
-                                .isBefore(meetingDuration)
-                )
-                .filter(selectedTime -> !selectedTime.getStartTime().isAfter(endTime))
-                .filter(selectedTime ->
-                        !selectedTime.getStartTime().isAfter(startTime) &&
-                                !endTime.isAfter(selectedTime.getEndTime())
+                        isBeforeOrEqual(selectedTime.getStartTime(), startTime)
+                                && isAfterOrEqual(selectedTime.getEndTime(),endTime)
                 )
                 .map(SelectedTime::getEnterRoom)
                 .map(EnterRoom::getMember)
                 .distinct()
                 .sorted(Comparator.comparing(Member::getName))
                 .collect(Collectors.toCollection(LinkedList::new));
+    }
+
+    private boolean isAfterOrEqual(LocalTime left, LocalTime right) {
+        // left >= right
+        return !left.isBefore(right);
+    }
+
+    private boolean isBeforeOrEqual(LocalTime left, LocalTime right) {
+        // left <= right
+        return !left.isAfter(right);
     }
 
     public List<Member> getNonParticipationMembers(Room room, List<Member> participationMembers) {

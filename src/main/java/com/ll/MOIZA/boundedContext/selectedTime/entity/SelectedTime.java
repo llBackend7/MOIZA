@@ -23,4 +23,10 @@ public class SelectedTime extends BaseEntity {
     private LocalTime endTime;
     @ManyToOne
     private EnterRoom enterRoom;
+
+    public LocalTime getDuration() {
+        return getEndTime()
+                .minusHours(getStartTime().getHour())
+                .minusMinutes(getStartTime().getMinute());
+    }
 }
