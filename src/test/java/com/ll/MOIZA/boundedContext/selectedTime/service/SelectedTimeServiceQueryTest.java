@@ -43,7 +43,7 @@ public class SelectedTimeServiceQueryTest {
         room = roomService.getRoom(1L);
 
         member2 = memberService.findByName("user2");
-        member3 = memberService.findByName("으네");
+        member3 = memberService.findByName("이은혜");
     }
 
     @DisplayName("조회_선택_날짜")
