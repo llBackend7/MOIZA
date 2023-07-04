@@ -1,6 +1,7 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
 import com.ll.MOIZA.base.appConfig.AppConfig;
+import com.ll.MOIZA.base.calendar.service.CalendarService;
 import com.ll.MOIZA.base.security.CustomOAuth2User;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
@@ -41,6 +42,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -280,6 +283,12 @@ public class RoomController {
 
         resultService.createResult(room, timeRangeWithMember, place);
         return "redirect:/room/%d/result".formatted(roomId);
+    }
+
+    @PostMapping("/addEvent")
+    public String addGoogleCalendarEvent(@RequestParam Long roomId) throws GeneralSecurityException, IOException {
+        DecidedResult result = resultService.getResult(roomId);
+        return "redirect:%s".formatted(CalendarService.createEvent(result));
     }
 
     @Data
