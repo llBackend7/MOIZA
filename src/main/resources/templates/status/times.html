@@ -1,0 +1,73 @@
+<ul th:fragment="times" class="flex flex-col items-center" id="times">
+    <button onclick="getSelectedTimes();">LOAD</button>
+
+    <script>
+        let path = window.location.pathname;
+        let pathSegments = path.split('/');
+        let roomId = pathSegments[pathSegments.length - 2];
+
+        let rank = 1;
+
+        $(document).ready(()=>getSelectedTimes())
+
+        function getSelectedTimes() {
+            $.ajax({
+                url: `http://localhost:8081/room/${roomId}/selected-time`,
+                type: 'get',
+                contentType: 'application/json',
+                success: function (response) {
+                    $('#times').empty();
+                    response.forEach(time => showTimeInfo(time));
+                },
+                error: function (error) {
+                    console.log(error);
+                    console.log("시간 조회 실패");
+                }
+            });
+        }
+
+        function showTimeInfo(time) {
+            $('#times').append(timeToHtml(time));
+            rank++;
+        }
+
+        function timeToHtml(time) {
+            let date = new Date(time.date);
+            let year = date.getFullYear();
+            let month = date.getMonth()+1;
+            let day = date.getDate();
+
+            return `
+            <li class="my-2">
+                <a href="javascript:" onclick="$(this).next().submit();">
+                    <div class="rank flex font-gsans hover:bg-slate-100 active:bg-slate-200">
+                        <div class="p-3 shrink">
+                            ${showRank(rank)}
+                        </div>
+                        <div class="flex flex-wrap">
+                            <div class="rank-content flex flex-grow flex-wrap gap-1">
+                            <div class="flex-grow">${year}년 ${month}월 ${day}일</div>
+                            <div>${time.start.split(':').slice(0,2).join(':') + ' ~ ' + time.end.split(':').slice(0,2).join(':')}</div>
+                        </div>
+                    </div>
+                    <div class="people-number text-center text-sm shrink">
+                        ${time.participationMembers.length}/${time.participationMembers.length + time.nonParticipationMembers.length}
+                    </div>
+                    </div>
+                </a>
+                <form hidden th:action="@{|/room/${roomId}/date|}">
+                    <input type="hidden" name="timeIndex" value="${rank-1}" />
+                </form>
+            </li>
+            `
+        }
+
+        function showRank(rank){
+            if(rank === 1){
+                return '<span class="rank-number text-bold text-xl" style="border: 6px solid #006bce; border-radius: 50%;">1위</span>';
+            }
+            return `<span class="rank-number text-bold text-lg" style="color: #006bce;">${rank}위</span>`;
+        }
+    </script>
+</ul>
+

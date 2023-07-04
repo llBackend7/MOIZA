@@ -46,28 +46,7 @@
             </div>
 
             <div id="app">
-                <ul th:if="${!#lists.isEmpty(overlappingTimes)}" class="flex flex-col items-center">
-                    <li th:each="time, index : ${overlappingTimes}" class="my-2">
-                        <a href="javascript:" onclick="$(this).next().submit();">
-                            <div class="rank flex font-gsans hover:bg-slate-100 active:bg-slate-200">
-                                <div class="p-3 shrink">
-                                    <span th:if="${index.index == 0}" class="rank-number text-bold text-xl" style="border: 6px solid #006bce; border-radius: 50%;">1위</span>
-                                    <span th:if="${index.index > 0}" th:text="${index.index + 1 + '위'}" class="rank-number text-bold text-lg" style="color: #006bce;"></span>
-                                </div>
-                                <div class="flex flex-wrap">
-                                    <div class="rank-content flex flex-grow flex-wrap gap-1">
-                                        <div class="flex-grow" th:text="${#temporals.format(time.date, 'yyyy년 M월 d일 EEEE')}"></div>
-                                        <div th:text="${time.start + ' ~ ' +time.end}"></div>
-                                    </div>
-                                </div>
-                                <div class="people-number text-center text-sm shrink" th:text="${time.participationMembers.size()} + '/' + ${time.participationMembers.size()+time.nonParticipationMembers.size()}"></div>
-                            </div>
-                        </a>
-                        <form hidden th:action="@{|/room/${room.id}/date|}">
-                            <input type="hidden" name="timeIndex" th:value="${index.index}" />
-                        </form>
-                    </li>
-                </ul>
+                <div th:replace="~{status/times :: times}"></div>
             </div>
         </div>
 
