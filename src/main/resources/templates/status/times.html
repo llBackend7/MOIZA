@@ -5,7 +5,7 @@
         let path = window.location.pathname;
         let pathSegments = path.split('/');
         let roomId = pathSegments[pathSegments.length - 2];
-
+        let times;
         let rank = 1;
 
         $(document).ready(()=>getSelectedTimes())
@@ -16,6 +16,7 @@
                 type: 'get',
                 contentType: 'application/json',
                 success: function (response) {
+                    times = response;
                     $('#times').empty();
                     response.forEach(time => showTimeInfo(time));
                 },
@@ -37,9 +38,11 @@
             let month = date.getMonth()+1;
             let day = date.getDate();
 
+            let idx = rank-1;
+
             return `
             <li class="my-2">
-                <a href="javascript:" onclick="$(this).next().submit();">
+                <a href="javascript:" onclick="showAllMembers(${idx});">
                     <div class="rank flex font-gsans hover:bg-slate-100 active:bg-slate-200">
                         <div class="p-3 shrink">
                             ${showRank(rank)}
@@ -55,9 +58,6 @@
                     </div>
                     </div>
                 </a>
-                <form hidden th:action="@{|/room/${roomId}/date|}">
-                    <input type="hidden" name="timeIndex" value="${rank-1}" />
-                </form>
             </li>
             `
         }
