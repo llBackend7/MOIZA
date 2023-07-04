@@ -174,22 +174,12 @@
                             </li>
 
                             <li class="flex flex-col items-center py-2">
-                                <button onclick="copyPageLink()">
-                                    <img src="https://img.icons8.com/external-prettycons-solid-prettycons/60/4D4D4D/external-link-social-media-prettycons-solid-prettycons.png" width="40" class="mask mask-circle mb-1">
-                                </button>
-                                <div class="text-sm">링크<br>공유하기</div>
-                                <script>
-                                    function copyPageLink() {
-                                        const pageLink = window.location.href;
-                                        navigator.clipboard.writeText(pageLink)
-                                            .then(() => {
-                                                toastWarning("페이지 링크가 복사되었습니다.");
-                                            })
-                                            .catch((error) => {
-                                                console.error("페이지 링크 복사 실패:", error);
-                                            });
-                                    }
-                                </script>
+                                <a href="javascript:" onclick="$(this).next().submit()">
+                                    <img src="https://www.getharvest.com/hs-fs/hubfs/integrations-new/google-calendar.png?width=300&name=google-calendar.png" width="40" class="mb-1">
+                                </a>
+                                <form hidden th:action="|/room/addEvent?roomId=${result.room.id}|" method="post">
+                                </form>
+                                <div class="text-sm">캘린더<br>일정추가</div>
                             </li>
 
                         </ul>
