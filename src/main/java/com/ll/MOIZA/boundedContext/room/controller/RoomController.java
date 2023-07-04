@@ -63,6 +63,9 @@ public class RoomController {
     @Value("${custom.site.baseUrl}")
     private String baseUrl;
 
+    @Value("${custom.site.calculatorUrl}")
+    private String calculatorUrl;
+
     @Data
     public static class RoomForm {
         @NotNull
@@ -217,6 +220,7 @@ public class RoomController {
         }
         model.addAttribute("selectedAvailableMembers", selectedAvailableMembers);
         model.addAttribute("selectedUnavailableMembers", selectedUnavailableMembers);
+        model.addAttribute("calculatorUrl", calculatorUrl);
         return "status/date";
     }
 
