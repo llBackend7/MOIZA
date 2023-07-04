@@ -1,6 +1,4 @@
 <ul th:fragment="times" class="flex flex-col items-center" id="times">
-    <button onclick="getSelectedTimes();">LOAD</button>
-
     <script>
         let path = window.location.pathname;
         let pathSegments = path.split('/');
@@ -16,6 +14,7 @@
                 type: 'get',
                 contentType: 'application/json',
                 success: function (response) {
+                    rank = 1;
                     times = response;
                     $('#times').empty();
                     response.forEach(time => showTimeInfo(time));

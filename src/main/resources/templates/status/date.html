@@ -44,6 +44,7 @@
                 <a th:href="@{|/room/${room.id}/changeTime|}" class="hover-pointer">
                     <i class="far fa-light fa-pen-to-square"></i>
                 </a>
+                <button onclick="getSelectedTimes();">LOAD</button>
             </div>
 
             <div th:if="${#lists.isEmpty(overlappingTimes)}" class="w-full flex flex-col items-center justify-center mt-4 text-xl font-gsans">
