@@ -8,4 +8,4 @@ spring:
 custom:
   site:
     baseUrl: https://moiza.online
-    calculatorUrl: https://172.17.0.2:8081 # 운영환경에서 직접 확인 후 수정 필요
+    calculatorUrl: https://172.17.0.1:8090
