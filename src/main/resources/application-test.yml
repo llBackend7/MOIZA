@@ -14,3 +14,4 @@ logging:
 custom:
   site:
     baseUrl: http://localhost:8080
+    calculatorUrl: http://localhost:8081
