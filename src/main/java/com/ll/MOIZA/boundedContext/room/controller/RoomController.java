@@ -194,36 +194,44 @@ public class RoomController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{roomId}/date")
     public String showRoomDate(@PathVariable Long roomId,
-                               @RequestParam(value = "timeIndex", defaultValue = "-1") int timeIndex,
                                @AuthenticationPrincipal User user, Model model) {
         Room room = roomService.getRoom(roomId);
         Member actor = memberService.loginMember(user);
         List<TimeRangeWithMember> overlappingTimes = selectedTimeService.findOverlappingTimeRanges(room);
 
-        List<List<Member>> availableMembers;
-        List<List<Member>> unavailableMembers;
-        List<Member> selectedAvailableMembers = null;
-        List<Member> selectedUnavailableMembers = null;
-
         model.addAttribute("room", room);
         model.addAttribute("actor", actor);
         model.addAttribute("overlappingTimes", overlappingTimes);
-
-        if (timeIndex >= 0) {
-            availableMembers = overlappingTimes.stream()
-                    .map(TimeRangeWithMember::getParticipationMembers)
-                    .toList();
-
-            unavailableMembers = overlappingTimes.stream()
-                    .map(TimeRangeWithMember::getNonParticipationMembers)
-                    .toList();
-
-            selectedAvailableMembers = availableMembers.get(timeIndex);
-            selectedUnavailableMembers = unavailableMembers.get(timeIndex);
-        }
-        model.addAttribute("selectedAvailableMembers", selectedAvailableMembers);
-        model.addAttribute("selectedUnavailableMembers", selectedUnavailableMembers);
+        model.addAttribute("selectedAvailableMembers", null);
+        model.addAttribute("selectedUnavailableMembers", null);
         return "status/date";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{roomId}/date/members")
+    public ResponseEntity<Map<String, Object>> returnMembersAttendance(@PathVariable Long roomId,
+                                                                       @RequestParam int timeIndex) {
+        Map<String, Object> data = new HashMap<>();
+
+        Room room = roomService.getRoom(roomId);
+        List<TimeRangeWithMember> overlappingTimes = selectedTimeService.findOverlappingTimeRanges(room);
+
+        List<List<Map<String, String>>> availableMembers = overlappingTimes.stream()
+                .map(TimeRangeWithMember::getParticipationMembers)
+                .map(this::extractMemberData) // Extract required member data
+                .toList();
+
+        List<List<Map<String, String>>> unavailableMembers = overlappingTimes.stream()
+                .map(TimeRangeWithMember::getNonParticipationMembers)
+                .map(this::extractMemberData) // Extract required member data
+                .toList();
+
+        List<Map<String, String>> selectedAvailableMembers = availableMembers.get(timeIndex);
+        List<Map<String, String>> selectedUnavailableMembers = unavailableMembers.get(timeIndex);
+
+        data.put("availableMembers", selectedAvailableMembers);
+        data.put("unavailableMembers", selectedUnavailableMembers);
+        return ResponseEntity.ok(data);
     }
 
     @GetMapping("/{roomId}/place")
@@ -326,5 +334,11 @@ public class RoomController {
 
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(updatedUser, "", updatedAuthorities));
+    }
+
+    private List<Map<String, String>> extractMemberData(List<Member> members) {
+        return members.stream()
+                .map(member -> Map.of("name", member.getName(), "profile", member.getProfile()))
+                .collect(Collectors.toList());
     }
 }
