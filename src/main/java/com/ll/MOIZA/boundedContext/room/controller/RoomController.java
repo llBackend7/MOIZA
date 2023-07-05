@@ -1,5 +1,7 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ll.MOIZA.base.appConfig.AppConfig;
 import com.ll.MOIZA.base.calendar.service.CalendarService;
 import com.ll.MOIZA.base.security.CustomOAuth2User;
@@ -16,6 +18,7 @@ import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -48,6 +51,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -120,20 +124,22 @@ public class RoomController {
         model.addAttribute("redirectUrl", redirectUrl);
         addUserAuthority(user, room.getId());
 
-        return "home/invite";
+        return "redirect:/groups";
     }
 
-    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{roomId}/invite")
     public String invite(@AuthenticationPrincipal User user,
                                @PathVariable Long roomId,
-                               Model model) {
+                               Model model, HttpServletRequest request) {
+
+        request.getSession().setAttribute("prevPage", request.getRequestURL().toString());
+
         Room room = roomService.getRoom(roomId);
         String accessToken = roomService.getAccessToken(room);
         String redirectUrl = "%s/room/enter?roomId=%d&accessToken=%s".formatted(baseUrl, room.getId(), accessToken);
 
         model.addAttribute("redirectUrl", redirectUrl);
-        return "home/invite";
+        return "redirect:%s".formatted(redirectUrl);
     }
 
     @GetMapping("/{roomId}/changeTime")

@@ -61,6 +61,7 @@ public class HomeController {
 
         model.addAttribute("member", rq.getMember());
         model.addAttribute("rooms", rooms);
+        model.addAttribute("appKey", AppConfig.getAppKey());
         return "home/main";
     }
 
