@@ -170,8 +170,8 @@ public class RoomController {
     public ResponseEntity enterRoom(@AuthenticationPrincipal User user,
                                     @RequestParam long roomId,
                                     @RequestParam String accessToken,
-                                    @RequestBody List<SelectedDayWithTime> selectedDayWhitTimeList,
-                                    Model model) {
+                                    @RequestBody List<SelectedDayWithTime> selectedDayWhitTimeList
+                                    ) throws IOException {
         Room room = roomService.getRoom(roomId);
 
         if (roomService.validateToken(room, accessToken)) {
@@ -179,6 +179,8 @@ public class RoomController {
             enterRoomService.enterRoomWithSelectedTime(room, member, selectedDayWhitTimeList);
 
             addUserAuthority(user, roomId);
+
+            enterRoomService.clearCache(room);
 
             Map<String, String> response = new HashMap<>();
             response.put("redirectUrl", String.format("/room/%d/date", roomId));
