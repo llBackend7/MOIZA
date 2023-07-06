@@ -47,7 +47,7 @@
 
                     <div class="mt-2">
                         약속 시간은
-                        <span id="roomMeetingDuration" th:text="${room.meetingDuration.getMinute() == 0 ? #temporals.format(room.meetingDuration, 'h시간') : #temporals.format(room.meetingDuration, 'h시간 mm분')}" class="p-1 border border-none rounded-lg bg-slate-200"></span>
+                        <span id="roomMeetingDuration" th:text="${room.meetingDuration.getMinute() == 0 ? #temporals.format(room.meetingDuration, 'HH시간') : #temporals.format(room.meetingDuration, 'HH시간 mm분')}" class="p-1 border border-none rounded-lg bg-slate-200"></span>
                         입니다. 시간 범위에 맞게 지정해주세요.
                     </div>
                 </div>

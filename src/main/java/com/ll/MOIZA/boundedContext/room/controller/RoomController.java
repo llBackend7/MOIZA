@@ -64,9 +64,6 @@ public class RoomController {
     private final EnterRoomService enterRoomService;
     private final SelectedPlaceService selectedPlaceService;
 
-    @Value("${custom.site.baseUrl}")
-    private String baseUrl;
-
     @Data
     public static class RoomForm {
         @NotNull
@@ -119,7 +116,7 @@ public class RoomController {
         enterRoomService.createEnterRoom(room, member);
 
         String accessToken = roomService.getAccessToken(room);
-        String redirectUrl = "%s/room/enter?roomId=%d&accessToken=%s".formatted(baseUrl, room.getId(), accessToken);
+        String redirectUrl = "%s/room/enter?roomId=%d&accessToken=%s".formatted(AppConfig.getBaseUrl(), room.getId(), accessToken);
 
         model.addAttribute("redirectUrl", redirectUrl);
         addUserAuthority(user, room.getId());
@@ -136,7 +133,7 @@ public class RoomController {
 
         Room room = roomService.getRoom(roomId);
         String accessToken = roomService.getAccessToken(room);
-        String redirectUrl = "%s/room/enter?roomId=%d&accessToken=%s".formatted(baseUrl, room.getId(), accessToken);
+        String redirectUrl = "%s/room/enter?roomId=%d&accessToken=%s".formatted(AppConfig.getBaseUrl(), room.getId(), accessToken);
 
         model.addAttribute("redirectUrl", redirectUrl);
         return "redirect:%s".formatted(redirectUrl);
@@ -148,7 +145,7 @@ public class RoomController {
         Room room = roomService.getRoom(roomId);
         String accessToken = roomService.getAccessToken(room);
 
-        String redirectUrl = "%s/room/enter?roomId=%d&accessToken=%s".formatted(baseUrl, roomId, accessToken);
+        String redirectUrl = "%s/room/enter?roomId=%d&accessToken=%s".formatted(AppConfig.getBaseUrl(), roomId, accessToken);
         return new ModelAndView("redirect:" + redirectUrl);
     }
 
@@ -204,6 +201,7 @@ public class RoomController {
         model.addAttribute("overlappingTimes", overlappingTimes);
         model.addAttribute("selectedAvailableMembers", null);
         model.addAttribute("selectedUnavailableMembers", null);
+        model.addAttribute("calculatorUrl", AppConfig.getCalculatorUrl());
         return "status/date";
     }
 
