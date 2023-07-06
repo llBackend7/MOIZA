@@ -45,7 +45,7 @@ public class Scheduler {
             Optional<DecidedResult> existResult = resultRepository.findByRoomId(room.getId());
 
             if(existResult.isPresent()) {
-                System.out.println("해당 모임에 대한 결과가 저장되어 있습니다.");
+//                System.out.println("해당 모임에 대한 결과가 저장되어 있습니다.");
                 return;
             }
 
@@ -82,9 +82,9 @@ public class Scheduler {
             try {
                 resultRepository.save(result);
             } catch (DataIntegrityViolationException duplicationEx) {
-                System.out.println("중복된 결과 저장에 대한 예외 발생 처리");
+//                System.out.println("중복된 결과 저장에 대한 예외 발생 처리");
             } catch (UnexpectedRollbackException rollbackEx) {
-                System.out.println("롤백 예외 처리");
+//                System.out.println("롤백 예외 처리");
             }
         });
     }
