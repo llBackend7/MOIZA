@@ -8,3 +8,4 @@ spring:
 custom:
   site:
     baseUrl: https://moiza.online
+    calculatorUrl: https://moiza-api.lwu.me

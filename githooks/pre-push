@@ -1,0 +1,24 @@
+#!/bin/bash
+
+### main push 검증
+
+# Get the current branch being pushed
+current_branch=$(git symbolic-ref --short HEAD 2>/dev/null || git rev-parse --short HEAD)
+
+# Check if the current branch is 'main'
+if [ "$current_branch" = "main" ]; then
+    echo "main 브런치로 push 할 수 없습니다."
+    exit 1
+fi
+
+### code Coverage 검증
+
+# Generate Jacoco Report
+cd "$project_path"
+./gradlew clean test jacocoTestCoverageVerification
+build_status=$?
+
+#커버리지 통과 실패
+if [ $build_status -eq 1 ]; then
+  exit 1
+fi

@@ -20,6 +20,11 @@
             </form>
         </div>
     </div>
+    <script>
+        /*<![CDATA[*/
+        let calculatorUrl = '[[${calculatorUrl}]]';
+        /*]]>*/
+    </script>
 </header>
 
 <main layout:fragment="main" class="flex-grow flex items-center justify-center">
@@ -32,12 +37,15 @@
 
         <div class="date-rank">
 
-            <div class="flex justify-center items-center m-2">
+            <div class="flex justify-around items-center m-2 w-full">
+                <a th:href="@{|/room/${room.id}/changeTime|}" class="hover-pointer">
+                    <i class="far fa-light fa-pen-to-square"></i>
+                </a>
                 <div class="text-center text-xl mr-2">
                     날짜 현황
                 </div>
-                <a th:href="@{|/room/${room.id}/changeTime|}" class="hover-pointer">
-                    <i class="far fa-light fa-pen-to-square"></i>
+                <a href="#" onclick="getSelectedTimes();" class="hover-pointer">
+                    <i class="far fa-solid fa-rotate-right"></i>
                 </a>
             </div>
 
@@ -46,58 +54,48 @@
             </div>
 
             <div id="app">
-                <ul th:if="${!#lists.isEmpty(overlappingTimes)}" class="flex flex-col items-center">
-                    <li th:each="time, index : ${overlappingTimes}" class="my-2">
-                        <a href="javascript:" onclick="$(this).next().submit();">
-                            <div class="rank flex font-gsans hover:bg-slate-100 active:bg-slate-200">
-                                <div class="p-3 shrink">
-                                    <span th:if="${index.index == 0}" class="rank-number text-bold text-xl" style="border: 6px solid #006bce; border-radius: 50%;">1위</span>
-                                    <span th:if="${index.index > 0}" th:text="${index.index + 1 + '위'}" class="rank-number text-bold text-lg" style="color: #006bce;"></span>
-                                </div>
-                                <div class="flex flex-wrap">
-                                    <div class="rank-content flex flex-grow flex-wrap gap-1">
-                                        <div class="flex-grow" th:text="${#temporals.format(time.date, 'yyyy년 M월 d일 EEEE')}"></div>
-                                        <div th:text="${time.start + ' ~ ' +time.end}"></div>
-                                    </div>
-                                </div>
-                                <div class="people-number text-center text-sm shrink" th:text="${time.participationMembers.size()} + '/' + ${time.participationMembers.size()+time.nonParticipationMembers.size()}"></div>
-                            </div>
-                        </a>
-                        <form hidden th:action="@{|/room/${room.id}/date|}">
-                            <input type="hidden" name="timeIndex" th:value="${index.index}" />
-                        </form>
-                    </li>
-                </ul>
+                <div th:replace="~{status/times :: times}"></div>
             </div>
         </div>
 
-        <div class="font-bold attend-status">
-            <div th:if="${selectedAvailableMembers == null && selectedUnavailableMembers == null}" class="flex justify-center">
+        <div class="font-bold attend-status" id="members">
+            <div class="flex justify-center">
                 시간을 선택하면 멤버들의 참여 여부를 확인 할 수 있습니다.
             </div>
-
-            <div th:if="${selectedAvailableMembers != null}">
-                <div class="mb-2">참여 멤버</div>
-                <ul class="flex justify-center">
-                    <li th:each="member : ${selectedAvailableMembers}" class="mr-2 flex flex-col items-center justify-center">
-                        <img th:src="${member.profile}" width="50" class="mask mask-circle" style="z-index: 0">
-                        <div th:text="${member.name}" class="text-center"></div>
-                    </li>
-                </ul>
-            </div>
-
-            <div th:if="${selectedUnavailableMembers != null}">
-                <div class="mb-2">참여 불가능 멤버</div>
-                <ul class="flex justify-center">
-                    <li th:each="member : ${selectedUnavailableMembers}" class="mr-2 flex flex-col items-center justify-center">
-                        <div><img th:src="${member.profile}" width="50" class="mask mask-circle" style="z-index: 0"></div>
-                        <div th:text="${member.name}" class="text-center"></div>
-                    </li>
-                </ul>
-            </div>
         </div>
-
     </div>
+    <script>
+        function showAllMembers(idx){
+            const time = times[idx];
+            $('#members').empty();
+            $('#members').append(`
+                <div>
+                    <div class="mb-2">참여 멤버</div>
+                    <ul class="flex justify-center">
+                        ${showMembers(time.participationMembers)}
+                    </ul>
+                </div>
+
+                <div>
+                    <div class="mb-2">참여 불가능 멤버</div>
+                    <ul class="flex justify-center">
+                        ${showMembers(time.nonParticipationMembers)}
+                    </ul>
+                </div>
+            `);
+        }
+
+        function showMembers(members) {
+            let membersHTML = '';
+            members.forEach(member=>membersHTML += `
+                <li class="mr-2 flex flex-col items-center justify-center">
+                    <div><img src="${member.profile}" width="50" class="mask mask-circle" style="z-index: 0"></div>
+                    <div class="text-center">${member.name}</div>
+                </li>
+            `);
+            return membersHTML;
+        }
+    </script>
 </main>
 
 </body>

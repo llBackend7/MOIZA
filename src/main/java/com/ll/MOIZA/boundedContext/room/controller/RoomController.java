@@ -1,6 +1,7 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
 import com.ll.MOIZA.base.appConfig.AppConfig;
+import com.ll.MOIZA.base.calendar.service.CalendarService;
 import com.ll.MOIZA.base.security.CustomOAuth2User;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
@@ -41,6 +42,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -59,6 +62,9 @@ public class RoomController {
 
     @Value("${custom.site.baseUrl}")
     private String baseUrl;
+
+    @Value("${custom.site.calculatorUrl}")
+    private String calculatorUrl;
 
     @Data
     public static class RoomForm {
@@ -164,8 +170,8 @@ public class RoomController {
     public ResponseEntity enterRoom(@AuthenticationPrincipal User user,
                                     @RequestParam long roomId,
                                     @RequestParam String accessToken,
-                                    @RequestBody List<SelectedDayWithTime> selectedDayWhitTimeList,
-                                    Model model) {
+                                    @RequestBody List<SelectedDayWithTime> selectedDayWhitTimeList
+                                    ) throws IOException {
         Room room = roomService.getRoom(roomId);
 
         if (roomService.validateToken(room, accessToken)) {
@@ -173,6 +179,8 @@ public class RoomController {
             enterRoomService.enterRoomWithSelectedTime(room, member, selectedDayWhitTimeList);
 
             addUserAuthority(user, roomId);
+
+            enterRoomService.clearCache(room);
 
             Map<String, String> response = new HashMap<>();
             response.put("redirectUrl", String.format("/room/%d/date", roomId));
@@ -214,6 +222,7 @@ public class RoomController {
         }
         model.addAttribute("selectedAvailableMembers", selectedAvailableMembers);
         model.addAttribute("selectedUnavailableMembers", selectedUnavailableMembers);
+        model.addAttribute("calculatorUrl", calculatorUrl);
         return "status/date";
     }
 
@@ -280,6 +289,12 @@ public class RoomController {
 
         resultService.createResult(room, timeRangeWithMember, place);
         return "redirect:/room/%d/result".formatted(roomId);
+    }
+
+    @PostMapping("/addEvent")
+    public String addGoogleCalendarEvent(@RequestParam Long roomId) throws GeneralSecurityException, IOException {
+        DecidedResult result = resultService.getResult(roomId);
+        return "redirect:%s".formatted(CalendarService.createEvent(result));
     }
 
     @Data

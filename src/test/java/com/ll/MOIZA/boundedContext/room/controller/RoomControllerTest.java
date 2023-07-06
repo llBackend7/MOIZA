@@ -1,6 +1,8 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
 import com.ll.MOIZA.boundedContext.room.controller.RoomController;
+import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import org.junit.jupiter.api.*;
@@ -39,6 +41,9 @@ class RoomControllerTest {
 
     @Autowired
     MockMvc mvc;
+
+    @Autowired
+    RoomService roomService;
 
     @Test
     @WithUserDetails("user1")
@@ -160,6 +165,58 @@ class RoomControllerTest {
                 .andExpect(model().attributeExists("selectedPlaceMap"))
                 .andExpect(model().attributeExists("room"))
                 .andExpect(model().attributeExists("actor"));
+    }
+
+    @Test
+    @DisplayName("방 입장 화면_정상_토큰")
+    @WithUserDetails("user1")
+    void show_enterRoom_page() throws Exception {
+        Long roomId = 1L;
+        Room room = roomService.getRoom(roomId);
+
+        String accessToken = roomService.getAccessToken(room);
+
+        ResultActions resultActions = mvc
+                .perform(get("/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken))
+                        .with(csrf())
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(view().name("room/enter"));
+    }
+
+    @Test
+    @DisplayName("방 입장 화면_비정상_토큰")
+    @WithUserDetails("user1")
+    void show_enterRoom_page_exception() throws Exception {
+        Long roomId = 1L;
+
+        String accessToken = "not_access_token";
+
+        ResultActions resultActions = mvc
+                .perform(get("/room/enter?roomId=%d&accessToken=%s".formatted(roomId, accessToken))
+                        .with(csrf())
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(status().is4xxClientError());
+    }
+
+    @Test
+    @DisplayName("추가 시간 테스트")
+    @WithUserDetails("user1")
+    void changeTime_test() throws Exception {
+        Long roomId = 1L;
+
+        ResultActions resultActions = mvc
+                .perform(get("/room/%d/changeTime".formatted(roomId))
+                        .with(csrf()));
+
+        resultActions
+                .andExpect(status().is3xxRedirection());
     }
 
     @Test

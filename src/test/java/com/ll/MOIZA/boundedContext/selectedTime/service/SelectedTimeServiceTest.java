@@ -161,4 +161,15 @@ class SelectedTimeServiceTest {
         );
 
     }
+
+    @Test
+    @DisplayName("SelectedTime의 기간 구하기")
+    void testGetDuration(){
+        SelectedTime selectedTime = SelectedTime.builder()
+                .endTime(LocalTime.of(2, 0))
+                .startTime(LocalTime.of(0, 30))
+                .build();
+
+        assertThat(selectedTime.getDuration()).hasHour(1).hasMinute(30);
+    }
 }
