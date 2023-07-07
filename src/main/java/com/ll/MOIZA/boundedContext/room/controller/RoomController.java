@@ -196,7 +196,6 @@ public class RoomController {
     public String showRoomDate(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
         Room room = roomService.getRoom(roomId);
         Member actor = memberService.loginMember(user);
-        List<TimeRangeWithMember> overlappingTimes = selectedTimeService.findOverlappingTimeRanges(room);
 
         model.addAttribute("room", room);
         model.addAttribute("actor", actor);

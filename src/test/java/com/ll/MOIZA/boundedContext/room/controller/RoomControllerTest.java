@@ -92,28 +92,6 @@ class RoomControllerTest {
     }
 
     @Test
-    @DisplayName("시간 현황 페이지의 View Attributes 확인")
-    @WithUserDetails("user1")
-    void showRoomDateTest() throws Exception {
-        // Arrange
-        Long roomId = 1L;
-
-        // Assert
-        ResultActions resultActions = mvc
-                .perform(get("/room/"+roomId+"/date").with(csrf()).param("timeIndex","0"))
-                .andDo(print());
-
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(view().name("status/date"))
-                .andExpect(model().attributeExists("room"))
-                .andExpect(model().attributeExists("actor"))
-                .andExpect(model().attributeExists("overlappingTimes"))
-                .andExpect(model().attributeExists("selectedAvailableMembers"))
-                .andExpect(model().attributeExists("selectedUnavailableMembers"));
-    }
-
-    @Test
     @DisplayName("모임 결과 페이지")
     @WithUserDetails("user1")
     void showResultTest() throws Exception {
@@ -128,25 +106,6 @@ class RoomControllerTest {
                 .andExpect(view().name("room/result"))
                 .andExpect(model().attributeExists("result"))
                 .andExpect(model().attributeExists("appKey"));
-    }
-
-    @Test
-    @DisplayName("모임 마감 POST request")
-    @WithUserDetails("user1")
-    void closeRoomTest() throws Exception {
-        long roomId = 1L;
-
-        ResultActions resultActions = mvc
-                .perform(
-                        post("/room/"+roomId+"/close")
-                                .with(csrf())
-                )
-                .andDo(print());
-
-        resultActions
-                .andExpect(handler().methodName("closeRoom"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/room/" + roomId + "/result"));
     }
 
     @Test

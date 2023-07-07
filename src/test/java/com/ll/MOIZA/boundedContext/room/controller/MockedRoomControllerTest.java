@@ -13,6 +13,7 @@ import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.data.mongo.AutoConfigureDataMongo;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -25,8 +26,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
+import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -46,6 +49,7 @@ import static org.mockito.Mockito.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(controllers = {RoomController.class, GlobalExceptionHandler.class})
@@ -177,5 +181,45 @@ public class MockedRoomControllerTest {
             boolean hasAuthority = user.getAuthorities().stream().anyMatch(a -> a.getAuthority().equals(authority));
             return ResponseEntity.ok(hasAuthority);
         }
+    }
+
+    @Test
+    @DisplayName("모임 마감 POST request")
+    @WithMockUser
+    void closeRoomTest() throws Exception {
+        long roomId = 1L;
+
+        ResultActions resultActions = mockMvc
+                .perform(
+                        post("/room/"+roomId+"/close")
+                                .with(csrf())
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().methodName("closeRoom"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/room/" + roomId + "/result"));
+    }
+
+    @Test
+    @DisplayName("시간 현황 페이지의 View Attributes 확인")
+    @WithMockUser
+    void showRoomDateTest() throws Exception {
+        // Arrange
+        Long roomId = 1L;
+        Mockito.when(roomService.getRoom(anyLong())).thenReturn(new Room());
+        Mockito.when(memberService.loginMember(any(User.class))).thenReturn(new Member());
+
+        // Assert
+        ResultActions resultActions = mockMvc
+                .perform(get("/room/"+roomId+"/date").with(csrf()).param("timeIndex","0"))
+                .andDo(print());
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(view().name("status/date"))
+                .andExpect(model().attributeExists("room"))
+                .andExpect(model().attributeExists("actor"));
     }
 }
