@@ -6,8 +6,13 @@ import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +26,9 @@ public class EnterRoomService {
 
     private final EnterRoomRepository enterRoomRepository;
     private final SelectedTimeService selectedTimeService;
+
+    @Value("${custom.site.calculatorUrl}")
+    private String calculatorUrl;
 
     @Transactional
     public EnterRoom createEnterRoom(Room room,
@@ -65,5 +73,20 @@ public class EnterRoomService {
             enterRoomRepository.delete(opEnterRoom.get());
         else
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+    }
+
+    public void clearCache(Room room) throws IOException {
+        URL url = new URL(calculatorUrl + "/refresh-cache/" + room.getId());
+
+        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+
+        connection.setRequestMethod("GET");
+        connection.setRequestProperty("Content-Type", "application/json");
+
+        int responseCode = connection.getResponseCode();
+
+        System.out.println("responseCode:" + responseCode);
+
+        connection.disconnect();
     }
 }
