@@ -2,11 +2,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create    # 앱 처음 시작 시 생기는 오류는 무시해도 됨
-    properties:
-      hibernate:
-        show_sql: true
-        format_sql: true
-        use_sql_comments: true
   datasource:
     driver-class-name: org.mariadb.jdbc.Driver
     url: jdbc:mariadb://127.0.0.1:3306/moiza__dev?useUnicode=true&characterEncoding=utf8&autoReconnect=true&serverTimezone=Asia/Seoul

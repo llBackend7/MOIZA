@@ -1,5 +1,6 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ll.MOIZA.base.appConfig.AppConfig;
 import com.ll.MOIZA.base.calendar.service.CalendarService;
 import com.ll.MOIZA.base.security.CustomOAuth2User;
@@ -192,38 +193,24 @@ public class RoomController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{roomId}/date")
-    public String showRoomDate(@PathVariable Long roomId,
-                               @RequestParam(value = "timeIndex", defaultValue = "-1") int timeIndex,
-                               @AuthenticationPrincipal User user, Model model) {
+    public String showRoomDate(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
         Room room = roomService.getRoom(roomId);
         Member actor = memberService.loginMember(user);
         List<TimeRangeWithMember> overlappingTimes = selectedTimeService.findOverlappingTimeRanges(room);
 
-        List<List<Member>> availableMembers;
-        List<List<Member>> unavailableMembers;
-        List<Member> selectedAvailableMembers = null;
-        List<Member> selectedUnavailableMembers = null;
-
         model.addAttribute("room", room);
         model.addAttribute("actor", actor);
-        model.addAttribute("overlappingTimes", overlappingTimes);
 
-        if (timeIndex >= 0) {
-            availableMembers = overlappingTimes.stream()
-                    .map(TimeRangeWithMember::getParticipationMembers)
-                    .toList();
-
-            unavailableMembers = overlappingTimes.stream()
-                    .map(TimeRangeWithMember::getNonParticipationMembers)
-                    .toList();
-
-            selectedAvailableMembers = availableMembers.get(timeIndex);
-            selectedUnavailableMembers = unavailableMembers.get(timeIndex);
-        }
-        model.addAttribute("selectedAvailableMembers", selectedAvailableMembers);
-        model.addAttribute("selectedUnavailableMembers", selectedUnavailableMembers);
-        model.addAttribute("calculatorUrl", calculatorUrl);
         return "status/date";
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @GetMapping("/{roomId}/selected-time")
+    @ResponseBody
+    public List<TimeRangeWithMember> selectedTimes(@PathVariable Long roomId) {
+        Room room = roomService.getRoom(roomId);
+
+        return selectedTimeService.findOverlappingTimeRanges(room);
     }
 
     @GetMapping("/{roomId}/place")

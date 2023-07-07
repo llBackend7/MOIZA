@@ -53,43 +53,6 @@ public class SelectedTimeServiceQueryTest {
                 room, LocalDate.now().plusDays(6)).size()).isEqualTo(6);
     }
 
-    @Test
-    @DisplayName("겹치는_시간_조회")
-    void findOverlappingTimeRanges_test() {
-
-        List<TimeRangeWithMember> overlappingRanges = selectedTimeService.findOverlappingTimeRanges(
-                room, LocalDate.now().plusDays(6)
-        );
-
-        for (TimeRangeWithMember t : overlappingRanges) {
-            System.out.println(t.date + " | " + t.start + "~" + t.end);
-            System.out.print("참여자 : ");
-            for (Member m : t.getParticipationMembers()) {
-                System.out.print(m.getName()+ " ");
-            }
-            System.out.println();
-
-            System.out.print("불참자 : ");
-            for (Member m : t.getNonParticipationMembers()) {
-                System.out.print(m.getName()+ " ");
-            }
-            System.out.println();
-        }
-
-        TimeRangeWithMember t1 = overlappingRanges.get(0);
-        TimeRangeWithMember t2 = overlappingRanges.get(1);
-        assertAll(
-                () -> assertThat(t1.getDate()).isEqualTo(LocalDate.now().plusDays(6)),
-                () -> assertThat(t1.getStart()).isEqualTo(LocalTime.of(7, 0)),
-                () -> assertThat(t1.getEnd()).isEqualTo(LocalTime.of(10, 0)),
-                () -> assertThat(t1.getParticipationMembers()).isEqualTo(List.of(member1, member2, member3)),
-
-                () -> assertThat(t2.getDate()).isEqualTo(LocalDate.now().plusDays(6)),
-                () -> assertThat(t2.getStart()).isEqualTo(LocalTime.of(11, 0)),
-                () -> assertThat(t2.getEnd()).isEqualTo(LocalTime.of(14, 0)),
-                () -> assertThat(t2.getParticipationMembers()).isEqualTo(List.of(member1, member2, member3))
-        );
-    }
 
     @Test
     @DisplayName("전체_겹치는_시간_조회")

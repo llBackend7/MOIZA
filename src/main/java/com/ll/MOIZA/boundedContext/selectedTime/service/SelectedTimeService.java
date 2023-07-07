@@ -7,6 +7,10 @@ import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
 
+import java.io.IOException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -17,9 +21,17 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
@@ -28,10 +40,11 @@ import java.util.*;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SelectedTimeService {
-
     private final SelectedTimeRepository selectedTimeRepository;
-
     private final EnterRoomRepository enterRoomRepository;
+
+    @Value("${custom.site.calculatorUrl}")
+    private String calculatorUrl;
 
     @Transactional
     public SelectedTime CreateSelectedTime(
@@ -89,112 +102,25 @@ public class SelectedTimeService {
         return selectedTimes;
     }
 
+    @SneakyThrows
     public List<TimeRangeWithMember> findOverlappingTimeRanges(Room room) {
-        List<TimeRangeWithMember> timeRangeWithMembers = new LinkedList<>();
-        LocalDate startDay = room.getAvailableStartDay();
-        LocalDate endDay = room.getAvailableEndDay();
+        RestTemplate restTemplate = new RestTemplate();
 
-        while (!startDay.isAfter(endDay)) {
-            List<TimeRangeWithMember> getTimeRangesWhitRoomAndDay = findOverlappingTimeRanges(room,
-                    startDay);
+        restTemplate.setMessageConverters(Collections.singletonList(new MappingJackson2HttpMessageConverter()));
 
-            timeRangeWithMembers.addAll(getTimeRangesWhitRoomAndDay);
+        String url = calculatorUrl + "/selected-time/" + room.getId();
 
-            startDay = startDay.plusDays(1);
+        ResponseEntity<List<TimeRangeWithMember>> response = restTemplate.exchange(
+                url,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<>() {
+                });
+
+        if (!response.getStatusCode().is2xxSuccessful()) {
+            throw new ResponseStatusException(response.getStatusCode(), "계산 API로부터 값을 가져오던 중 문제가 발생했습니다.");
         }
 
-        if (!timeRangeWithMembers.isEmpty())
-            Collections.sort(timeRangeWithMembers);
-
-        if (timeRangeWithMembers.size() > 10) {
-            return new ArrayList<>(timeRangeWithMembers.subList(0, 10));
-        }
-
-        return timeRangeWithMembers;
-    }
-
-    public List<TimeRangeWithMember> findOverlappingTimeRanges(
-            Room room, LocalDate date) {
-
-        List<SelectedTime> selectedTimeList = selectedTimeRepository.searchSelectedTimeByRoom(room,
-                date);
-
-        if (selectedTimeList.isEmpty()) {
-            return new ArrayList<>();
-        }
-
-        List<TimeRangeWithMember> overlappingRanges = new LinkedList<>();
-
-        // 탐색 시간 기준 시작점
-        LocalTime startTime = room.getAvailableStartTime();
-
-        LocalTime meetingDuration = room.getMeetingDuration();
-
-        while (startTime.isBefore(room.getAvailableEndTime())) {
-
-            LocalTime basicStartTime = startTime;
-            LocalTime basicEndTime = startTime.plusHours(meetingDuration.getHour())
-                    .plusMinutes(meetingDuration.getMinute());
-
-            List<Member> participationMembers = getContainedMember(selectedTimeList, meetingDuration,
-                    basicStartTime,
-                    basicEndTime);
-
-            List<Member> nonParticipationMembers = getNonParticipationMembers(room, participationMembers);
-
-            if (participationMembers.size() >= 1) {
-                overlappingRanges.add(
-                        new TimeRangeWithMember(date, basicStartTime, basicEndTime, participationMembers, nonParticipationMembers));
-            }
-
-            startTime = basicStartTime.plusMinutes(30);
-        }
-
-        Collections.sort(overlappingRanges);
-
-        if (overlappingRanges.size() > 10) {
-            return new ArrayList<>(overlappingRanges.subList(0, 10));
-        }
-
-        return overlappingRanges;
-    }
-
-    public List<Member> getContainedMember(List<SelectedTime> selectedTimeList,
-                                           LocalTime meetingDuration,
-                                           LocalTime startTime,
-                                           LocalTime endTime) {
-        return selectedTimeList.stream()
-                .filter(selectedTime -> {
-                    LocalTime selectedDuration = selectedTime.getDuration();
-                    return isAfterOrEqual(selectedDuration, meetingDuration);
-                })
-                .filter(selectedTime -> isBeforeOrEqual(selectedTime.getStartTime(), endTime))
-                .filter(selectedTime ->
-                        isBeforeOrEqual(selectedTime.getStartTime(), startTime)
-                                && isAfterOrEqual(selectedTime.getEndTime(),endTime)
-                )
-                .map(SelectedTime::getEnterRoom)
-                .map(EnterRoom::getMember)
-                .distinct()
-                .sorted(Comparator.comparing(Member::getName))
-                .collect(Collectors.toCollection(LinkedList::new));
-    }
-
-    private boolean isAfterOrEqual(LocalTime left, LocalTime right) {
-        // left >= right
-        return !left.isBefore(right);
-    }
-
-    private boolean isBeforeOrEqual(LocalTime left, LocalTime right) {
-        // left <= right
-        return !left.isAfter(right);
-    }
-
-    public List<Member> getNonParticipationMembers(Room room, List<Member> participationMembers) {
-        List<Member> allMembers = enterRoomRepository.findMembersByRoom(room);
-
-        return allMembers.stream()
-                .filter(m -> !participationMembers.contains(m))
-                .collect(Collectors.toList());
+        return response.getBody();
     }
 }
