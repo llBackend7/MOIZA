@@ -1,48 +1,31 @@
 package com.ll.MOIZA.boundedContext.selectedTime.service;
 
-import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
-import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
-
-import java.io.IOException;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SelectedTimeService {
     private final SelectedTimeRepository selectedTimeRepository;
-    private final EnterRoomRepository enterRoomRepository;
-
+    private final RestTemplate restTemplate;
     @Value("${custom.site.calculatorUrl}")
     private String calculatorUrl;
 
@@ -96,18 +79,8 @@ public class SelectedTimeService {
         }
     }
 
-    public List<SelectedTime> findSelectedTimeByRoomAndDate(Room room, LocalDate date) {
-        List<SelectedTime> selectedTimes = selectedTimeRepository.searchSelectedTimeByRoom(
-                room, date);
-        return selectedTimes;
-    }
-
     @SneakyThrows
     public List<TimeRangeWithMember> findOverlappingTimeRanges(Room room) {
-        RestTemplate restTemplate = new RestTemplate();
-
-        restTemplate.setMessageConverters(Collections.singletonList(new MappingJackson2HttpMessageConverter()));
-
         String url = calculatorUrl + "/selected-time/" + room.getId();
 
         ResponseEntity<List<TimeRangeWithMember>> response = restTemplate.exchange(

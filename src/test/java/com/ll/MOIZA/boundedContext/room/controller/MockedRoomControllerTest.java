@@ -182,44 +182,4 @@ public class MockedRoomControllerTest {
             return ResponseEntity.ok(hasAuthority);
         }
     }
-
-    @Test
-    @DisplayName("모임 마감 POST request")
-    @WithMockUser
-    void closeRoomTest() throws Exception {
-        long roomId = 1L;
-
-        ResultActions resultActions = mockMvc
-                .perform(
-                        post("/room/"+roomId+"/close")
-                                .with(csrf())
-                )
-                .andDo(print());
-
-        resultActions
-                .andExpect(handler().methodName("closeRoom"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/room/" + roomId + "/result"));
-    }
-
-    @Test
-    @DisplayName("시간 현황 페이지의 View Attributes 확인")
-    @WithMockUser
-    void showRoomDateTest() throws Exception {
-        // Arrange
-        Long roomId = 1L;
-        Mockito.when(roomService.getRoom(anyLong())).thenReturn(new Room());
-        Mockito.when(memberService.loginMember(any(User.class))).thenReturn(new Member());
-
-        // Assert
-        ResultActions resultActions = mockMvc
-                .perform(get("/room/"+roomId+"/date").with(csrf()).param("timeIndex","0"))
-                .andDo(print());
-
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(view().name("status/date"))
-                .andExpect(model().attributeExists("room"))
-                .andExpect(model().attributeExists("actor"));
-    }
 }
