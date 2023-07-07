@@ -129,7 +129,7 @@ public class MockedRoomControllerTest {
                         .content(selectedDaysJSON)
                         .contentType(MediaType.APPLICATION_JSON)
                         .with(csrf()))
-                .andExpect(jsonPath("$.redirectUrl", is("/room/1/date")));
+                .andExpect(jsonPath("$.redirectUrl", is("/room/1/place")));
 
         MvcResult mvcResult = mockMvc.perform(get("/test-authority")
                         .param("authority", "ROOM#1_MEMBER")

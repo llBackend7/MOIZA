@@ -184,7 +184,7 @@ public class RoomController {
             enterRoomService.clearCache(room);
 
             Map<String, String> response = new HashMap<>();
-            response.put("redirectUrl", String.format("/room/%d/date", roomId));
+            response.put("redirectUrl", String.format("/room/%d/place", roomId));
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
