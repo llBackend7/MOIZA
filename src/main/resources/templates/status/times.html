@@ -1,5 +1,5 @@
 <ul th:fragment="times" class="flex flex-col items-center" id="times">
-    <script>
+    <script th:inline="javascript">
         let path = window.location.pathname;
         let pathSegments = path.split('/');
         let roomId = pathSegments[pathSegments.length - 2];
@@ -10,7 +10,7 @@
 
         function getSelectedTimes() {
             $.ajax({
-                url: `${calculatorUrl}/selected-time/${roomId}`,
+                url: `selected-time`,
                 type: 'get',
                 contentType: 'application/json',
                 success: function (response) {
