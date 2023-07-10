@@ -73,9 +73,11 @@ public class RoomService {
         if (LocalDateTime.now().isAfter(deadLine)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "마감시간이 잘못되었습니다.");
         }
-        if (startDay.atStartOfDay().isBefore(deadLine)) {
+        if (startDay.isBefore(deadLine.toLocalDate())
+                || (startDay.isEqual(deadLine.toLocalDate()) && availableStartTime.isBefore(deadLine.toLocalTime()))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "마감시간은 가능한 날짜보다 이전이어야 합니다.");
         }
+
     }
 
     private boolean validateTime(LocalTime time) {

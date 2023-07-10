@@ -177,7 +177,8 @@
                                 <a href="javascript:" onclick="$(this).next().submit()">
                                     <img src="https://www.getharvest.com/hs-fs/hubfs/integrations-new/google-calendar.png?width=300&name=google-calendar.png" width="40" class="mb-1">
                                 </a>
-                                <form hidden th:action="|/room/addEvent?roomId=${result.room.id}|" method="post">
+                                <form hidden action="/room/addEvent">
+                                    <input type="hidden" name="roomId" th:value="${result.room.id}">
                                 </form>
                                 <div class="text-sm">캘린더<br>일정추가</div>
                             </li>

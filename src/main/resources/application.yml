@@ -10,6 +10,13 @@ spring:
     oauth2:
       client:
         registration:
+          google:
+            scope: https://www.googleapis.com/auth/calendar.events
+            authorization-grant-type: authorization_code
+            auth-uri: 'https://accounts.google.com/o/oauth2/v2/auth'
+            token-uri: 'https://oauth2.googleapis.com/token'
+            redirect-uri: 'http://localhost:8080/callback'
+            response-type: code
           kakao:
             scope: profile_nickname, account_email, profile_image
             client-name: Kakao
