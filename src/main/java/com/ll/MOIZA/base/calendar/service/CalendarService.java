@@ -1,28 +1,31 @@
 package com.ll.MOIZA.base.calendar.service;
 
 import com.google.api.client.auth.oauth2.Credential;
-import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
-import com.google.api.client.extensions.jetty.auth.oauth2.LocalServerReceiver;
-import com.google.api.client.googleapis.auth.oauth2.GoogleAuthorizationCodeFlow;
-import com.google.api.client.googleapis.auth.oauth2.GoogleClientSecrets;
+import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
+import com.google.api.services.calendar.Calendar;
+import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
+import com.ll.MOIZA.boundedContext.result.service.ResultService;
+import com.ll.MOIZA.boundedContext.room.entity.Room;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+
+import java.io.FileReader;
 import com.google.api.client.json.gson.GsonFactory;
 import com.google.api.client.util.DateTime;
-import com.google.api.client.util.store.FileDataStoreFactory;
-import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
-import com.ll.MOIZA.boundedContext.result.entity.DecidedResult;
-import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.squareup.okhttp.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.security.GeneralSecurityException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -30,36 +33,60 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CalendarService {
-    /**
-     * Application name.
-     */
-    private static final String APPLICATION_NAME = "MOIZA";
-    /**
-     * Global instance of the JSON factory.
-     */
-    private static final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
-    /**
-     * Directory to store authorization tokens for this application.
-     */
-    private static final String TOKENS_DIRECTORY_PATH = "tokens";
-    /**
-     * Global instance of the scopes required by this quickstart.
-     * If modifying these scopes, delete your previously saved tokens/ folder.
-     */
-    private static final List<String> SCOPES =
-            Collections.singletonList(CalendarScopes.CALENDAR_EVENTS);
-    private static final String CREDENTIALS_FILE_PATH = "/client_secret.json";
+    private final ResultService resultService;
+    private static Long roomId;
 
-    public static String createEvent(DecidedResult result) throws IOException, GeneralSecurityException {
-        // Build a new authorized API client service.
+    private final String APPLICATION_NAME = "MOIZA";
+    private final JsonFactory JSON_FACTORY = GsonFactory.getDefaultInstance();
+    private final List<String> SCOPES =
+            Collections.singletonList(CalendarScopes.CALENDAR_EVENTS);
+    private final String TOKEN_PATH = "tokens/token.json";
+
+    private final String AUTHORIZATION_GRANT_TYPE = "authorization_code";
+    private final String AUTH_URI = "https://accounts.google.com/o/oauth2/v2/auth";
+    private final String TOKEN_URI = "https://oauth2.googleapis.com/token";
+    private final String REDIRECT_URI = "http://localhost:8080/callback";
+    private final String RESPONSE_TYPE = "code";
+
+    private static String CLIENT_ID;
+    private static String CLIENT_SECRET;
+
+    @Value("${spring.security.oauth2.client.registration.google.clientId}")
+    private void setClientId(String clientId) {
+        CalendarService.CLIENT_ID = clientId;
+    }
+    @Value("${spring.security.oauth2.client.registration.google.client-secret}")
+    private void setClientSecret(String clientSecret) {
+        CalendarService.CLIENT_SECRET = clientSecret;
+    }
+
+    public String GoogleOauth(Long id) {
+        roomId = id;
+
+        String redirectUrl = AUTH_URI +
+                "?scope=" + SCOPES.get(0) +
+                "&access_type=offline" +
+                "&response_type=" + RESPONSE_TYPE +
+                "&redirect_uri=" + REDIRECT_URI +
+                "&client_id=" + CLIENT_ID;
+
+        return redirectUrl;
+    }
+
+    public String setEvent(String accessToken) throws IOException, GeneralSecurityException {
         final NetHttpTransport HTTP_TRANSPORT = GoogleNetHttpTransport.newTrustedTransport();
-        Room room = result.getRoom();
+        Credential credential = new GoogleCredential().setAccessToken(accessToken);
 
         Calendar service =
-                new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, getCredentials(HTTP_TRANSPORT))
+                new Calendar.Builder(HTTP_TRANSPORT, JSON_FACTORY, credential)
                         .setApplicationName(APPLICATION_NAME)
                         .build();
+
+
+        DecidedResult result = resultService.getResult(roomId);
+        Room room = result.getRoom();
 
         Event event = new Event()
                 .setSummary(room.getName())
@@ -85,31 +112,57 @@ public class CalendarService {
         return event.getHtmlLink();
     }
 
-    /**
-     * Creates an authorized Credential object.
-     *
-     * @param HTTP_TRANSPORT The network HTTP Transport.
-     * @return An authorized Credential object.
-     * @throws IOException If the credentials.json file cannot be found.
-     */
-    private static Credential getCredentials(final NetHttpTransport HTTP_TRANSPORT)
-            throws IOException {
-        // Load client secrets.
-        InputStream in = CalendarService.class.getResourceAsStream(CREDENTIALS_FILE_PATH);
-        if (in == null) {
-            throw new FileNotFoundException("Resource not found: " + CREDENTIALS_FILE_PATH);
-        }
-        GoogleClientSecrets clientSecrets =
-                GoogleClientSecrets.load(JSON_FACTORY, new InputStreamReader(in));
+    public String getAccessTokenJsonData(String code) {
+        OkHttpClient client = new OkHttpClient();
+        HttpUrl.Builder urlBuilder = HttpUrl.parse(TOKEN_URI).newBuilder();
+        urlBuilder.addQueryParameter("client_id", CLIENT_ID);
+        urlBuilder.addQueryParameter("client_secret", CLIENT_SECRET);
+        urlBuilder.addQueryParameter("code", code);
+        urlBuilder.addQueryParameter("grant_type", AUTHORIZATION_GRANT_TYPE);
+        urlBuilder.addQueryParameter("redirect_uri", REDIRECT_URI);
 
-        // Build flow and trigger user authorization request.
-        GoogleAuthorizationCodeFlow flow = new GoogleAuthorizationCodeFlow.Builder(
-                HTTP_TRANSPORT, JSON_FACTORY, clientSecrets, SCOPES)
-                .setDataStoreFactory(new FileDataStoreFactory(new java.io.File(TOKENS_DIRECTORY_PATH)))
-                .setAccessType("offline")
+        RequestBody requestBody = RequestBody.create(null, new byte[0]);
+
+        Request request = new Request.Builder()
+                .url(urlBuilder.build())
+                .post(requestBody)
                 .build();
-        LocalServerReceiver receiver = new LocalServerReceiver.Builder().setPort(8888).build();
-        //returns an authorized Credential object.
-        return new AuthorizationCodeInstalledApp(flow, receiver).authorize("user");
+
+        try (ResponseBody response = client.newCall(request).execute().body()) {
+            String responseBody = response.string();
+            File file = new File(TOKEN_PATH);
+            BufferedWriter writer = new BufferedWriter(new FileWriter(file, false));
+
+            writer.write(responseBody);
+            writer.flush();
+            writer.close();
+
+            return "/token";
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return "Error";
+    }
+
+    public String readAccessTokenFromFile() {
+        String projectPath = System.getProperty("user.dir");
+        String filePath = projectPath + File.separator + TOKEN_PATH;
+        String accessToken = null;
+
+        try {
+            JSONParser parser = new JSONParser();
+            JSONObject json = (JSONObject) parser.parse(new FileReader(filePath));
+            accessToken = (String) json.get("access_token");
+
+            if (accessToken == null) {
+                System.out.println("Access Token not found in the JSON file.");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return accessToken;
     }
 }

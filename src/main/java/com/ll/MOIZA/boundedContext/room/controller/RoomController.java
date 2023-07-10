@@ -1,7 +1,5 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ll.MOIZA.base.appConfig.AppConfig;
 import com.ll.MOIZA.base.calendar.service.CalendarService;
 import com.ll.MOIZA.base.security.CustomOAuth2User;
@@ -63,6 +61,7 @@ public class RoomController {
     private final SelectedTimeService selectedTimeService;
     private final EnterRoomService enterRoomService;
     private final SelectedPlaceService selectedPlaceService;
+    private final CalendarService calendarService;
 
     @Data
     public static class RoomForm {
@@ -183,7 +182,7 @@ public class RoomController {
             enterRoomService.clearCache(room);
 
             Map<String, String> response = new HashMap<>();
-            response.put("redirectUrl", String.format("/room/%d/date", roomId));
+            response.put("redirectUrl", String.format("/room/%d/place", roomId));
             return new ResponseEntity<>(response, HttpStatus.OK);
         }
 
@@ -192,46 +191,23 @@ public class RoomController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{roomId}/date")
-    public String showRoomDate(@PathVariable Long roomId,
-                               @AuthenticationPrincipal User user, Model model) {
+    public String showRoomDate(@PathVariable Long roomId, @AuthenticationPrincipal User user, Model model) {
         Room room = roomService.getRoom(roomId);
         Member actor = memberService.loginMember(user);
-        List<TimeRangeWithMember> overlappingTimes = selectedTimeService.findOverlappingTimeRanges(room);
 
         model.addAttribute("room", room);
         model.addAttribute("actor", actor);
-        model.addAttribute("overlappingTimes", overlappingTimes);
-        model.addAttribute("selectedAvailableMembers", null);
-        model.addAttribute("selectedUnavailableMembers", null);
-        model.addAttribute("calculatorUrl", AppConfig.getCalculatorUrl());
+
         return "status/date";
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/{roomId}/date/members")
-    public ResponseEntity<Map<String, Object>> returnMembersAttendance(@PathVariable Long roomId,
-                                                                       @RequestParam int timeIndex) {
-        Map<String, Object> data = new HashMap<>();
-
+    @GetMapping("/{roomId}/selected-time")
+    @ResponseBody
+    public List<TimeRangeWithMember> selectedTimes(@PathVariable Long roomId) {
         Room room = roomService.getRoom(roomId);
-        List<TimeRangeWithMember> overlappingTimes = selectedTimeService.findOverlappingTimeRanges(room);
 
-        List<List<Map<String, String>>> availableMembers = overlappingTimes.stream()
-                .map(TimeRangeWithMember::getParticipationMembers)
-                .map(this::extractMemberData) // Extract required member data
-                .toList();
-
-        List<List<Map<String, String>>> unavailableMembers = overlappingTimes.stream()
-                .map(TimeRangeWithMember::getNonParticipationMembers)
-                .map(this::extractMemberData) // Extract required member data
-                .toList();
-
-        List<Map<String, String>> selectedAvailableMembers = availableMembers.get(timeIndex);
-        List<Map<String, String>> selectedUnavailableMembers = unavailableMembers.get(timeIndex);
-
-        data.put("availableMembers", selectedAvailableMembers);
-        data.put("unavailableMembers", selectedUnavailableMembers);
-        return ResponseEntity.ok(data);
+        return selectedTimeService.findOverlappingTimeRanges(room);
     }
 
     @GetMapping("/{roomId}/place")
@@ -299,10 +275,10 @@ public class RoomController {
         return "redirect:/room/%d/result".formatted(roomId);
     }
 
-    @PostMapping("/addEvent")
-    public String addGoogleCalendarEvent(@RequestParam Long roomId) throws GeneralSecurityException, IOException {
-        DecidedResult result = resultService.getResult(roomId);
-        return "redirect:%s".formatted(CalendarService.createEvent(result));
+    @GetMapping("/addEvent")
+    public String addCalendarEvent(@RequestParam Long roomId) throws GeneralSecurityException, IOException {
+        String url = calendarService.GoogleOauth(roomId);
+        return "redirect:%s".formatted(url);
     }
 
     @Data
@@ -334,11 +310,5 @@ public class RoomController {
 
         SecurityContextHolder.getContext().setAuthentication(
                 new UsernamePasswordAuthenticationToken(updatedUser, "", updatedAuthorities));
-    }
-
-    private List<Map<String, String>> extractMemberData(List<Member> members) {
-        return members.stream()
-                .map(member -> Map.of("name", member.getName(), "profile", member.getProfile()))
-                .collect(Collectors.toList());
     }
 }

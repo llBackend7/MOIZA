@@ -1,6 +1,7 @@
 package com.ll.MOIZA.boundedContext.home.controller;
 
 import com.ll.MOIZA.base.appConfig.AppConfig;
+import com.ll.MOIZA.base.calendar.service.CalendarService;
 import com.ll.MOIZA.base.rq.Rq;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.service.MemberService;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -28,6 +31,7 @@ public class HomeController {
     private final MemberService memberService;
     private final RoomService roomService;
     private final EnterRoomService enterRoomService;
+    private final CalendarService calendarService;
     private final Rq rq;
 
     @GetMapping("/")
@@ -79,5 +83,16 @@ public class HomeController {
         Member member = memberService.findByName(user.getUsername());
         enterRoomService.leaveEnterRoom(room, member);
         return "redirect:/groups";
+    }
+
+    @GetMapping("/callback")
+    public String callback(@RequestParam String code, @RequestParam String scope){
+        return "redirect:"+ calendarService.getAccessTokenJsonData(code);
+    }
+
+    @GetMapping("/token")
+    public String token() throws GeneralSecurityException, IOException {
+        String accessToken = calendarService.readAccessTokenFromFile();
+        return "redirect:"+ calendarService.setEvent(accessToken);
     }
 }

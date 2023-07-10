@@ -1,31 +1,34 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
-import com.ll.MOIZA.boundedContext.room.controller.RoomController;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
-import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
-import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
+import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
+import com.nimbusds.oauth2.sdk.ResponseType;
 import org.junit.jupiter.api.*;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.Model;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.RestTemplate;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.codehaus.groovy.runtime.DefaultGroovyMethods.any;
+import static org.mockito.ArgumentMatchers.*;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -44,6 +47,19 @@ class RoomControllerTest {
 
     @Autowired
     RoomService roomService;
+
+    @MockBean
+    RestTemplate restTemplate;
+
+    @BeforeEach
+    void setRestTemplate(){
+        Mockito.when(restTemplate.exchange(
+                        anyString(),
+                        any(HttpMethod.class),
+                        ArgumentMatchers.any(),
+                        ArgumentMatchers.<ParameterizedTypeReference<List<TimeRangeWithMember>>>any()))
+                .thenReturn(new ResponseEntity<>(new ArrayList<>(), null, HttpStatus.OK));
+    }
 
     @Test
     @WithUserDetails("user1")
@@ -75,9 +91,9 @@ class RoomControllerTest {
         roomForm.put("description", List.of("설명"));
         roomForm.put("startDate", List.of(LocalDate.now().plusDays(4).toString()));
         roomForm.put("endDate", List.of(LocalDate.now().plusDays(10).toString()));
-        roomForm.put("availableStartTime", List.of(LocalTime.of(13,30).toString()));
-        roomForm.put("availableEndTime", List.of(LocalTime.of(15,30).toString()));
-        roomForm.put("duration", List.of(LocalTime.of(0,30).toString()));
+        roomForm.put("availableStartTime", List.of(LocalTime.of(13, 30).toString()));
+        roomForm.put("availableEndTime", List.of(LocalTime.of(15, 30).toString()));
+        roomForm.put("duration", List.of(LocalTime.of(0, 30).toString()));
         roomForm.put("deadLine", List.of(LocalDateTime.now().plusDays(2).toString()));
 
 
@@ -92,35 +108,13 @@ class RoomControllerTest {
     }
 
     @Test
-    @DisplayName("시간 현황 페이지의 View Attributes 확인")
-    @WithUserDetails("user1")
-    void showRoomDateTest() throws Exception {
-        // Arrange
-        Long roomId = 1L;
-
-        // Assert
-        ResultActions resultActions = mvc
-                .perform(get("/room/"+roomId+"/date").with(csrf()).param("timeIndex","0"))
-                .andDo(print());
-
-        resultActions
-                .andExpect(status().isOk())
-                .andExpect(view().name("status/date"))
-                .andExpect(model().attributeExists("room"))
-                .andExpect(model().attributeExists("actor"))
-                .andExpect(model().attributeExists("overlappingTimes"))
-                .andExpect(model().attributeExists("selectedAvailableMembers"))
-                .andExpect(model().attributeExists("selectedUnavailableMembers"));
-    }
-
-    @Test
     @DisplayName("모임 결과 페이지")
     @WithUserDetails("user1")
     void showResultTest() throws Exception {
         long roomId = 2L;
 
         ResultActions resultActions = mvc
-                .perform(get("/room/"+roomId+"/result").with(csrf()))
+                .perform(get("/room/" + roomId + "/result").with(csrf()))
                 .andDo(print());
 
         resultActions
@@ -131,32 +125,13 @@ class RoomControllerTest {
     }
 
     @Test
-    @DisplayName("모임 마감 POST request")
-    @WithUserDetails("user1")
-    void closeRoomTest() throws Exception {
-        long roomId = 1L;
-
-        ResultActions resultActions = mvc
-                .perform(
-                        post("/room/"+roomId+"/close")
-                                .with(csrf())
-                )
-                .andDo(print());
-
-        resultActions
-                .andExpect(handler().methodName("closeRoom"))
-                .andExpect(status().is3xxRedirection())
-                .andExpect(redirectedUrl("/room/" + roomId + "/result"));
-    }
-
-    @Test
     @DisplayName("장소 투표 페이지의 View Attributes 확인")
     @WithUserDetails("user1")
     void showRoomPlaceTest() throws Exception {
         Long roomId = 1L;
 
         ResultActions resultActions = mvc
-                .perform(get("/room/"+roomId+"/place").with(csrf()).param("timeIndex","0"))
+                .perform(get("/room/" + roomId + "/place").with(csrf()).param("timeIndex", "0"))
                 .andDo(print());
 
         resultActions
@@ -227,7 +202,7 @@ class RoomControllerTest {
 
         ResultActions resultActions = mvc
                 .perform(
-                        post("/room/"+roomId+"/place")
+                        post("/room/" + roomId + "/place")
                                 .with(csrf())
                 )
                 .andDo(print());
@@ -236,5 +211,43 @@ class RoomControllerTest {
                 .andExpect(handler().methodName("createPlace"))
                 .andExpect(status().is3xxRedirection())
                 .andExpect(redirectedUrl("/room/" + roomId + "/place"));
+    }
+
+    @Test
+    @DisplayName("모임 마감 POST request")
+    @WithUserDetails("user1")
+    void closeRoomTest() throws Exception {
+        long roomId = 1L;
+
+        ResultActions resultActions = mvc
+                .perform(
+                        post("/room/" + roomId + "/close")
+                                .with(csrf())
+                )
+                .andDo(print());
+
+        resultActions
+                .andExpect(handler().methodName("closeRoom"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(redirectedUrl("/room/" + roomId + "/result"));
+    }
+
+    @Test
+    @DisplayName("시간 현황 페이지의 View Attributes 확인")
+    @WithUserDetails("user1")
+    void showRoomDateTest() throws Exception {
+        // Arrange
+        Long roomId = 1L;
+
+        // Assert
+        ResultActions resultActions = mvc
+                .perform(get("/room/" + roomId + "/date").with(csrf()).param("timeIndex", "0"))
+                .andDo(print());
+
+        resultActions
+                .andExpect(status().isOk())
+                .andExpect(view().name("status/date"))
+                .andExpect(model().attributeExists("room"))
+                .andExpect(model().attributeExists("actor"));
     }
 }
