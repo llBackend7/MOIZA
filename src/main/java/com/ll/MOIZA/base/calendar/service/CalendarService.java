@@ -90,22 +90,39 @@ public class CalendarService {
 
         Event event = new Event()
                 .setSummary(room.getName())
-                .setDescription(room.getDescription())
-                .setLocation(result.getDecidedPlace());
+                .setDescription(room.getDescription());
 
-        LocalDateTime startLocalDateTime = result.getDecidedDayTime();
-        DateTime startDateTime = new DateTime(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
-        EventDateTime start = new EventDateTime()
-                .setDateTime(startDateTime)
-                .setTimeZone("Asia/Seoul");
-        event.setStart(start);
+        String place = result.getDecidedPlace();
+        if(place != null)
+            event.setLocation(place);
 
-        LocalDateTime endLocalDateTime = startLocalDateTime.plusHours(room.getMeetingDuration().getHour()).plusMinutes(room.getMeetingDuration().getMinute());
-        DateTime endDateTime = new DateTime(endLocalDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
-        EventDateTime end = new EventDateTime()
-                .setDateTime(endDateTime)
-                .setTimeZone("Asia/Seoul");
-        event.setEnd(end);
+        if(result.getDecidedDayTime() != null) {
+            LocalDateTime startLocalDateTime = result.getDecidedDayTime();
+            DateTime startDateTime = new DateTime(startLocalDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+            EventDateTime start = new EventDateTime()
+                    .setDateTime(startDateTime)
+                    .setTimeZone("Asia/Seoul");
+            event.setStart(start);
+
+            LocalDateTime endLocalDateTime = startLocalDateTime.plusHours(room.getMeetingDuration().getHour()).plusMinutes(room.getMeetingDuration().getMinute());
+            DateTime endDateTime = new DateTime(endLocalDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli());
+            EventDateTime end = new EventDateTime()
+                    .setDateTime(endDateTime)
+                    .setTimeZone("Asia/Seoul");
+            event.setEnd(end);
+        } else {
+            DateTime startDateTime = new DateTime(System.currentTimeMillis());
+            EventDateTime start = new EventDateTime()
+                    .setDateTime(startDateTime)
+                    .setTimeZone("Asia/Seoul");
+            event.setStart(start);
+
+            DateTime endDateTime = new DateTime(System.currentTimeMillis());
+            EventDateTime end = new EventDateTime()
+                    .setDateTime(endDateTime)
+                    .setTimeZone("Asia/Seoul");
+            event.setEnd(end);
+        }
 
         event = service.events().insert("primary", event).execute();
         System.out.printf("이벤트가 생성되었습니다. 이벤트 ID: %s\n", event.getHtmlLink());
