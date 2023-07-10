@@ -66,6 +66,10 @@ public class EnterRoomService {
         return enterRoomRepository.findByMemberIdAndRoomId(memberId, roomId);
     }
 
+    public EnterRoom findByMemberIdAndRoomIdElseThrow(Long memberId, Long roomId) {
+        return enterRoomRepository.findByMemberIdAndRoomId(memberId, roomId).orElseThrow();
+    }
+
     @Transactional
     public void leaveEnterRoom(Room room, Member actor) {
         Optional<EnterRoom> opEnterRoom = enterRoomRepository.findByRoomAndMember(room, actor);

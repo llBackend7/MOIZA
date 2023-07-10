@@ -9,6 +9,8 @@
         $(document).ready(()=>getSelectedTimes())
 
         function getSelectedTimes() {
+            console.log(calculatorUrl)
+            console.log(roomId)
             $.ajax({
                 url: `${calculatorUrl}/selected-time/${roomId}`,
                 type: 'get',

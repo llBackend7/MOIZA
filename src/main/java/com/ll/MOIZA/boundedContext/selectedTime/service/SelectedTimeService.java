@@ -1,9 +1,12 @@
 package com.ll.MOIZA.boundedContext.selectedTime.service;
 
 import com.ll.MOIZA.boundedContext.member.entity.Member;
+import com.ll.MOIZA.boundedContext.member.service.MemberService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
+import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
+import com.ll.MOIZA.boundedContext.selectedTime.dto.SelectedTimeDto;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
 
@@ -17,6 +20,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,13 +32,16 @@ import java.util.*;
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
+@EnableCaching
 public class SelectedTimeService {
 
     private final SelectedTimeRepository selectedTimeRepository;
 
     private final EnterRoomRepository enterRoomRepository;
 
+
     @Transactional
+//    @CachePut(value = "overlappingTimeRangesCache", key = "#enterRoom.room.id")
     public SelectedTime CreateSelectedTime(
             LocalDate day,
             LocalTime startTime,
@@ -50,6 +58,23 @@ public class SelectedTimeService {
                 .build();
 
         return selectedTimeRepository.save(selectedTime);
+    }
+
+    @Transactional
+    public SelectedTime addSelectedTime(SelectedTimeDto selectedTimeDto, EnterRoom enterRoom) {
+        Integer[] dayArray = Arrays.stream(selectedTimeDto.getDay().split("-"))
+                .map(Integer::parseInt).toArray(Integer[]::new);
+        Integer[] startArray = Arrays.stream(selectedTimeDto.getStart().split(":"))
+                .map(Integer::parseInt).toArray(Integer[]::new);
+        Integer[] endArray = Arrays.stream(selectedTimeDto.getEnd().split(":"))
+                .map(Integer::parseInt).toArray(Integer[]::new);
+
+        LocalDate day = LocalDate.of(dayArray[0], dayArray[1], dayArray[2]);
+        LocalTime start = LocalTime.of(startArray[0], startArray[1], startArray[2]);
+        LocalTime end = LocalTime.of(endArray[0], endArray[1], endArray[2]);
+
+        SelectedTime selectedTime = CreateSelectedTime(day, start, end, enterRoom);
+        return selectedTime;
     }
 
     private void validDate(Room room, LocalDate day) {
