@@ -5,10 +5,7 @@ import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import jakarta.persistence.*;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 import java.util.ArrayList;
@@ -28,6 +25,7 @@ public class EnterRoom extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "enterRoom", cascade = CascadeType.ALL)
     @ToString.Exclude
     @Builder.Default
+    @Setter
     private List<SelectedTime> selectedTimes = new ArrayList<>();
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "enterRoom", cascade = CascadeType.ALL)
     @ToString.Exclude

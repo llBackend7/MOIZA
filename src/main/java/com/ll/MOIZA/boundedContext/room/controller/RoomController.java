@@ -152,13 +152,17 @@ public class RoomController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/enter")
-    public String enterRoom(@AuthenticationPrincipal User user, @RequestParam long roomId, @RequestParam String accessToken, Model model) {
+    public String enterRoom(@AuthenticationPrincipal User user,
+                            @RequestParam long roomId,
+                            @RequestParam String accessToken,
+                            Model model) {
         Room room = roomService.getRoom(roomId);
 
         if (roomService.validateToken(room, accessToken)) {
             Member member = memberService.loginMember(user);
-            enterRoomService.createEnterRoom(room, member);
+            EnterRoom enterRoom = enterRoomService.enter(room, member);
             model.addAttribute("room", room);
+            model.addAttribute("selectedTimes", enterRoom.getSelectedTimes());
             return "room/enter";
         }
 

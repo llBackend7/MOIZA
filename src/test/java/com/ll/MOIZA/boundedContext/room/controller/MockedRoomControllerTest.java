@@ -121,7 +121,7 @@ public class MockedRoomControllerTest {
         when(roomService.getRoom(anyLong())).thenReturn(room);
         when(roomService.validateToken(eq(room), anyString())).thenReturn(true);
         when(memberService.loginMember(any(User.class))).thenReturn(member);
-        doNothing().when(enterRoomService).enterRoomWithSelectedTime(eq(room), eq(member), anyList());
+        when(enterRoomService.enterRoomWithSelectedTime(eq(room), eq(member), anyList())).thenReturn(null);
 
         mockMvc.perform(post("/room/enter")
                         .param("roomId", "1")

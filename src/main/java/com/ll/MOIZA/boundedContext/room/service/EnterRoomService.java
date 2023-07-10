@@ -48,10 +48,11 @@ public class EnterRoomService {
     }
 
     @Transactional
-    public void enterRoomWithSelectedTime(Room room, Member member,
+    public EnterRoom enterRoomWithSelectedTime(Room room, Member member,
             List<RoomController.SelectedDayWithTime> selectedDayWhitTimesList) {
-
-        EnterRoom enterRoom = createEnterRoom(room, member);
+        EnterRoom enterRoom = enter(room, member);
+        enterRoomRepository.delete(enterRoom);
+        enterRoom = enter(room, member);
 
         for (RoomController.SelectedDayWithTime selectedDayWhitTime : selectedDayWhitTimesList) {
             selectedTimeService.CreateSelectedTime(
@@ -61,6 +62,8 @@ public class EnterRoomService {
                     enterRoom
             );
         }
+
+        return enterRoom;
     }
     public Optional<EnterRoom> findByMemberIdAndRoomId(Long memberId, Long roomId) {
         return enterRoomRepository.findByMemberIdAndRoomId(memberId, roomId);
@@ -88,5 +91,11 @@ public class EnterRoomService {
         System.out.println("responseCode:" + responseCode);
 
         connection.disconnect();
+    }
+
+    public EnterRoom enter(Room room, Member member) {
+        Long memberId = member.getId();
+        Long roomId = room.getId();
+        return findByMemberIdAndRoomId(memberId, roomId).orElse(createEnterRoom(room,member));
     }
 }

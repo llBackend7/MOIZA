@@ -57,8 +57,125 @@
                 <span class="title">가능한 시간 선택</span>
 
                 <!-- 가능시간 목록 -->
-                <div class="shrink-0 border border-blue-400 rounded-lg divide-y divide-[#adcfee]"
-                     id="availableTimeList"></div>
+                <div class="shrink-0 border border-blue-400 rounded-lg divide-y divide-[#adcfee]" id="availableTimeList">
+                    <!-- 이전에 선택했던 시간들 -->
+                    <div name="availableTime" class="flex gap-1 p-2" th:each="availableTime:${selectedTimes}">
+                        <div class="w-1/2 flex flex-col justify-start gap-2">
+                            <span class="self-center text-center w-full border border-none rounded-lg bg-slate-200 p-1" style="font-family: GmarketSansMedium !important;">날짜</span>
+                            <input required name="date" type="date" class="input input-bordered flex items-center self-center w-full" th:value="${availableTime.date}">
+                        </div>
+
+                        <div class="w-1/2 flex flex-col justify-center items-stretch gap-1">
+                            <div class="w-2/2 flex flex-wrap justify-end mb-2 gap-1">
+                                <span class="self-center w-full border border-none rounded-lg bg-slate-200 p-1" style="font-family: GmarketSansMedium !important;">시작 시간</span>
+                                <select required class="select w-full select-bordered select-sm time-30m-intervals text-center font-gsans" name="startTime" on>
+                                    <option value="00:00" th:selected="${availableTime.startTime.toString() == '00:00'}">00:00</option>
+                                    <option value="00:30" th:selected="${availableTime.startTime.toString() == '00:30'}">00:30</option>
+                                    <option value="01:00" th:selected="${availableTime.startTime.toString() == '01:00'}">01:00</option>
+                                    <option value="01:30" th:selected="${availableTime.startTime.toString() == '01:30'}">01:30</option>
+                                    <option value="02:00" th:selected="${availableTime.startTime.toString() == '02:00'}">02:00</option>
+                                    <option value="02:30" th:selected="${availableTime.startTime.toString() == '02:30'}">02:30</option>
+                                    <option value="03:00" th:selected="${availableTime.startTime.toString() == '03:00'}">03:00</option>
+                                    <option value="03:30" th:selected="${availableTime.startTime.toString() == '03:30'}">03:30</option>
+                                    <option value="04:00" th:selected="${availableTime.startTime.toString() == '04:00'}">04:00</option>
+                                    <option value="04:30" th:selected="${availableTime.startTime.toString() == '04:30'}">04:30</option>
+                                    <option value="05:00" th:selected="${availableTime.startTime.toString() == '05:00'}">05:00</option>
+                                    <option value="05:30" th:selected="${availableTime.startTime.toString() == '05:30'}">05:30</option>
+                                    <option value="06:00" th:selected="${availableTime.startTime.toString() == '06:00'}">06:00</option>
+                                    <option value="06:30" th:selected="${availableTime.startTime.toString() == '06:30'}">06:30</option>
+                                    <option value="07:00" th:selected="${availableTime.startTime.toString() == '07:00'}">07:00</option>
+                                    <option value="07:30" th:selected="${availableTime.startTime.toString() == '07:30'}">07:30</option>
+                                    <option value="08:00" th:selected="${availableTime.startTime.toString() == '08:00'}">08:00</option>
+                                    <option value="08:30" th:selected="${availableTime.startTime.toString() == '08:30'}">08:30</option>
+                                    <option value="09:00" th:selected="${availableTime.startTime.toString() == '09:00'}">09:00</option>
+                                    <option value="09:30" th:selected="${availableTime.startTime.toString() == '09:30'}">09:30</option>
+                                    <option value="10:00" th:selected="${availableTime.startTime.toString() == '10:00'}">10:00</option>
+                                    <option value="10:30" th:selected="${availableTime.startTime.toString() == '10:30'}">10:30</option>
+                                    <option value="11:00" th:selected="${availableTime.startTime.toString() == '11:00'}">11:00</option>
+                                    <option value="11:30" th:selected="${availableTime.startTime.toString() == '11:30'}">11:30</option>
+                                    <option value="12:00" th:selected="${availableTime.startTime.toString() == '12:00'}">12:00</option>
+                                    <option value="12:30" th:selected="${availableTime.startTime.toString() == '12:30'}">12:30</option>
+                                    <option value="13:00" th:selected="${availableTime.startTime.toString() == '13:00'}">13:00</option>
+                                    <option value="13:30" th:selected="${availableTime.startTime.toString() == '13:30'}">13:30</option>
+                                    <option value="14:00" th:selected="${availableTime.startTime.toString() == '14:00'}">14:00</option>
+                                    <option value="14:30" th:selected="${availableTime.startTime.toString() == '14:30'}">14:30</option>
+                                    <option value="15:00" th:selected="${availableTime.startTime.toString() == '15:00'}">15:00</option>
+                                    <option value="15:30" th:selected="${availableTime.startTime.toString() == '15:30'}">15:30</option>
+                                    <option value="16:00" th:selected="${availableTime.startTime.toString() == '16:00'}">16:00</option>
+                                    <option value="16:30" th:selected="${availableTime.startTime.toString() == '16:30'}">16:30</option>
+                                    <option value="17:00" th:selected="${availableTime.startTime.toString() == '17:00'}">17:00</option>
+                                    <option value="17:30" th:selected="${availableTime.startTime.toString() == '17:30'}">17:30</option>
+                                    <option value="18:00" th:selected="${availableTime.startTime.toString() == '18:00'}">18:00</option>
+                                    <option value="18:30" th:selected="${availableTime.startTime.toString() == '18:30'}">18:30</option>
+                                    <option value="19:00" th:selected="${availableTime.startTime.toString() == '19:00'}">19:00</option>
+                                    <option value="19:30" th:selected="${availableTime.startTime.toString() == '19:30'}">19:30</option>
+                                    <option value="20:00" th:selected="${availableTime.startTime.toString() == '20:00'}">20:00</option>
+                                    <option value="20:30" th:selected="${availableTime.startTime.toString() == '20:30'}">20:30</option>
+                                    <option value="21:00" th:selected="${availableTime.startTime.toString() == '21:00'}">21:00</option>
+                                    <option value="21:30" th:selected="${availableTime.startTime.toString() == '21:30'}">21:30</option>
+                                    <option value="22:00" th:selected="${availableTime.startTime.toString() == '22:00'}">22:00</option>
+                                    <option value="22:30" th:selected="${availableTime.startTime.toString() == '22:30'}">22:30</option>
+                                    <option value="23:00" th:selected="${availableTime.startTime.toString() == '23:00'}">23:00</option>
+                                    <option value="23:30" th:selected="${availableTime.startTime.toString() == '23:30'}">23:30</option>
+                                </select>
+                            </div>
+
+                            <div class="w-2/2 flex flex-wrap justify-end gap-1">
+                                <span class="self-center w-full border border-none rounded-lg bg-slate-200 p-1" style="font-family: GmarketSansMedium !important; ">끝나는 시간</span>
+                                <select required class="select w-full select-bordered select-sm time-30m-intervals text-center font-gsans" name="endTime">
+                                    <option value="00:00" th:selected="${availableTime.endTime.toString() == '00:00'}">00:00</option>
+                                    <option value="00:30" th:selected="${availableTime.endTime.toString() == '00:30'}">00:30</option>
+                                    <option value="01:00" th:selected="${availableTime.endTime.toString() == '01:00'}">01:00</option>
+                                    <option value="01:30" th:selected="${availableTime.endTime.toString() == '01:30'}">01:30</option>
+                                    <option value="02:00" th:selected="${availableTime.endTime.toString() == '02:00'}">02:00</option>
+                                    <option value="02:30" th:selected="${availableTime.endTime.toString() == '02:30'}">02:30</option>
+                                    <option value="03:00" th:selected="${availableTime.endTime.toString() == '03:00'}">03:00</option>
+                                    <option value="03:30" th:selected="${availableTime.endTime.toString() == '03:30'}">03:30</option>
+                                    <option value="04:00" th:selected="${availableTime.endTime.toString() == '04:00'}">04:00</option>
+                                    <option value="04:30" th:selected="${availableTime.endTime.toString() == '04:30'}">04:30</option>
+                                    <option value="05:00" th:selected="${availableTime.endTime.toString() == '05:00'}">05:00</option>
+                                    <option value="05:30" th:selected="${availableTime.endTime.toString() == '05:30'}">05:30</option>
+                                    <option value="06:00" th:selected="${availableTime.endTime.toString() == '06:00'}">06:00</option>
+                                    <option value="06:30" th:selected="${availableTime.endTime.toString() == '06:30'}">06:30</option>
+                                    <option value="07:00" th:selected="${availableTime.endTime.toString() == '07:00'}">07:00</option>
+                                    <option value="07:30" th:selected="${availableTime.endTime.toString() == '07:30'}">07:30</option>
+                                    <option value="08:00" th:selected="${availableTime.endTime.toString() == '08:00'}">08:00</option>
+                                    <option value="08:30" th:selected="${availableTime.endTime.toString() == '08:30'}">08:30</option>
+                                    <option value="09:00" th:selected="${availableTime.endTime.toString() == '09:00'}">09:00</option>
+                                    <option value="09:30" th:selected="${availableTime.endTime.toString() == '09:30'}">09:30</option>
+                                    <option value="10:00" th:selected="${availableTime.endTime.toString() == '10:00'}">10:00</option>
+                                    <option value="10:30" th:selected="${availableTime.endTime.toString() == '10:30'}">10:30</option>
+                                    <option value="11:00" th:selected="${availableTime.endTime.toString() == '11:00'}">11:00</option>
+                                    <option value="11:30" th:selected="${availableTime.endTime.toString() == '11:30'}">11:30</option>
+                                    <option value="12:00" th:selected="${availableTime.endTime.toString() == '12:00'}">12:00</option>
+                                    <option value="12:30" th:selected="${availableTime.endTime.toString() == '12:30'}">12:30</option>
+                                    <option value="13:00" th:selected="${availableTime.endTime.toString() == '13:00'}">13:00</option>
+                                    <option value="13:30" th:selected="${availableTime.endTime.toString() == '13:30'}">13:30</option>
+                                    <option value="14:00" th:selected="${availableTime.endTime.toString() == '14:00'}">14:00</option>
+                                    <option value="14:30" th:selected="${availableTime.endTime.toString() == '14:30'}">14:30</option>
+                                    <option value="15:00" th:selected="${availableTime.endTime.toString() == '15:00'}">15:00</option>
+                                    <option value="15:30" th:selected="${availableTime.endTime.toString() == '15:30'}">15:30</option>
+                                    <option value="16:00" th:selected="${availableTime.endTime.toString() == '16:00'}">16:00</option>
+                                    <option value="16:30" th:selected="${availableTime.endTime.toString() == '16:30'}">16:30</option>
+                                    <option value="17:00" th:selected="${availableTime.endTime.toString() == '17:00'}">17:00</option>
+                                    <option value="17:30" th:selected="${availableTime.endTime.toString() == '17:30'}">17:30</option>
+                                    <option value="18:00" th:selected="${availableTime.endTime.toString() == '18:00'}">18:00</option>
+                                    <option value="18:30" th:selected="${availableTime.endTime.toString() == '18:30'}">18:30</option>
+                                    <option value="19:00" th:selected="${availableTime.endTime.toString() == '19:00'}">19:00</option>
+                                    <option value="19:30" th:selected="${availableTime.endTime.toString() == '19:30'}">19:30</option>
+                                    <option value="20:00" th:selected="${availableTime.endTime.toString() == '20:00'}">20:00</option>
+                                    <option value="20:30" th:selected="${availableTime.endTime.toString() == '20:30'}">20:30</option>
+                                    <option value="21:00" th:selected="${availableTime.endTime.toString() == '21:00'}">21:00</option>
+                                    <option value="21:30" th:selected="${availableTime.endTime.toString() == '21:30'}">21:30</option>
+                                    <option value="22:00" th:selected="${availableTime.endTime.toString() == '22:00'}">22:00</option>
+                                    <option value="22:30" th:selected="${availableTime.endTime.toString() == '22:30'}">22:30</option>
+                                    <option value="23:00" th:selected="${availableTime.endTime.toString() == '23:00'}">23:00</option>
+                                    <option value="23:30" th:selected="${availableTime.endTime.toString() == '23:30'}">23:30</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="text-end mr-4">
                     <button class="text-slate-400 mr-3" onclick="addNewTime();">+ 추가</button>
                     <button class="text-slate-400" onclick="removeNewTime();">- 삭제</button>
@@ -83,17 +200,115 @@
                 <div class="w-1/2 flex flex-col justify-center items-stretch gap-1">
                     <div class="w-2/2 flex flex-wrap justify-end mb-2 gap-1">
                         <span class="self-center w-full border border-none rounded-lg bg-slate-200 p-1" style="font-family: GmarketSansMedium !important;">시작 시간</span>
-                        <select required class="select w-full select-bordered select-sm time-30m-intervals text-center font-gsans" name="startTime"></select>
+                        <select required class="select w-full select-bordered select-sm time-30m-intervals text-center font-gsans" name="startTime">
+                            <option value="00:00">00:00</option>
+                            <option value="00:30">00:30</option>
+                            <option value="01:00">01:00</option>
+                            <option value="01:30">01:30</option>
+                            <option value="02:00">02:00</option>
+                            <option value="02:30">02:30</option>
+                            <option value="03:00">03:00</option>
+                            <option value="03:30">03:30</option>
+                            <option value="04:00">04:00</option>
+                            <option value="04:30">04:30</option>
+                            <option value="05:00">05:00</option>
+                            <option value="05:30">05:30</option>
+                            <option value="06:00">06:00</option>
+                            <option value="06:30">06:30</option>
+                            <option value="07:00">07:00</option>
+                            <option value="07:30">07:30</option>
+                            <option value="08:00">08:00</option>
+                            <option value="08:30">08:30</option>
+                            <option value="09:00">09:00</option>
+                            <option value="09:30">09:30</option>
+                            <option value="10:00">10:00</option>
+                            <option value="10:30">10:30</option>
+                            <option value="11:00">11:00</option>
+                            <option value="11:30">11:30</option>
+                            <option value="12:00">12:00</option>
+                            <option value="12:30">12:30</option>
+                            <option value="13:00">13:00</option>
+                            <option value="13:30">13:30</option>
+                            <option value="14:00">14:00</option>
+                            <option value="14:30">14:30</option>
+                            <option value="15:00">15:00</option>
+                            <option value="15:30">15:30</option>
+                            <option value="16:00">16:00</option>
+                            <option value="16:30">16:30</option>
+                            <option value="17:00">17:00</option>
+                            <option value="17:30">17:30</option>
+                            <option value="18:00">18:00</option>
+                            <option value="18:30">18:30</option>
+                            <option value="19:00">19:00</option>
+                            <option value="19:30">19:30</option>
+                            <option value="20:00">20:00</option>
+                            <option value="20:30">20:30</option>
+                            <option value="21:00">21:00</option>
+                            <option value="21:30">21:30</option>
+                            <option value="22:00">22:00</option>
+                            <option value="22:30">22:30</option>
+                            <option value="23:00">23:00</option>
+                            <option value="23:30">23:30</option>
+                        </select>
                     </div>
 
                     <div class="w-2/2 flex flex-wrap justify-end gap-1">
                       <span class="self-center w-full border border-none rounded-lg bg-slate-200 p-1" style="font-family: GmarketSansMedium !important; ">끝나는 시간</span>
-                      <select required class="select w-full select-bordered select-sm time-30m-intervals text-center font-gsans" name="endTime"></select>
+                      <select required class="select w-full select-bordered select-sm time-30m-intervals text-center font-gsans" name="endTime">
+                            <option value="00:00">00:00</option>
+                            <option value="00:30">00:30</option>
+                            <option value="01:00">01:00</option>
+                            <option value="01:30">01:30</option>
+                            <option value="02:00">02:00</option>
+                            <option value="02:30">02:30</option>
+                            <option value="03:00">03:00</option>
+                            <option value="03:30">03:30</option>
+                            <option value="04:00">04:00</option>
+                            <option value="04:30">04:30</option>
+                            <option value="05:00">05:00</option>
+                            <option value="05:30">05:30</option>
+                            <option value="06:00">06:00</option>
+                            <option value="06:30">06:30</option>
+                            <option value="07:00">07:00</option>
+                            <option value="07:30">07:30</option>
+                            <option value="08:00">08:00</option>
+                            <option value="08:30">08:30</option>
+                            <option value="09:00">09:00</option>
+                            <option value="09:30">09:30</option>
+                            <option value="10:00">10:00</option>
+                            <option value="10:30">10:30</option>
+                            <option value="11:00">11:00</option>
+                            <option value="11:30">11:30</option>
+                            <option value="12:00">12:00</option>
+                            <option value="12:30">12:30</option>
+                            <option value="13:00">13:00</option>
+                            <option value="13:30">13:30</option>
+                            <option value="14:00">14:00</option>
+                            <option value="14:30">14:30</option>
+                            <option value="15:00">15:00</option>
+                            <option value="15:30">15:30</option>
+                            <option value="16:00">16:00</option>
+                            <option value="16:30">16:30</option>
+                            <option value="17:00">17:00</option>
+                            <option value="17:30">17:30</option>
+                            <option value="18:00">18:00</option>
+                            <option value="18:30">18:30</option>
+                            <option value="19:00">19:00</option>
+                            <option value="19:30">19:30</option>
+                            <option value="20:00">20:00</option>
+                            <option value="20:30">20:30</option>
+                            <option value="21:00">21:00</option>
+                            <option value="21:30">21:30</option>
+                            <option value="22:00">22:00</option>
+                            <option value="22:30">22:30</option>
+                            <option value="23:00">23:00</option>
+                            <option value="23:30">23:30</option>
+                        </select>
                     </div>
                 </div>
             </div>
             `);
-                setTimeSelect();
+                // setTimeSelect();
             }
 
             function removeNewTime() {
