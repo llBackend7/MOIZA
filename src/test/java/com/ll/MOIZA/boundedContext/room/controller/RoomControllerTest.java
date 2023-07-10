@@ -16,11 +16,13 @@ import org.springframework.http.*;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -181,17 +183,22 @@ class RoomControllerTest {
     }
 
     @Test
-    @DisplayName("추가 시간 테스트")
+    @DisplayName("시간 변경 페이지 테스트")
     @WithUserDetails("user1")
     void changeTime_test() throws Exception {
         Long roomId = 1L;
 
-        ResultActions resultActions = mvc
-                .perform(get("/room/%d/changeTime".formatted(roomId))
-                        .with(csrf()));
+        // 기존에 선택한 시간이 나와야 함
+        MvcResult getChange = mvc
+                .perform(get("/room/%d/changeTime".formatted(roomId)).with(csrf()))
+                .andExpect(status().is3xxRedirection())
+                .andReturn();
 
-        resultActions
-                .andExpect(status().is3xxRedirection());
+        String redirectedUrl = getChange.getResponse().getRedirectedUrl();
+        MvcResult getEnter = mvc.perform(get(redirectedUrl))
+                .andExpect(status().isOk())
+                .andExpect(model().attributeExists("selectedTimes"))
+                .andReturn();
     }
 
     @Test

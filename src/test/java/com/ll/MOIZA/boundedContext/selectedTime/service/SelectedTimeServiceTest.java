@@ -2,6 +2,7 @@ package com.ll.MOIZA.boundedContext.selectedTime.service;
 
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
+import com.ll.MOIZA.boundedContext.room.controller.RoomController;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
@@ -10,7 +11,9 @@ import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
+
 import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +21,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -89,6 +93,7 @@ class SelectedTimeServiceTest {
 
         assertThat(selectedTime.getDate()).isEqualTo(LocalDate.now().plusDays(6));
     }
+
     @DisplayName("시간_선택_초과")
     @ParameterizedTest(name = "{index} - 기준 1~5시 시간:{0} 끝:{1}")
     @CsvSource({"0, 6", "0, 3", "3, 6", "1, 2", "3, 0"})
@@ -164,12 +169,27 @@ class SelectedTimeServiceTest {
 
     @Test
     @DisplayName("SelectedTime의 기간 구하기")
-    void testGetDuration(){
+    void testGetDuration() {
         SelectedTime selectedTime = SelectedTime.builder()
                 .endTime(LocalTime.of(2, 0))
                 .startTime(LocalTime.of(0, 30))
                 .build();
 
         assertThat(selectedTime.getDuration()).hasHour(1).hasMinute(30);
+    }
+
+    @Test
+    @DisplayName("선택시간 변경")
+    void changeTime() {
+        RoomController.SelectedDayWithTime selectedDayWithTime = new RoomController.SelectedDayWithTime(
+                LocalDate.now().plusDays(6),
+                LocalTime.of(1, 0),
+                LocalTime.of(4, 0));
+        List<RoomController.SelectedDayWithTime> selectedDayWhitTimesList = List.of(selectedDayWithTime);
+        enterRoom = enterRoomService.enterRoomWithSelectedTime(room,member,selectedDayWhitTimesList);
+
+        assertThat(enterRoom.getSelectedTimes().stream()
+                .map(time -> new RoomController.SelectedDayWithTime(time.getDate(), time.getStartTime(), time.getEndTime())))
+                .containsExactly(selectedDayWithTime);
     }
 }

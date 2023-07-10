@@ -30,12 +30,10 @@ public class SelectedTimeService {
     private String calculatorUrl;
 
     @Transactional
-    public SelectedTime CreateSelectedTime(
-            LocalDate day,
-            LocalTime startTime,
-            LocalTime endTime,
-            EnterRoom enterRoom
-    ) {
+    public SelectedTime CreateSelectedTime(LocalDate day,
+                                           LocalTime startTime,
+                                           LocalTime endTime,
+                                           EnterRoom enterRoom) {
         validDate(enterRoom.getRoom(), day);
         validTime(enterRoom.getRoom(), startTime, endTime);
         SelectedTime selectedTime = SelectedTime.builder()
@@ -45,6 +43,7 @@ public class SelectedTimeService {
                 .enterRoom(enterRoom)
                 .build();
 
+        enterRoom.getSelectedTimes().add(selectedTime);
         return selectedTimeRepository.save(selectedTime);
     }
 
