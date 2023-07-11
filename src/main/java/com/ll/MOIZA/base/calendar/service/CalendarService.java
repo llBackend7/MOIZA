@@ -146,6 +146,11 @@ public class CalendarService {
                 .build();
 
         try (ResponseBody response = client.newCall(request).execute().body()) {
+            File dir = new File("tokens");
+            if(!dir.exists()) {
+                boolean created = dir.mkdir();
+            }
+
             String responseBody = response.string();
             File file = new File(TOKEN_PATH);
             BufferedWriter writer = new BufferedWriter(new FileWriter(file, false));
