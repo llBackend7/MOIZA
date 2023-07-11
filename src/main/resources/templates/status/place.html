@@ -29,9 +29,9 @@
 
 <main layout:fragment="main" class="flex-grow flex justify-center">
     <div class="max-w-2xl w-full bg-blue-50">
-        <div class="text">
+        <div class="w-full p-5 text">
             <div class="title">모임이름</div>
-            <div class="font-gsans w-1/2 flex justify-center text-2xl" th:text="${room.name}">서울 벙개</div>
+            <div class="font-gsans ml-2 w-1/2 h-12 flex items-center justify-center text-xl" th:text="${room.name}">서울 벙개</div>
         </div>
 
         <div class="place-rank">
@@ -39,21 +39,21 @@
                 장소 투표
             </div>
 
-            <div class="rank-1th" th:each="map, iterStat : ${selectedPlaceMap}" th:if="${iterStat.first}">
-                <span class="rank-one text-bold">
+            <div class="rank-1th flex justify-between p-5" th:each="map, iterStat : ${selectedPlaceMap}" th:if="${iterStat.first}">
+                <span class="rank-n w-1/5 text-xl text-center text-bold">
                     <span th:text="${iterStat.index + 1}"></span>
                     <span>위</span>
                 </span>
-                <span class="place ml-7 text-xl" th:text="${map.key.name}"></span>
-                <span class="people-number ml-12">
+                <span class="w-2/5 text-center place text-xl" th:text="${map.key.name}"></span>
+                <span class="people-number text-sm w-1/5">
                     <span th:text="${map.value}"></span>
                     <span>명 / </span>
                     <span th:text="${room.enterRoom.size()}"></span>
                     <span>명</span>
                 </span>
-                <form th:action th:method="POST">
+                <form th:action th:method="POST" class="w-1/5">
                     <input type="hidden" name="name" th:value="${map.key.name}">
-                    <button type="submit" class="vote-btn !bg-[#006bce] ml-10" th:disabled="${map.value + 1 > room.enterRoom.size()}">투표</button>
+                    <button type="submit" class="vote-btn !bg-[#006bce]" th:disabled="${map.value + 1 > room.enterRoom.size()}">투표</button>
                 </form>
             </div>
 
