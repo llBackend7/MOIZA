@@ -98,4 +98,8 @@ public class EnterRoomService {
         Long roomId = room.getId();
         return findByMemberIdAndRoomId(memberId, roomId).orElse(createEnterRoom(room,member));
     }
+
+    public EnterRoom findByMemberIdAndRoomIdElseThrow(Long memberId, Long roomId) {
+        return enterRoomRepository.findByMemberIdAndRoomId(memberId, roomId).orElseThrow();
+    }
 }
