@@ -83,6 +83,7 @@ class SelectedTimeServiceTest {
                 LocalTime.of(3, 0),
                 LocalDateTime.now().plusDays(2));
         enterRoom = enterRoomService.createEnterRoom(room, member);
+        enterRoom2 = enterRoomService.createEnterRoom(room, member2);
     }
 
     @DisplayName("시간_선택_정상")
