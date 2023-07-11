@@ -71,6 +71,7 @@ class SelectedTimeServiceTest {
     @BeforeEach
     void init() {
         member = memberRepository.findByName("user1").get();
+        member2 = memberRepository.findByName("user2").get();
         room = roomService.createRoom(
                 member,
                 "테스트룸",
