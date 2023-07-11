@@ -23,21 +23,19 @@
     <div class="max-w-2xl w-full flex justify-center">
         <div class="w-full flex flex-col items-center">
 
-            <div class="w-3/4 h-22 flex items-center profile border border-2 border-slate-300 rounded-lg m-5 p-3">
-                <div class="w-1/5 flex justify-end">
+            <div class="w-3/4 h-22 flex justify-around items-center profile border border-2 border-slate-300 rounded-lg p-3">
+                <div class="w-1/5 flex justify-center">
                     <img th:src="${@rq.member.profile}" width="65" class="mr-2 mask mask-circle">
                 </div>
 
-                <div class="flex  w-4/5">
-                    <div class="w-1/2 ml-3">
-                        <div class="text-xl sm:text-xl/4 md:text-xl/2 font-gsans font-bold"
-                             th:text="${@rq.member.name}"></div>
-                        <div class="text-slate-300 text-sm sm:text-sm/4 md:text-sm/2 font-gsans"
-                             th:text="${@rq.member.email}"></div>
+                <div class="flex items-center justify-between w-full">
+                    <div class="w-1/2 mx-2">
+                        <div class="text-lg font-gsans font-bold" th:text="${@rq.member.name}"></div>
+                        <div class="text-slate-300 text-xs font-gsans" th:text="${@rq.member.email}"></div>
                     </div>
 
-                    <div class="w-1/2 flex justify-end mr-2">
-                        <a href="/room/create" class="btn btn-xs sm:btn-sm md:btn-md">+ 모임 생성</a>
+                    <div class="w-1/3 flex justify-end">
+                        <a href="/room/create" class="btn w-full">+ 모임 생성</a>
                     </div>
                 </div>
 
@@ -48,7 +46,7 @@
             </div>
 
             <ul th:if="${!#lists.isEmpty(rooms)}" class="w-full flex flex-col items-center overflow-auto">
-                <li th:each="room : ${rooms}" class="groups w-3/5 h-48 rounded-2xl mt-5 flex flex-col justify-center shadow-md text-white" style="background-color: #006BCE;">
+                <li th:each="room : ${rooms}" class="groups mx-5 mt-5 w-2/3 h-56 rounded-2xl flex flex-col justify-center shadow-md text-white" style="background-color: #006BCE;">
 
                     <div th:if="${room.deadLine.isAfter(#temporals.createNow())}" class="h-full p-7 rounded-2xl">
                         <div class="h-1/5 mx-4 text-sm font-gsans">
@@ -73,8 +71,8 @@
                                 </div>
                             </div>
 
-                            <div class="flex justify-end p-2">
-                                <div class="text-sm font-gsans">
+                            <div class="flex justify-end">
+                                <div class="text-sm font-gsans mr-2">
                                     <button th:onclick="|inviteWithKaKaoShare(${room.id});|" class="mr-2 hover:text-slate-300 active:text-slate-400">초대하기</button>
                                     <script th:inline="javascript">
                                         function inviteWithKaKaoShare(id) {
@@ -117,7 +115,7 @@
                                 <div th:text="${room.name}" class="text-xl text-center"></div>
                             </div>
 
-                            <div class="flex justify-end p-2">
+                            <div class="flex justify-end mr-2">
                                 <div class="text-sm font-gsans hover:text-slate-300 active:text-slate-400">
                                     <a th:href="@{'room/'+${room.id}+'/result'}">결과 확인</a>
                                 </div>

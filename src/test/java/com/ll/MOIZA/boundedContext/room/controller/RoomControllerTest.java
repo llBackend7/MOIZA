@@ -106,7 +106,7 @@ class RoomControllerTest {
         resultActions
                 .andExpect(handler().handlerType(RoomController.class))
                 .andExpect(handler().methodName("createRoom"))
-                .andExpect(status().is2xxSuccessful());
+                .andExpect(status().is3xxRedirection());
     }
 
     @Test

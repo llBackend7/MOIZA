@@ -23,9 +23,9 @@
 <main layout:fragment="main" class="flex-grow flex items-center justify-center">
     <div class="max-w-2xl w-full bg-blue-50">
         <div class="m-10 w-2xl flex flex-col items-center">
-            <div class="w-full flex">
-                <span class="title w-1/5">모임 이름</span>
-                <span class="content w-3/5 text-center text-2xl font-gsans" th:text="${room.name}">서울 벙개</span>
+            <div class="w-full flex justify-center items-center">
+                <span class="title w-18">모임 이름</span>
+                <span class="content w-3/5 ml-4 text-center text-xl font-gsans" th:text="${room.name}">서울 벙개</span>
             </div>
 
             <div class="w-full mt-4">
@@ -65,7 +65,7 @@
                             <input required name="date" type="date" class="input input-bordered flex items-center self-center w-full" th:value="${availableTime.date}">
                         </div>
 
-                        <div class="w-1/2 flex flex-col justify-center items-stretch gap-1">
+                        <div class="w-1/2 text-center flex flex-col justify-center items-stretch gap-1">
                             <div class="w-2/2 flex flex-wrap justify-end mb-2 gap-1">
                                 <span class="self-center w-full border border-none rounded-lg bg-slate-200 p-1" style="font-family: GmarketSansMedium !important;">시작 시간</span>
                                 <select required class="select w-full select-bordered select-sm time-30m-intervals text-center font-gsans" name="startTime" on>
