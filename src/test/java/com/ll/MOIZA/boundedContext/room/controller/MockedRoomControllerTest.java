@@ -1,6 +1,7 @@
 package com.ll.MOIZA.boundedContext.room.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ll.MOIZA.base.calendar.service.CalendarService;
 import com.ll.MOIZA.base.exception.GlobalExceptionHandler;
 import com.ll.MOIZA.base.mail.MailService;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
@@ -89,6 +90,9 @@ public class MockedRoomControllerTest {
     @MockBean
     SelectedPlaceService selectedPlaceService;
 
+    @MockBean
+    CalendarService calendarService;
+
     @Test
     @WithMockUser
     public void testDateTimeExceptionHandler() throws Exception {
@@ -157,7 +161,7 @@ public class MockedRoomControllerTest {
 
         mockMvc.perform(get("/room/1/invite"))
                 .andExpect(status().is3xxRedirection())
-                .andExpect(view().name("home/invite"));
+                .andExpect(redirectedUrlPattern("*/room/enter*"));
     }
 
     @Test

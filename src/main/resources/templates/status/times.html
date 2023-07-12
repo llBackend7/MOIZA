@@ -17,7 +17,11 @@
                     rank = 1;
                     times = response;
                     $('#times').empty();
-                    response.forEach(time => showTimeInfo(time));
+                    if (response.length === 0) {
+                        $('#times').append(noTime());
+                    } else {
+                        response.forEach(time => showTimeInfo(time));
+                    }
                 },
                 error: function (error) {
                     console.log(error);
@@ -63,9 +67,13 @@
 
         function showRank(rank){
             if(rank === 1){
-                return '<span class="rank-number text-bold text-xl" style="border: 6px solid #006bce; border-radius: 50%;">1위</span>';
+                return '<span class="rank-number text-bold text-lg" style="color: #006bce;">1위</span>';
             }
             return `<span class="rank-number text-bold text-lg" style="color: #006bce;">${rank}위</span>`;
+        }
+
+        function noTime() {
+            return `<div id="no-time" class="w-full flex flex-col items-center justify-center mt-4 text-xl font-gsans">가능한 시간이 없습니다. 가능 시간을 수정해보세요.</div>`;
         }
     </script>
 </ul>
