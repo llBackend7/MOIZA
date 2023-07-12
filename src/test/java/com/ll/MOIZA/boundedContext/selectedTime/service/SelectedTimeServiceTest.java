@@ -9,6 +9,7 @@ import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
 import com.ll.MOIZA.boundedContext.room.repository.RoomRepository;
 import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
+import com.ll.MOIZA.boundedContext.selectedTime.dto.SelectedTimeDto;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
 
@@ -33,6 +34,9 @@ import java.time.LocalTime;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @Transactional
@@ -59,13 +63,18 @@ class SelectedTimeServiceTest {
     @Autowired
     MemberRepository memberRepository;
 
+    SelectedTime selectedTime;
+
     static Member member;
+    static Member member2;
     static Room room;
     static EnterRoom enterRoom;
+    static EnterRoom enterRoom2;
 
     @BeforeEach
     void init() {
         member = memberRepository.findByName("user1").get();
+        member2 = memberRepository.findByName("user2").get();
         room = roomService.createRoom(
                 member,
                 "테스트룸",
@@ -77,6 +86,14 @@ class SelectedTimeServiceTest {
                 LocalTime.of(3, 0),
                 LocalDateTime.now().plusDays(2));
         enterRoom = enterRoomService.createEnterRoom(room, member);
+        enterRoom2 = enterRoomService.createEnterRoom(room, member2);
+
+        selectedTime = selectedTimeService.CreateSelectedTime(
+                LocalDate.now().plusDays(6),
+                LocalTime.of(1, 0),
+                LocalTime.of(4, 0),
+                enterRoom
+        );
     }
 
     @DisplayName("시간_선택_정상")
@@ -191,5 +208,28 @@ class SelectedTimeServiceTest {
         assertThat(enterRoom.getSelectedTimes().stream()
                 .map(time -> new RoomController.SelectedDayWithTime(time.getDate(), time.getStartTime(), time.getEndTime())))
                 .containsExactly(selectedDayWithTime);
+    }
+
+    @Test
+    @DisplayName("SelectedTime 추가하기")
+    void testAddSelectedTime(){
+        // given
+        String start = selectedTime.getStartTime().toString();
+        String end = selectedTime.getEndTime().toString();
+        String day = selectedTime.getDate().toString();
+
+        SelectedTimeDto dto = SelectedTimeDto.builder()
+                .start(start)
+                .end(end)
+                .day(day)
+                .build();
+
+        // when
+        SelectedTime savedSelectedTime = selectedTimeService.addSelectedTime(dto, enterRoom2);
+
+        // then
+        assertThat(savedSelectedTime.getStartTime().toString()).isEqualTo(start);
+        assertThat(savedSelectedTime.getEndTime().toString()).isEqualTo(end);
+        assertThat(savedSelectedTime.getDate().toString()).isEqualTo(day);
     }
 }

@@ -25,6 +25,10 @@
         let calculatorUrl = '[[${calculatorUrl}]]';
         /*]]>*/
     </script>
+
+    <script th:inline="javascript">
+        const token = /*[[${_csrf.token}]]*/ '';
+    </script>
 </header>
 
 <main layout:fragment="main" class="flex-grow flex items-center justify-center">
@@ -64,6 +68,8 @@
     <script>
         function showAllMembers(idx){
             const time = times[idx];
+            console.log(time)
+            console.log(roomId)
             $('#members').empty();
             $('#members').append(`
                 <div>
@@ -79,8 +85,16 @@
                         ${showMembers(time.nonParticipationMembers)}
                     </ul>
                 </div>
+                <form method="post" action="/room/${roomId}/date">
+                    <input type="hidden" name="_csrf" value="${token}">
+                    <input type="hidden" value="${time.start}" name="start">
+                    <input type="hidden" value="${time.end}" name="end">
+                    <input type="hidden" value="${time.date}" name="day">
+                    <button>참여</button>
+                </form>
             `);
         }
+
 
         function showMembers(members) {
             let membersHTML = '';

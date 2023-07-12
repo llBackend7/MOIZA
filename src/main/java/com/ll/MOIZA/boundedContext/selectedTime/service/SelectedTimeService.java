@@ -2,6 +2,7 @@ package com.ll.MOIZA.boundedContext.selectedTime.service;
 
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.selectedTime.dto.SelectedTimeDto;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -45,6 +47,21 @@ public class SelectedTimeService {
 
         enterRoom.getSelectedTimes().add(selectedTime);
         return selectedTimeRepository.save(selectedTime);
+    }
+    @Transactional
+    public SelectedTime addSelectedTime(SelectedTimeDto selectedTimeDto, EnterRoom enterRoom) {
+        Integer[] dayArray = Arrays.stream(selectedTimeDto.getDay().split("-"))
+                .map(Integer::parseInt).toArray(Integer[]::new);
+        Integer[] startArray = Arrays.stream(selectedTimeDto.getStart().split(":"))
+                .map(Integer::parseInt).toArray(Integer[]::new);
+        Integer[] endArray = Arrays.stream(selectedTimeDto.getEnd().split(":"))
+                .map(Integer::parseInt).toArray(Integer[]::new);
+
+        LocalDate day = LocalDate.of(dayArray[0], dayArray[1], dayArray[2]);
+        LocalTime start = LocalTime.of(startArray[0], startArray[1]);
+        LocalTime end = LocalTime.of(endArray[0], endArray[1]);
+        SelectedTime selectedTime = CreateSelectedTime(day, start, end, enterRoom);
+        return selectedTime;
     }
 
     private void validDate(Room room, LocalDate day) {
