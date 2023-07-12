@@ -113,7 +113,7 @@ public class MockedRoomControllerTest {
                 .perform(post("/room/create")
                         .params(form)
                         .with(csrf()))
-                .andExpect(status().is3xxRedirection());
+                .andExpect(status().is4xxClientError());
     }
 
     @Test
@@ -175,7 +175,7 @@ public class MockedRoomControllerTest {
         when(memberService.loginMember(any(User.class))).thenReturn(dummyActor);
 
         mockMvc.perform(get("/room/1/chat"))
-                .andExpect(status().is3xxRedirection())
+                .andExpect(status().is2xxSuccessful())
                 .andExpect(view().name("status/chat"));
     }
 
