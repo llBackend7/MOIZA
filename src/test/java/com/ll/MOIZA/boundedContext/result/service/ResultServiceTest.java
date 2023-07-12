@@ -79,8 +79,8 @@ class ResultServiceTest {
     @Test
     @DisplayName("결과 데이터 만들기 테스트")
     void createResultTest() {
-        resultService.createResult(room, timeRangeWithMember, "testPlace");
-        assertThat(resultRepository.findByRoomId(room.getId()).get().getDecidedPlace()).isEqualTo("testPlace");
+        resultService.createResult(room, timeRangeWithMember, "강남");
+        assertThat(resultRepository.findByRoomId(room.getId()).get().getDecidedPlace()).isEqualTo("강남");
     }
 
     @Test
