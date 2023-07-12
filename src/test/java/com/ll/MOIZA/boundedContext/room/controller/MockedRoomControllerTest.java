@@ -109,7 +109,7 @@ public class MockedRoomControllerTest {
                 .perform(post("/room/create")
                         .params(form)
                         .with(csrf()))
-                .andExpect(status().isBadRequest());
+                .andExpect(status().is3xxRedirection());
     }
 
     @Test
@@ -156,7 +156,7 @@ public class MockedRoomControllerTest {
         when(roomService.getAccessToken(any(Room.class))).thenReturn("ACCESS_TOKEN");
 
         mockMvc.perform(get("/room/1/invite"))
-                .andExpect(status().isOk())
+                .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("home/invite"));
     }
 
@@ -171,7 +171,7 @@ public class MockedRoomControllerTest {
         when(memberService.loginMember(any(User.class))).thenReturn(dummyActor);
 
         mockMvc.perform(get("/room/1/chat"))
-                .andExpect(status().isOk())
+                .andExpect(status().is3xxRedirection())
                 .andExpect(view().name("status/chat"));
     }
 
