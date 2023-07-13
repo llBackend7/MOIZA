@@ -11,7 +11,7 @@
 최종적으로 모두가 원하는 시간과 장소를 결정할 수 있도록 한다.
 결과는 모든 그룹원들에게 알림으로 전송된다.
 
-
+[모임 내에서 사용자간 겹치는 시간대를 식별하는 계산 서버](https://github.com/llBackend7/MOIZA-TIME-CALCULATOR/tree/main)
 
 ## 🕰️ 개발 기간
 
