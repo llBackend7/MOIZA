@@ -12,7 +12,9 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +30,8 @@ import java.util.List;
 public class ResultService {
 
     private final ResultRepository resultRepository;
+    @Value("${custom.webdriver.port}")
+    private int port;
 
     @Transactional
     public void createResult(Room room, TimeRangeWithMember timeRangeWithMember, String decidedPlace) {
@@ -70,11 +74,15 @@ public class ResultService {
 
         // Chrome 드라이버 경로 설정
         WebDriverManager.chromedriver().setup();
+        // ChromeDriverService 설정
+        ChromeDriverService service = new ChromeDriverService.Builder()
+                .usingPort(port)
+                .build();
         // Headless Chrome 옵션 설정
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
         // Chrome WebDriver 인스턴스 생성
-        WebDriver driver = new ChromeDriver(options);
+        WebDriver driver = new ChromeDriver(service, options);
 
         // 웹 페이지 열기
         driver.get(url);

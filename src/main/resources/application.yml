@@ -36,3 +36,5 @@ custom:
     sender: mouse4786@gmail.com
   site:
     baseUrl:
+  webdriver:
+    port: 9515
