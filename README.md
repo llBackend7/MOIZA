@@ -51,5 +51,10 @@
 	Junit5, Jacoco, ApacheJmeter
 
 
+## 📌 주요 기능
 
-### 
+[성능 개선 기록 Wiki 보기](https://github.com/llBackend7/MOIZA/wiki/%EC%84%B1%EB%8A%A5-%EA%B0%9C%EC%84%A0-%EA%B8%B0%EB%A1%9D)
+
+[겹치는 시간 TOP10 계산 프로세스 분리 과정 Wiki 보기](https://github.com/iyk2h/MOIZA-TIME-CALCULATOR/wiki/%EA%B2%B9%EC%B9%98%EB%8A%94-%EC%8B%9C%EA%B0%84-TOP10-%EA%B3%84%EC%82%B0-%ED%94%84%EB%A1%9C%EC%84%B8%EC%8A%A4-%EB%B6%84%EB%A6%AC-%EA%B3%BC%EC%A0%95)
+
+
