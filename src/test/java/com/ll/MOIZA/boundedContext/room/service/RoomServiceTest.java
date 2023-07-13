@@ -139,7 +139,7 @@ class RoomServiceTest {
                     "테스트룸임",
                     LocalDate.now().plusDays(5),
                     LocalDate.now().plusDays(8),
-                    LocalTime.of(10, 0),
+                    LocalTime.of(0, 0),
                     LocalTime.of(14, 0),
                     LocalTime.of(3, 0),
                     LocalDateTime.now().plusDays(5));
