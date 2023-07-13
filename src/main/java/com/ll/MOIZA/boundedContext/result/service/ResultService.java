@@ -7,6 +7,11 @@ import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
 
 import lombok.RequiredArgsConstructor;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,11 +33,16 @@ public class ResultService {
         LocalDateTime decidedDateTime = null;
         List<Member> participationMembers = null;
         List<Member> nonParticipationMembers = null;
+        String placeId = null;
 
         if (timeRangeWithMember != null) {
             decidedDateTime = (timeRangeWithMember.getDate() != null) ? timeRangeWithMember.getDate().atTime(timeRangeWithMember.getStart()) : null;
             participationMembers = (timeRangeWithMember.getParticipationMembers() != null) ? timeRangeWithMember.getParticipationMembers() : null;
             nonParticipationMembers = (timeRangeWithMember.getNonParticipationMembers() != null) ? timeRangeWithMember.getNonParticipationMembers() : null;
+        }
+
+        if(decidedPlace != null) {
+            placeId = getPlaceId(decidedPlace);
         }
 
         DecidedResult result = DecidedResult.builder()
@@ -41,6 +51,7 @@ public class ResultService {
                 .participationMembers(participationMembers)
                 .nonParticipationMembers(nonParticipationMembers)
                 .room(room)
+                .placeId(placeId)
                 .build();
 
         resultRepository.save(result);
@@ -50,5 +61,28 @@ public class ResultService {
         return resultRepository
                 .findByRoomId(roomId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "모임의 결과를 찾을 수 없습니다."));
+    }
+
+    public String getPlaceId(String place) {
+        String url = "https://map.kakao.com/?q="+place;
+        String id;
+
+        // Chrome 드라이버 경로 설정
+        System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+        // Headless Chrome 옵션 설정
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless");
+        // Chrome WebDriver 인스턴스 생성
+        WebDriver driver = new ChromeDriver(options);
+
+        // 웹 페이지 열기
+        driver.get(url);
+
+        WebElement element = driver.findElement(By.xpath("//*[@id=\"info.search.place.list\"]/li[1]/div[5]/div[4]/a[1]"));
+        id = element.getAttribute("href").split("/")[3];
+
+        // WebDriver 종료
+        driver.quit();
+        return id;
     }
 }

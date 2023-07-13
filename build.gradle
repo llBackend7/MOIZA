@@ -113,6 +113,9 @@ dependencies {
 	implementation 'com.google.apis:google-api-services-calendar:v3-rev20220715-2.0.0'
 	implementation 'com.squareup.okhttp:okhttp:2.7.5'
 	implementation 'com.googlecode.json-simple:json-simple:1.1.1'
+
+	// Dynamic Web Scraping
+	implementation 'org.seleniumhq.selenium:selenium-java:3.141.59'
 }
 
 tasks.named('test') {

@@ -3,6 +3,7 @@ package com.ll.MOIZA.boundedContext.result.entity;
 import com.ll.MOIZA.base.entity.BaseEntity;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -22,6 +23,10 @@ import java.util.List;
 public class DecidedResult extends BaseEntity {
     private LocalDateTime decidedDayTime;
     private String decidedPlace;
+
+    @Nullable
+    private String placeId;
+
     @OneToOne
     private Room room;
 
