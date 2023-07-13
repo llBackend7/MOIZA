@@ -33,6 +33,9 @@ public class ResultService {
     @Value("${custom.webdriver.port}")
     private int port;
 
+    @Value("${custom.webdriver.path}")
+    private String path;
+
     @Transactional
     public void createResult(Room room, TimeRangeWithMember timeRangeWithMember, String decidedPlace) {
         LocalDateTime decidedDateTime = null;
@@ -73,7 +76,7 @@ public class ResultService {
         String id;
 
         // Chrome 드라이버 경로 설정
-        WebDriverManager.chromedriver().setup();
+        System.setProperty("webdriver.chrome.driver", path);
         // ChromeDriverService 설정
         ChromeDriverService service = new ChromeDriverService.Builder()
                 .usingPort(port)
