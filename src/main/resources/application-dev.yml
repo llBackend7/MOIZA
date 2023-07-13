@@ -9,5 +9,3 @@ custom:
   site:
     baseUrl: http://localhost:8080
     calculatorUrl: http://localhost:8081
-  webdriver:
-    port: 9515
