@@ -6,6 +6,7 @@ import com.ll.MOIZA.boundedContext.result.repository.ResultRepository;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
 
+import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.RequiredArgsConstructor;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -68,7 +69,7 @@ public class ResultService {
         String id;
 
         // Chrome 드라이버 경로 설정
-        System.setProperty("webdriver.chrome.driver", "chromedriver.exe");
+        WebDriverManager.chromedriver().setup();
         // Headless Chrome 옵션 설정
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
