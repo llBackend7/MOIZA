@@ -84,6 +84,9 @@ public class ResultService {
         // Headless Chrome 옵션 설정
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless");
+        options.addArguments("--disable-dev-shm-usage");
+        options.addArguments("--no-sandbox");
+
         // Chrome WebDriver 인스턴스 생성
         WebDriver driver = new ChromeDriver(service, options);
 
