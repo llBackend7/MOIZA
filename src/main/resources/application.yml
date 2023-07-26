@@ -38,3 +38,4 @@ custom:
     baseUrl:
   webdriver:
     port: 9515
+    path: "path"

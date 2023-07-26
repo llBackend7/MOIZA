@@ -49,9 +49,9 @@ public class ResultService {
             nonParticipationMembers = (timeRangeWithMember.getNonParticipationMembers() != null) ? timeRangeWithMember.getNonParticipationMembers() : null;
         }
 
-        if(decidedPlace != null) {
-            placeId = getPlaceId(decidedPlace);
-        }
+//        if(decidedPlace != null) {
+//            placeId = getPlaceId(decidedPlace);
+//        }
 
         DecidedResult result = DecidedResult.builder()
                 .decidedDayTime(decidedDateTime)
