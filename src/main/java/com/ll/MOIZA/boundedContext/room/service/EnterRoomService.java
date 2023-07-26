@@ -2,6 +2,7 @@ package com.ll.MOIZA.boundedContext.room.service;
 
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.room.controller.RoomController;
+import com.ll.MOIZA.boundedContext.room.controller.RoomController.SelectedDayWithTime;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
@@ -10,8 +11,14 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.mapping.Collection;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -54,7 +61,9 @@ public class EnterRoomService {
         enterRoomRepository.delete(enterRoom);
         enterRoom = enter(room, member);
 
-        for (RoomController.SelectedDayWithTime selectedDayWhitTime : selectedDayWhitTimesList) {
+        List<RoomController.SelectedDayWithTime> nonOverlappingTimeList = removeOverlappingTime(selectedDayWhitTimesList);
+
+        for (RoomController.SelectedDayWithTime selectedDayWhitTime : nonOverlappingTimeList) {
             selectedTimeService.CreateSelectedTime(
                     selectedDayWhitTime.getDate(),
                     selectedDayWhitTime.getStartTime(),
@@ -65,6 +74,45 @@ public class EnterRoomService {
 
         return enterRoom;
     }
+
+    private List<RoomController.SelectedDayWithTime> sortList(
+            List<RoomController.SelectedDayWithTime> inputList) {
+
+        List<RoomController.SelectedDayWithTime> sortedList = new ArrayList<>(inputList);
+
+        sortedList.sort(Comparator.comparing(RoomController.SelectedDayWithTime::getStartTime));
+
+        return sortedList;
+    }
+    public List<RoomController.SelectedDayWithTime> removeOverlappingTime (List<RoomController.SelectedDayWithTime> inputList){
+
+        List<RoomController.SelectedDayWithTime> sortedList = new ArrayList<>(sortList(inputList));
+
+        List<RoomController.SelectedDayWithTime> nonOverlapping = new ArrayList<>();
+
+        RoomController.SelectedDayWithTime prevInterval = null;
+
+        for (RoomController.SelectedDayWithTime interval : sortedList) {
+            if (prevInterval == null) {
+                prevInterval = interval;
+                nonOverlapping.add(interval);
+            } else {
+                LocalTime prevEndTime = prevInterval.getEndTime();
+                LocalTime currentStartTime = interval.getStartTime();
+                LocalTime currentEndTime = interval.getEndTime();
+
+                if (currentStartTime.isAfter(prevEndTime)) {
+                    nonOverlapping.add(interval);
+                    prevInterval = interval;
+                } else if (currentEndTime.isAfter(prevEndTime)) {
+                    prevInterval.setEndTime(currentEndTime);
+                }
+            }
+        }
+
+        return nonOverlapping;
+    }
+
     public Optional<EnterRoom> findByMemberIdAndRoomId(Long memberId, Long roomId) {
         return enterRoomRepository.findByMemberIdAndRoomId(memberId, roomId);
     }
