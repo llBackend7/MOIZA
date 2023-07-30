@@ -117,6 +117,10 @@ public class EnterRoomService {
         return enterRoomRepository.findByMemberIdAndRoomId(memberId, roomId);
     }
 
+    public List<Member> findMembersByRoom(Room room) {
+        return enterRoomRepository.findMembersByRoom(room);
+    }
+
     @Transactional
     public void leaveEnterRoom(Room room, Member actor) {
         Optional<EnterRoom> opEnterRoom = enterRoomRepository.findByRoomAndMember(room, actor);

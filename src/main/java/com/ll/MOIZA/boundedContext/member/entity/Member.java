@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
-public class Member extends BaseEntity {
+public class Member extends BaseEntity  implements Comparable<Member> {
     @Column(unique = true)
     private String name;
     private String email;
@@ -51,5 +51,10 @@ public class Member extends BaseEntity {
         authorities.add(new SimpleGrantedAuthority("USER"));
 
         return authorities;
+    }
+
+    @Override
+    public int compareTo(Member o) {
+        return name.compareTo(o.name);
     }
 }
