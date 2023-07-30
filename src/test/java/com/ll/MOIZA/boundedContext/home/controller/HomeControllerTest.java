@@ -80,7 +80,7 @@ class HomeControllerTest {
     @WithUserDetails("user1")
     void showHomeTest() throws Exception {
         Member member = memberService.findByName("user1");
-        assertThat(member.getEnterRooms().size()).isEqualTo(2);
+        assertThat(member.getEnterRooms().size()).isEqualTo(3);
 
         mvc.perform(get("/groups"))
                 .andExpect(handler().methodName("home"))

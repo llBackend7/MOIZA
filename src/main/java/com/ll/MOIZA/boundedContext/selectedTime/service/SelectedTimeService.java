@@ -1,41 +1,39 @@
 package com.ll.MOIZA.boundedContext.selectedTime.service;
 
+import com.ll.MOIZA.boundedContext.calculater.service.DateTimeToMembersService;
 import com.ll.MOIZA.boundedContext.room.entity.EnterRoom;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
+import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
 import com.ll.MOIZA.boundedContext.selectedTime.dto.SelectedTimeDto;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
-import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.server.ResponseStatusException;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.List;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class SelectedTimeService {
+
     private final SelectedTimeRepository selectedTimeRepository;
-    private final RestTemplate restTemplate;
+    private final DateTimeToMembersService dateTimeToMembersService;
+    private final EnterRoomRepository enterRoomRepository;
     @Value("${custom.site.calculatorUrl}")
     private String calculatorUrl;
 
     @Transactional
     public SelectedTime CreateSelectedTime(LocalDate day,
-                                           LocalTime startTime,
-                                           LocalTime endTime,
-                                           EnterRoom enterRoom) {
+            LocalTime startTime,
+            LocalTime endTime,
+            EnterRoom enterRoom) {
         validDate(enterRoom.getRoom(), day);
         validTime(enterRoom.getRoom(), startTime, endTime);
         SelectedTime selectedTime = SelectedTime.builder()
@@ -44,10 +42,13 @@ public class SelectedTimeService {
                 .endTime(endTime)
                 .enterRoom(enterRoom)
                 .build();
+        dateTimeToMembersService.addDateTimeToMembers(enterRoom.getRoom(), selectedTime,
+                enterRoom.getMember());
 
         enterRoom.getSelectedTimes().add(selectedTime);
         return selectedTimeRepository.save(selectedTime);
     }
+
     @Transactional
     public SelectedTime addSelectedTime(SelectedTimeDto selectedTimeDto, EnterRoom enterRoom) {
         Integer[] dayArray = Arrays.stream(selectedTimeDto.getDay().split("-"))
@@ -61,6 +62,8 @@ public class SelectedTimeService {
         LocalTime start = LocalTime.of(startArray[0], startArray[1]);
         LocalTime end = LocalTime.of(endArray[0], endArray[1]);
         SelectedTime selectedTime = CreateSelectedTime(day, start, end, enterRoom);
+        dateTimeToMembersService.setDateTimeToMembers(enterRoom.getRoom().getId(), day, start,
+                enterRoom.getMember());
         return selectedTime;
     }
 
@@ -95,21 +98,8 @@ public class SelectedTimeService {
         }
     }
 
-    @SneakyThrows
     public List<TimeRangeWithMember> findOverlappingTimeRanges(Room room) {
-        String url = calculatorUrl + "/selected-time/" + room.getId();
-
-        ResponseEntity<List<TimeRangeWithMember>> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<>() {
-                });
-
-        if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new ResponseStatusException(response.getStatusCode(), "계산 API로부터 값을 가져오던 중 문제가 발생했습니다.");
-        }
-
-        return response.getBody();
+        return dateTimeToMembersService.getFindTOP10(room.getId(),
+                enterRoomRepository.findMembersByRoom(room));
     }
 }
