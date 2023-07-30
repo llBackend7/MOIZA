@@ -3,8 +3,8 @@ package com.ll.MOIZA.boundedContext.calculater.service;
 import com.ll.MOIZA.boundedContext.calculater.entity.DateTimeToMembers;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
-import com.ll.MOIZA.boundedContext.room.service.EnterRoomService;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
+import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,19 +14,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class DateTimeToMembersService {
 
     static final int RANK_NUM = 10;
-    @Autowired
-    RoomService roomService;
-
-    @Autowired
-    EnterRoomService enterRoomService;
-
+    private final RoomService roomService;
     private final Map<Long, DateTimeToMembers> dateTimeToMembersStorage = new ConcurrentHashMap<>();
 
     public DateTimeToMembers getDateTimeToMembers(Long roomId) {
@@ -48,7 +44,23 @@ public class DateTimeToMembersService {
         dateTimeToMembers.deleteDateTimeToMembers(localDateTime, member);
     }
 
-    public List<TimeRangeWithMember> getFindTOP10(Long roomId) {
+    public void addDateTimeToMembers(Room room, SelectedTime selectedTime, Member member) {
+
+        LocalDate date = selectedTime.getDate();
+        LocalTime startTime = selectedTime.getStartTime();
+        LocalTime endTime = selectedTime.getEndTime();
+        LocalTime meetingDuration = room.getMeetingDuration();
+        LocalTime curTime = startTime.plusHours(meetingDuration.getHour())
+                .plusMinutes(meetingDuration.getMinute());
+
+        while (!curTime.isAfter(endTime)) {
+            setDateTimeToMembers(room.getId(), date, startTime, member);
+            curTime = curTime.plusMinutes(30);
+            startTime = startTime.plusMinutes(30);
+        }
+    }
+
+    public List<TimeRangeWithMember> getFindTOP10(Long roomId, List<Member> allMembers) {
         DateTimeToMembers dateTimeToMembers = getDateTimeToMembers(roomId);
         Room room = roomService.getRoom(roomId);
 
@@ -56,7 +68,7 @@ public class DateTimeToMembersService {
                 .limit(RANK_NUM)
                 .map(entry -> {
                     List<Member> contain = new ArrayList<>(entry.getValue());
-                    List<Member> noContain = getNotContaion(room, contain);
+                    List<Member> noContain = getNotContaion(allMembers, contain);
 
                     return new TimeRangeWithMember(
                             entry.getKey().toLocalDate(),
@@ -71,8 +83,8 @@ public class DateTimeToMembersService {
                 .collect(Collectors.toList());
     }
 
-    private List<Member> getNotContaion(Room room, List<Member> contain) {
-        List<Member> noContain = enterRoomService.findMembersByRoom(room);
+    private List<Member> getNotContaion(List<Member> allMembers, List<Member> contain) {
+        List<Member> noContain = new ArrayList<>(allMembers);
         contain.forEach(noContain::remove);
         return noContain;
     }

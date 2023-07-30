@@ -7,6 +7,10 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,19 +18,14 @@ import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
-public class Member extends BaseEntity  implements Comparable<Member> {
+public class Member extends BaseEntity implements Comparable<Member> {
+
     @Column(unique = true)
     private String name;
     private String email;
@@ -56,5 +55,24 @@ public class Member extends BaseEntity  implements Comparable<Member> {
     @Override
     public int compareTo(Member o) {
         return name.compareTo(o.name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        Member member = (Member) o;
+
+        return Objects.equals(this.getId(), member.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this.getId());
     }
 }
