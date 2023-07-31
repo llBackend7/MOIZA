@@ -9,6 +9,7 @@ import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.repository.SelectedTimeRepository;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -99,7 +100,12 @@ public class SelectedTimeService {
     }
 
     public List<TimeRangeWithMember> findOverlappingTimeRanges(Room room) {
+        return dateTimeToMembersService.findOverlappingTimeRanges(room.getId(),
+                new ArrayList<>());
+    }
+
+    public List<TimeRangeWithMemberDTO> Top10(Room room) {
         return dateTimeToMembersService.getFindTOP10(room.getId(),
-                enterRoomRepository.findMembersByRoom(room));
+                new ArrayList<>());
     }
 }

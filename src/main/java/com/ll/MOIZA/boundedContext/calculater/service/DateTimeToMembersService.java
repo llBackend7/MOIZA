@@ -1,11 +1,13 @@
 package com.ll.MOIZA.boundedContext.calculater.service;
 
 import com.ll.MOIZA.boundedContext.calculater.entity.DateTimeToMembers;
+import com.ll.MOIZA.boundedContext.member.dto.MemberDTO;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedTime.entity.SelectedTime;
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
+import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMemberDTO;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -60,7 +62,31 @@ public class DateTimeToMembersService {
         }
     }
 
-    public List<TimeRangeWithMember> getFindTOP10(Long roomId, List<Member> allMembers) {
+    public List<TimeRangeWithMemberDTO> getFindTOP10(Long roomId, List<Member> allMembers) {
+        DateTimeToMembers dateTimeToMembers = getDateTimeToMembers(roomId);
+        Room room = roomService.getRoom(roomId);
+
+        return dateTimeToMembers.getSortedEntries().stream()
+                .limit(RANK_NUM)
+                .map(entry -> {
+                    List<MemberDTO> contain = getMembersDto(new ArrayList<>(entry.getValue()));
+// todo
+//                    List<MemberDTO> noContain = getNotContaion(allMembers, contain);
+
+                    return new TimeRangeWithMemberDTO(
+                            entry.getKey().toLocalDate(),
+                            entry.getKey().toLocalTime(),
+                            entry.getKey().toLocalTime()
+                                    .plusHours(room.getMeetingDuration().getHour())
+                                    .plusMinutes(room.getMeetingDuration().getMinute()),
+                            contain,
+                            new ArrayList<>()
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
+    public List<TimeRangeWithMember> findOverlappingTimeRanges(Long roomId, List<Member> allMembers) {
         DateTimeToMembers dateTimeToMembers = getDateTimeToMembers(roomId);
         Room room = roomService.getRoom(roomId);
 
@@ -76,8 +102,8 @@ public class DateTimeToMembersService {
                             entry.getKey().toLocalTime()
                                     .plusHours(room.getMeetingDuration().getHour())
                                     .plusMinutes(room.getMeetingDuration().getMinute()),
-                            new ArrayList<>(contain),
-                            new ArrayList<>(noContain)
+                            contain,
+                            noContain
                     );
                 })
                 .collect(Collectors.toList());
@@ -87,5 +113,12 @@ public class DateTimeToMembersService {
         List<Member> noContain = new ArrayList<>(allMembers);
         contain.forEach(noContain::remove);
         return noContain;
+    }
+
+    private List<MemberDTO> getMembersDto(List<Member> members) {
+        return members.stream()
+                .map(member -> new MemberDTO(member.getId(), member.getName(),
+                        member.getEmail(), member.getProfile()))
+                .collect(Collectors.toList());
     }
 }

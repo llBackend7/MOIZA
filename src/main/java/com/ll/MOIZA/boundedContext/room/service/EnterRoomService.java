@@ -58,8 +58,8 @@ public class EnterRoomService {
     public EnterRoom enterRoomWithSelectedTime(Room room, Member member,
             List<RoomController.SelectedDayWithTime> selectedDayWhitTimesList) {
         EnterRoom enterRoom = enter(room, member);
-        enterRoomRepository.delete(enterRoom);
-        enterRoom = enter(room, member);
+//        enterRoomRepository.delete(enterRoom);
+//        enterRoom = enter(room, member);
 
         List<RoomController.SelectedDayWithTime> nonOverlappingTimeList = removeOverlappingTime(selectedDayWhitTimesList);
 

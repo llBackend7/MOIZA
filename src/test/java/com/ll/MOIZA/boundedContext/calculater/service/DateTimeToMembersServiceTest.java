@@ -1,11 +1,13 @@
 package com.ll.MOIZA.boundedContext.calculater.service;
 
+import com.ll.MOIZA.boundedContext.member.dto.MemberDTO;
 import com.ll.MOIZA.boundedContext.member.entity.Member;
 import com.ll.MOIZA.boundedContext.member.repository.MemberRepository;
 import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
+import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMemberDTO;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -72,18 +74,18 @@ class DateTimeToMembersServiceTest {
 
         System.out.println(treeMap);
 
-        List<TimeRangeWithMember> overlappingRanges = dateTimeToMembersService.getFindTOP10(roomId,
+        List<TimeRangeWithMemberDTO> overlappingRanges = dateTimeToMembersService.getFindTOP10(roomId,
                 enterRoomRepository.findMembersByRoom(room));
 
-        for (TimeRangeWithMember t : overlappingRanges) {
+        for (TimeRangeWithMemberDTO t : overlappingRanges) {
             System.out.println(t.getDate() + " | " + t.getStart() + "~" + t.getEnd());
             System.out.print("참가자 : ");
-            for (Member m : t.getParticipationMembers()) {
+            for (MemberDTO m : t.getParticipationMembers()) {
                 System.out.print(m.getName() + " ");
             }
             System.out.println();
             System.out.print("불참자 : ");
-            for (Member m : t.getNonParticipationMembers()) {
+            for (MemberDTO m : t.getNonParticipationMembers()) {
                 System.out.print(m.getName() + " ");
             }
             System.out.println();
@@ -92,18 +94,18 @@ class DateTimeToMembersServiceTest {
         dateTimeToMembersService.deleteDateTimeToMembers(roomId, LocalDate.now().plusDays(1),
                 LocalTime.of(0, 0, 0), member3);
 
-        List<TimeRangeWithMember> overlappingRanges2 = dateTimeToMembersService.getFindTOP10(roomId,
+        List<TimeRangeWithMemberDTO> overlappingRanges2 = dateTimeToMembersService.getFindTOP10(roomId,
                 enterRoomRepository.findMembersByRoom(room));
 
-        for (TimeRangeWithMember t : overlappingRanges2) {
+        for (TimeRangeWithMemberDTO t : overlappingRanges2) {
             System.out.println(t.getDate() + " | " + t.getStart() + "~" + t.getEnd());
             System.out.print("참가자 : ");
-            for (Member m : t.getParticipationMembers()) {
+            for (MemberDTO m : t.getParticipationMembers()) {
                 System.out.print(m.getName() + " ");
             }
             System.out.println();
             System.out.print("불참자 : ");
-            for (Member m : t.getNonParticipationMembers()) {
+            for (MemberDTO m : t.getNonParticipationMembers()) {
                 System.out.print(m.getName() + " ");
             }
             System.out.println();

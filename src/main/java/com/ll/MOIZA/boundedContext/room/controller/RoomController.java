@@ -16,15 +16,25 @@ import com.ll.MOIZA.boundedContext.selectedPlace.entity.SelectedPlace;
 import com.ll.MOIZA.boundedContext.selectedPlace.service.SelectedPlaceService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.SelectedTimeService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
+import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMemberDTO;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import java.io.IOException;
+import java.security.GeneralSecurityException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AuthorizationServiceException;
@@ -38,18 +48,16 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
-import java.io.IOException;
-import java.security.GeneralSecurityException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -183,7 +191,7 @@ public class RoomController {
 
             addUserAuthority(user, roomId);
 
-            enterRoomService.clearCache(room);
+//            enterRoomService.clearCache(room);
 
             Map<String, String> response = new HashMap<>();
             response.put("redirectUrl", String.format("/room/%d/place", roomId));
@@ -208,10 +216,10 @@ public class RoomController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{roomId}/selected-time")
     @ResponseBody
-    public List<TimeRangeWithMember> selectedTimes(@PathVariable Long roomId) {
+    public List<TimeRangeWithMemberDTO> selectedTimes(@PathVariable Long roomId) {
         Room room = roomService.getRoom(roomId);
 
-        return selectedTimeService.findOverlappingTimeRanges(room);
+        return selectedTimeService.Top10(room);
     }
 
     @GetMapping("/{roomId}/place")

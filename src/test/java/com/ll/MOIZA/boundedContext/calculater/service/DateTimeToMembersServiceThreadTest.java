@@ -9,6 +9,7 @@ import com.ll.MOIZA.boundedContext.room.entity.Room;
 import com.ll.MOIZA.boundedContext.room.repository.EnterRoomRepository;
 import com.ll.MOIZA.boundedContext.room.service.RoomService;
 import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMember;
+import com.ll.MOIZA.boundedContext.selectedTime.service.TimeRangeWithMemberDTO;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -94,10 +95,10 @@ public class DateTimeToMembersServiceThreadTest {
                 e.printStackTrace();
             }
 
-            List<TimeRangeWithMember> overlappingRanges = dateTimeToMembersService.getFindTOP10(
+            List<TimeRangeWithMemberDTO> overlappingRanges = dateTimeToMembersService.getFindTOP10(
                     ROOM_ID, enterRoomRepository.findMembersByRoom(room));
             for (int j = 0; j < 10; j++) {
-                TimeRangeWithMember tm = overlappingRanges.get(j);
+                TimeRangeWithMemberDTO tm = overlappingRanges.get(j);
                 int finalJ = j;
                 assertAll(
                         () -> assertThat(tm.getDate()).isEqualTo(LocalDate.now().plusDays(6)),
